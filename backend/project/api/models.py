@@ -1,7 +1,10 @@
 from django.db import models
 
 from django.contrib.auth.models import AbstractUser,Group,Permission
+from django.contrib.auth.base_user import AbstractBaseUser,BaseUserManager
+from django.core.mail import send_mail
 from django.db import models
+from django.db.models import JSONField
 from django.utils.translation import gettext_lazy as _
 
 # Create your models here.
@@ -13,14 +16,16 @@ class Company(models.Model):
         return self.name 
     
 class User(AbstractUser):
-    user_public_id = models.CharField(max_length = 255, unique = True)
     user_public_name = models.CharField(max_length = 48, null = True, blank = True)
+    email = models.EmailField(_('email address'))
     is_company_user = models.BooleanField(default = False)
     company = models.ForeignKey(Company, on_delete = models.CASCADE, null = True, blank = True)
-    company_user_id = models.CharField(max_length = 255, null = True, blank = True)
+    company_user_id = models.CharField(max_length = 255, null = True, blank = True) # いる？
     
     problem_create_cnt = models.IntegerField(default = 0)
     problem_slv_cnt = models.IntegerField(default = 0)
+    
+    USERNAME_FIELD = 'username'
     
     groups = models.ManyToManyField(
         Group,
@@ -42,3 +47,55 @@ class User(AbstractUser):
     
     def __str__(self):
         return self.username
+
+
+    class Meta:
+        unique_together = (('company','company_user_id'),)
+    
+    def __str__(self):
+        return str(self.username)
+
+
+class Workbook(models.Model):
+    workbook_id = models.AutoField(primary_key=True)
+    workbook_name = models.CharField(max_length=48)
+    description = models.TextField(blank=True, null=True)
+    create_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    create_date = models.DateField()
+    update_date = models.DateField(null=True, blank=True)
+    is_public = models.BooleanField(default=True)
+    json_data = JSONField()
+    
+    categories = models.ManyToManyField('Category', through='WorkbookCategory')
+    def __str__(self):
+        return self.workbook_name
+
+class Category(models.Model):
+    category_id = models.AutoField(primary_key=True, unique=True)
+    category_name = models.CharField(max_length=25)
+
+    def __str__(self):
+        return self.category_name
+
+class WorkbookCategory(models.Model):
+    workbook = models.ForeignKey(Workbook, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.workbook} - {self.category}'
+
+class Contract(models.Model):
+    contract_id = models.IntegerField(primary_key=True, unique=True)
+    company_id = models.CharField(max_length=4, null=True, blank=True)
+    start_date = models.DateField()
+    end_date = models.DateField()
+
+    def __str__(self):
+        return str(self.contract_id)
+
+class Csv(models.Model):
+    company_user_id = models.IntegerField(primary_key=True, unique=True)
+    company_user_name = models.CharField(max_length=20)
+
+    def __str__(self):
+        return f"{self.company_user_id} - {self.company_user_name}"
