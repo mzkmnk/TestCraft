@@ -9,6 +9,7 @@ import {
 import LoginForm from "./LoginForm";
 import MyPage from "./Mypage";
 import Signup from "./Signup";
+import QuestionsAll from "./QuestionsAll";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/login" element = {<LoginForm />} />
         <Route path="/mypage" element = {<MyPage />} />
         <Route path="/signup" element = {<Signup />} />
+        <Route path="/questionsAll" element = {<QuestionsAll />} />
       </Routes>
     </Router>
   );

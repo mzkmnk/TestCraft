@@ -69,3 +69,39 @@ def check_auth(request):
 def logout_user(request):
     django_logout(request)
     return JsonResponse({"success": True}, status=200)
+
+# 問題を取得するAPI
+@api.get("/questionsall")
+def questionsall(request):
+    try:
+        workbooks = Workbook.objects.filter(is_public = True).order_by('-create_date').values(
+            'workbook_id',
+            'workbook_name',
+            'description',
+            'json_data',
+            'create_id__username',
+            'create_date',
+            'update_date'
+        )
+        workbooks_with_categories = []
+        for workbook in workbooks:
+            categories = WorkbookCategory.objects.filter(workbook_id=workbook['workbook_id']).values_list('category__category_name', flat=True)
+            workbooks_with_categories.append({
+                **workbook,
+                'categories': list(categories)
+            })
+        return JsonResponse(
+            {
+                'success' : True,
+                'workbook' : workbooks_with_categories
+            },
+            status = 200
+            )
+    except Exception as e:
+        return JsonResponse(
+            {
+                'success' : False,
+                'workbook' : None
+            },
+            status = 400
+            )
