@@ -57,7 +57,7 @@ const UserHeader = () => {
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            アプリ名
+            TestCraft
           </Typography>
           {isLoggedIn ? (
             <>
@@ -122,8 +122,20 @@ const UserHeader = () => {
                 onClose={handleMenuClose}
                 TransitionComponent={Fade}
               >
-                <MenuItem onClick={handleMenuClose}>問題一覧</MenuItem>
-                <MenuItem onClick={handleMenuClose}>問題作成</MenuItem>
+                <MenuItem
+                  component={Link}
+                  to="/questionsAll"
+                  onClick={handleMenuClose}
+                >
+                  問題一覧
+                </MenuItem>
+                <MenuItem
+                  // component={Link}
+                  // to="/questions/create"
+                  onClick={handleMenuClose}
+                >
+                  問題作成
+                </MenuItem>
               </Menu>
             </>
           ) : (
@@ -139,7 +151,7 @@ const UserHeader = () => {
               <Button
                 color="inherit"
                 component={Link}
-                to="/register"
+                to="/signup"
                 style={{ cursor: 'pointer' }}
               >
                 登録

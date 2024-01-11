@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
@@ -21,6 +21,24 @@ function Signup() {
   const [user_email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isCorporate, setIsCorporate] = useState(false);
+
+  useEffect(() => {
+    fetch('http://localhost:8000/api/check_auth', {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.authenticated === true) {
+          navigate('/mypage');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  }, [navigate]);
 
   const handleSignup = async () => {
     try {
