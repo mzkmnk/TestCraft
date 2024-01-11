@@ -20,7 +20,8 @@ function Signup() {
   const [username, setUsername] = useState('');
   const [user_email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isCorporate, setIsCorporate] = useState(false);
+  const [is_company_user,setIsCompanyUser] = useState(false);
+  const [is_own_company, setIsOwnCompany] = useState(false);
 
   useEffect(() => {
     fetch('http://localhost:8000/api/check_auth', {
@@ -52,17 +53,32 @@ function Signup() {
             "username" : username,
             "email" : user_email,
             "password" : password,
-            "is_company_user" : isCorporate,
+            "is_company_user" : is_company_user,
+            "is_own_company" : is_own_company,
         }
         ),
       });
-
       if (response.ok) {
         localStorage.setItem('username', username);
-        if (isCorporate) {
-          navigate('/company_form');
-        } else {
-            navigate('/mypage');
+        const is_login_response = await fetch('http://localhost:8000/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(
+              {
+              "username" : username,
+              "password" : password,
+          }
+          ),
+          credentials: 'include',
+        });
+        if(is_login_response.ok){
+          localStorage.setItem('is_own_company', is_own_company);
+          navigate('/mypage');
+        }
+        else{
+          console.error('Login failed');
         }
       } else {
         console.error('Signup failed');
@@ -134,8 +150,12 @@ function Signup() {
                 onChange={(e) => setPassword(e.target.value)}
               />
               <FormControlLabel
-                control={<Checkbox value={isCorporate} onChange={(e) => setIsCorporate(e.target.checked)} color="primary" />}
-                label="企業の方はチェックを入れてください"
+                control={<Checkbox value={is_own_company} onChange={(e) => setIsOwnCompany(e.target.checked)} color="primary" />}
+                label="企業の代表の方はチェックを入れてください"
+              />
+              <FormControlLabel 
+                control={<Checkbox value={is_company_user} onChange={(e) => setIsCompanyUser(e.target.checked)} color="primary" />}
+                label="企業の代表ではないが、企業のメンバーの方はチェックを入れてください"
               />
               <Button
                 type="submit"

@@ -10,17 +10,19 @@ from django.utils.translation import gettext_lazy as _
 # Create your models here.
 
 class Company(models.Model):
+    company_id = models.AutoField(max_length=11, primary_key=True)
     name =  models.CharField(max_length=100)
     
     def __str__(self):
-        return self.name 
+        return self.company_id
     
 class User(AbstractUser):
     user_public_name = models.CharField(max_length = 48, null = True, blank = True)
     email = models.EmailField(_('email address'))
-    is_company_user = models.BooleanField(default = False)
     company = models.ForeignKey(Company, on_delete = models.CASCADE, null = True, blank = True)
     company_user_id = models.CharField(max_length = 255, null = True, blank = True) # いる？
+    is_company_user = models.BooleanField(default = False)
+    is_own_company = models.BooleanField(default = False)
     
     problem_create_cnt = models.IntegerField(default = 0)
     problem_slv_cnt = models.IntegerField(default = 0)

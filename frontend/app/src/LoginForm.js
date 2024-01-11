@@ -47,6 +47,7 @@ function LoginForm() {
       if (response.ok) {
         console.log('Login succeeded');
         localStorage.setItem('username', data.username);
+        localStorage.setItem('is_own_company',data.is_own_company);
         navigate('/mypage');
       } else {
         console.error('Login failed');

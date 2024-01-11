@@ -13,6 +13,7 @@ const UserHeader = () => {
   const navigate = useNavigate();
   const username = localStorage.getItem('username');
   const isLoggedIn = !!username;
+  const isOwnCompany = localStorage.getItem('is_own_company');
 
   const [userMenuAnchorEl, setUserMenuAnchorEl] = React.useState(null);
   const [questionsMenuAnchorEl, setQuestionsMenuAnchorEl] = React.useState(null);
@@ -86,6 +87,13 @@ const UserHeader = () => {
                 >
                   マイステータス
                 </MenuItem>
+                <MenuItem
+                  component={Link}
+                  to="/mypage/message"
+                  onClick={handleMenuClose}
+                >
+                  メッセージ
+                </MenuItem>
                 <MenuItem 
                   component={Link} 
                   to="/mypage/mycreate"
@@ -136,6 +144,15 @@ const UserHeader = () => {
                 >
                   問題作成
                 </MenuItem>
+                {isOwnCompany && (
+                  <MenuItem
+                    component={Link}
+                    to="/add_user"
+                    onClick={handleMenuClose}
+                  >
+                    ユーザー追加
+                  </MenuItem>
+                )}
               </Menu>
             </>
           ) : (

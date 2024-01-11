@@ -21,11 +21,15 @@ class SignUpSchema(Schema):
     email : str
     password : str
     is_company_user : bool = False
+    is_own_company : bool = False
     
 class LoginSchema(Schema):
     username : str
     password : str
 
+class CompanySignUpSchema(Schema):
+    company_id : str
+    name : str
 
 # API
 # ユーザー登録するAPI
@@ -37,6 +41,7 @@ def signup(request, payload: SignUpSchema):
             email = payload.email,
             password = payload.password,
             is_company_user = payload.is_company_user,
+            is_own_company = payload.is_own_company,
             )
         user.set_password(payload.password)
         user.save()
@@ -54,6 +59,7 @@ def login(request, payload: LoginSchema):
             {
                 "success" : True,
                 "username" : user.username,
+                "is_own_company" : user.is_own_company,
             },
             status = 200
             )
@@ -78,6 +84,19 @@ def logout_user(request):
         },
         status=200
     )
+
+# 会社登録するAPI
+@api.post("/company_signup")
+def company_signup(request,payload: CompanySignUpSchema):
+    try:
+        company = Company.objects.create(
+            company_id = payload.company_id,
+            name = payload.name,
+            )
+        company.save()
+        return JsonResponse({"success":True, "id" : company.company_id },status = 200)
+    except Exception as e:
+        return JsonResponse({"success":False, "message" : str(e) },status = 400)
 
 # 問題を取得するAPI
 @api.get("/questionsall")
@@ -154,3 +173,4 @@ def get_create_user_workbook(request):
             },
             status = 400
             )
+
