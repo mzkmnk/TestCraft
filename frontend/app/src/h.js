@@ -79,30 +79,8 @@ const UserHeader = () => {
                 onClose={handleMenuClose}
                 TransitionComponent={Fade}
               >
-                <MenuItem 
-                  component={Link} 
-                  to="/mypage" 
-                  onClick={handleMenuClose}
-                >
-                  マイステータス
-                </MenuItem>
-                <MenuItem 
-                  component={Link} 
-                  to="/mypage/mycreate"
-                  onClick={handleMenuClose}
-                >
-                  作成履歴
-                </MenuItem>
-                <MenuItem 
-                  component={Link} 
-                  to="/mypage/mysolve" 
-                  onClick={handleMenuClose}
-                >
-                  解答履歴
-                </MenuItem>
-                <MenuItem onClick={handleLogout}>
-                  ログアウト
-                </MenuItem>
+                <MenuItem onClick={handleMenuClose}>マイページ</MenuItem>
+                <MenuItem onClick={handleLogout}>ログアウト</MenuItem>
               </Menu>
               <Button
                 color="inherit"

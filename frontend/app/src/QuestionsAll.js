@@ -7,6 +7,22 @@ function QuestionsAll() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    fetch('http://localhost:8000/api/check_auth', {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      }
+    )
+      .then(response => response.json())
+      .then(data => {
+        if (data.authenticated === false) {
+          navigate('/login');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
     fetch('http://localhost:8000/api/questionsall')
       .then(response => response.json())
       .then(data => {

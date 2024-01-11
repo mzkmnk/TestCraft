@@ -2,6 +2,7 @@ from django.contrib.auth.hashers import make_password
 from ninja import NinjaAPI,Schema
 
 from django.contrib.auth import authenticate
+from django.contrib.auth import login as django_login
 from django.contrib.auth import logout as django_logout
 
 from .models import *
@@ -48,11 +49,14 @@ def signup(request, payload: SignUpSchema):
 def login(request, payload: LoginSchema):
     user = authenticate(username = payload.username, password = payload.password)
     if user:
-        return JsonResponse({
-            "success" : True,
-            "username" : user.username,
+        django_login(request,user)
+        return JsonResponse(
+            {
+                "success" : True,
+                "username" : user.username,
             },
-            status = 200,)
+            status = 200
+            )
     else:
         return JsonResponse({ "success" : False },status = 400)
 
@@ -68,7 +72,12 @@ def check_auth(request):
 @api.post("/logout")
 def logout_user(request):
     django_logout(request)
-    return JsonResponse({"success": True}, status=200)
+    return JsonResponse(
+        {
+            "success": True
+        },
+        status=200
+    )
 
 # 問題を取得するAPI
 @api.get("/questionsall")
@@ -97,6 +106,46 @@ def questionsall(request):
             },
             status = 200
             )
+    except Exception as e:
+        return JsonResponse(
+            {
+                'success' : False,
+                'workbook' : None
+            },
+            status = 400
+            )
+
+# ユーザが作成した問題を取得するAPI
+@api.get("/create_user_workbook")
+def get_create_user_workbook(request):
+    print("session",request.session)
+    print('user',request.user)
+    try:
+        workbooks = Workbook.objects.filter(create_id__id = request.user.id).order_by('-create_date').values(
+            'workbook_id',
+            'workbook_name',
+            'description',
+            'json_data',
+            'create_id__username',
+            'create_date',
+            'update_date'
+        )
+        workbooks_with_categories = []
+        for workbook in workbooks:
+            categories = WorkbookCategory.objects.filter(workbook_id=workbook['workbook_id']).values_list('category__category_name', flat=True)
+            workbooks_with_categories.append({
+                **workbook,
+                'categories': list(categories)
+            })
+        User = request.user
+        print(workbooks_with_categories,User.id)
+        return JsonResponse(
+            {
+                'success' : True,
+                'workbook' : workbooks_with_categories,
+            },
+            status = 200
+        )
     except Exception as e:
         return JsonResponse(
             {
