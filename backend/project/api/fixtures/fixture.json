@@ -20,6 +20,7 @@
         "fields": {
             "username": "MurakamiCompany",
             "user_public_name": "MurakamiCompany",
+            "company":1,
             "email": "company@company.com", 
             "password": "pbkdf2_sha256$720000$E2bY6le4KUgRNnLz9XbBvm$BARpTsheUHuPoFTDVpQ5mAMqGQTj3MBwZ24YVLlkE1s=",
             "is_company_user": false,
@@ -83,6 +84,42 @@
                 "id": "199",
                 "createdAt": "2020-02-20T11:00:28.107Z"
             }
+        }
+    },
+    {
+        "model":"api.useractivity",
+        "fields": {
+            "user":1,
+            "date":"2024-01-01",
+            "problems_solved_count":3,
+            "problems_created_count":2
+        }
+    },
+    {
+        "model":"api.useractivity",
+        "fields": {
+            "user":1,
+            "date":"2024-01-02",
+            "problems_solved_count":1,
+            "problems_created_count":3
+        }
+    },
+    {
+        "model":"api.useractivity",
+        "fields": {
+            "user":1,
+            "date":"2024-01-04",
+            "problems_solved_count":8,
+            "problems_created_count":1
+        }
+    },
+    {
+        "model":"api.useractivity",
+        "fields": {
+            "user":1,
+            "date":"2024-01-08",
+            "problems_solved_count":1,
+            "problems_created_count":7
         }
     }
 ]

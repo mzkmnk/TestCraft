@@ -5,6 +5,8 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login as django_login
 from django.contrib.auth import logout as django_logout
 
+from django.db.models import Sum
+
 from .models import *
 
 from django.http import JsonResponse
@@ -28,7 +30,6 @@ class LoginSchema(Schema):
     password : str
 
 class CompanySignUpSchema(Schema):
-    company_id : str
     name : str
 
 # API
@@ -90,7 +91,6 @@ def logout_user(request):
 def company_signup(request,payload: CompanySignUpSchema):
     try:
         company = Company.objects.create(
-            company_id = payload.company_id,
             name = payload.name,
             )
         company.save()
@@ -174,3 +174,21 @@ def get_create_user_workbook(request):
             status = 400
             )
 
+@api.get("/get_graph_data")
+def get_graph_data(request):
+    print(request.user.company)
+    try:
+        activities = UserActivity.objects.filter(user_id = request.user.id).values('date').annotate(
+            solve_cnt = Sum('problems_solved_count'),
+            create_cnt = Sum('problems_created_count')
+        ).order_by('date')
+        print(activities)
+        data = [{
+            'date': activity['date'].strftime('%Y-%m-%d'),
+            'solve_cnt': activity['solve_cnt'],
+            'create_cnt': activity['create_cnt']}
+            for activity in activities]
+        
+        return JsonResponse({'success':True,'data': data},status = 200)
+    except Exception as e:
+        return JsonResponse({'success':False,'data': None},status = 400)
