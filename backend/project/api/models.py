@@ -50,6 +50,17 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
+class UserActivity(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateField()
+    problems_solved_count = models.IntegerField(default=0)
+    problems_created_count = models.IntegerField(default=0)
+
+    class Meta:
+        unique_together = (('user', 'date'),)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.date}"
 
 class Workbook(models.Model):
     workbook_id = models.AutoField(primary_key=True)
@@ -71,6 +82,7 @@ class Category(models.Model):
 
     def __str__(self):
         return self.category_name
+
 
 class WorkbookCategory(models.Model):
     workbook = models.ForeignKey(Workbook, on_delete=models.CASCADE)
