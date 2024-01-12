@@ -8,6 +8,7 @@ class CustomUser(admin.ModelAdmin):
 admin.site.register(User,CustomUser)
 
 admin.site.register(Company)
+admin.site.register(UserActivity)
 admin.site.register(Workbook)
 admin.site.register(Category)
 admin.site.register(WorkbookCategory)
