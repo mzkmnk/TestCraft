@@ -30,7 +30,6 @@ class LoginSchema(Schema):
     password : str
 
 class CompanySignUpSchema(Schema):
-    company_id : str
     name : str
 
 # API
@@ -92,7 +91,6 @@ def logout_user(request):
 def company_signup(request,payload: CompanySignUpSchema):
     try:
         company = Company.objects.create(
-            company_id = payload.company_id,
             name = payload.name,
             )
         company.save()
@@ -178,12 +176,13 @@ def get_create_user_workbook(request):
 
 @api.get("/get_graph_data")
 def get_graph_data(request):
+    print(request.user.company)
     try:
         activities = UserActivity.objects.filter(user_id = request.user.id).values('date').annotate(
             solve_cnt = Sum('problems_solved_count'),
             create_cnt = Sum('problems_created_count')
         ).order_by('date')
-        print(activities    )
+        print(activities)
         data = [{
             'date': activity['date'].strftime('%Y-%m-%d'),
             'solve_cnt': activity['solve_cnt'],

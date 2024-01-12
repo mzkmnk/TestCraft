@@ -2,6 +2,28 @@ import React, { useState, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
 import { useNavigate } from 'react-router-dom';
 import UserHeader from './UserHeader';
+import 'chartjs-adapter-date-fns';
+import { 
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+} from 'chart.js';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
 
 function MyPage() {
   const navigate = useNavigate();
@@ -32,15 +54,16 @@ function MyPage() {
         credentials: 'include',
       })
         .then(response => response.json())
-        .then(data => {
-          console.log(data);
-          if(data.success){
+        .then(userData => {
+          console.log(userData);
+          if(userData.success && userData.data){
+            const graphdata = userData.data;
             setChartData({
-              labels:data.map(item => item.date),
+              labels:graphdata.map(item => item.date),
               datasets: [
                 {
-                  labels:'問題回答数',
-                  data: data.map(item => item.solve_cnt),
+                  label:'問題回答数',
+                  data: graphdata.map(item => item.solve_cnt),
                   backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
                   ],
@@ -49,8 +72,8 @@ function MyPage() {
                   ],
                 },
                 {
-                  labels:'問題作成数',
-                  data:data.map(item => item.create_cnt),
+                  label:'問題作成数',
+                  data:graphdata.map(item => item.create_cnt),
                   backgroundColor: [
                     'rgba(54, 162, 235, 0.2)',
                   ],
@@ -64,13 +87,39 @@ function MyPage() {
             console.log("グラフデータの取得に失敗しました");
           }
         })
-    }, []);
+  }, [navigate]);
+
+  const options = {
+    scales: {
+      x: {
+        type: 'category',
+        time: {
+          display: true,
+          text: '日付'
+        },
+        title: {
+          display: true,
+          text: 'date'
+        }
+      },
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: 'count'
+        }
+      }
+    },
+    responsive: true,
+    maintainAspectRatio: false
+  };
+
   return (
     <>
       <UserHeader />
-      <div>
+      <div style={{ height: '400px', width: '100%' }}>
         {chartData.labels ? (
-          <Line data={chartData} />
+          <Line data={chartData} options={options} />
         ) : (
           <p>グラフデータがありません or ロード中</p>
         )}
