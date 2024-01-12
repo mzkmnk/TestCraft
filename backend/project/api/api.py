@@ -46,6 +46,13 @@ def signup(request, payload: SignUpSchema):
             )
         user.set_password(payload.password)
         user.save()
+        if payload.is_own_company:
+            company = Company.objects.create(
+                name = payload.username,
+                )
+            company.save()
+            user.company = company
+            user.save()
         return JsonResponse({"success":True, "id" : user.id },status = 200)
     except Exception as e:
         return JsonResponse({"success":False, "message" : str(e) },status = 400)
