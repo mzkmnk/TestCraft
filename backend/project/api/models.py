@@ -10,7 +10,6 @@ from django.utils.translation import gettext_lazy as _
 # Create your models here.
 
 class Company(models.Model):
-    company_id = models.AutoField(primary_key=True)
     name =  models.CharField(max_length=100, unique=True)
     
     def __str__(self):

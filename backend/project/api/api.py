@@ -10,6 +10,10 @@ from .models import *
 from django.http import JsonResponse
 
 
+from django.db import transaction
+import tempfile
+from django.core.files.uploadedfile import UploadedFile
+import pandas as pd
 
 api = NinjaAPI()
 
@@ -30,6 +34,13 @@ class LoginSchema(Schema):
 class CompanySignUpSchema(Schema):
     company_id : str
     name : str
+
+
+class CsvUploadSchema(Schema):
+    csv_file: UploadedFile
+    class Config:
+        arbitrary_types_allowed = True
+
 
 # API
 # ユーザー登録するAPI
@@ -174,3 +185,61 @@ def get_create_user_workbook(request):
             status = 400
             )
 
+#社員ユーザをcvsファイルを用いて一斉に登録するAPI
+@api.post("/file_upload")
+def file_upload(request ,payload:CsvUploadSchema):
+    company_id = request.user.company.company_id
+    print(company_id)
+    try:
+        with transaction.atomic():
+            csv_file=payload.csv_file
+            #csv_file = request.data.get('file')
+            #company_id = request.company_id,
+            
+            with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+                for chunk in csv_file.chunks():
+                    temp_file.write(chunk)
+            csv_pandas= pd.read_csv(temp_file.name, encoding='utf-8')
+            # デバッグ用
+            # print(df)
+            # print("Before conversion:", company_id)
+            user_address = ""
+            company_instance = Company.objects.get(company_id=company_id)
+            if csv_pandas is None:
+                raise ValueError("DataFrame is None. Check CSV file format.")
+            csv_pandas[user_address] = ""
+            for index, row in csv_pandas.iterrows():
+                # 列の名前を使用して値を取得
+                company_user_id = row['company_user_id']
+                username = row['username']
+                user_public_id = company_id + str(company_user_id)
+                user_public_name = username + str(user_public_id).zfill(6)
+                # ここでデータベースに書き込み
+                User.objects.create_user(username=username, password="password", company_user_id=company_user_id, user_public_name=user_public_name, company=company_instance, user_public_id=user_public_id, is_company_user=True)
+                csv_pandas.at[index, 'user_address'] = user_public_name
+            print("-" * 20)
+            #serializer.is_valid()
+            csv_data = csv_pandas.to_csv(index=False)
+            print(type(csv_data))
+
+                #response = self.make_url(csv_data)
+            return JsonResponse({"csv_data": csv_data})
+    except Exception as e:
+        # logger.error(f"ファイル処理中にエラーが発生しました: {e}")
+        return JsonResponse({"message": "ファイルの処理に失敗しました。", "errors": str(e)})
+
+# @transaction.atomic
+# def process_csv_pandas(self, csv_file):
+#         try:
+#             # InMemoryUploadedFileを一時ファイルに保存
+#             with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+#                 for chunk in csv_file.chunks():
+#                     temp_file.write(chunk)
+#             df = pd.read_csv(temp_file.name, encoding='utf-8')
+#             return df
+#         except Exception as e:
+#             logger.error(f"ファイルの処理に失敗: {e}")
+#             return None
+#         finally:
+#             # 一時ファイルを削除
+#             os.remove(temp_file.name)
