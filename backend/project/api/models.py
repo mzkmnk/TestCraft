@@ -11,10 +11,10 @@ from django.utils.translation import gettext_lazy as _
 
 class Company(models.Model):
     company_id = models.AutoField(primary_key=True)
-    name =  models.CharField(max_length=100)
+    name =  models.CharField(max_length=100, unique=True)
     
     def __str__(self):
-        return self.company_id
+        return self.name
     
 class User(AbstractUser):
     user_public_name = models.CharField(max_length = 48, null = True, blank = True)
@@ -49,13 +49,6 @@ class User(AbstractUser):
     
     def __str__(self):
         return self.username
-
-
-    class Meta:
-        unique_together = (('company','company_user_id'),)
-    
-    def __str__(self):
-        return str(self.username)
 
 
 class Workbook(models.Model):

@@ -13,7 +13,7 @@ const UserHeader = () => {
   const navigate = useNavigate();
   const username = localStorage.getItem('username');
   const isLoggedIn = !!username;
-  const isOwnCompany = localStorage.getItem('is_own_company');
+  const isOwnCompany = localStorage.getItem('is_own_company') === 'true';
 
   const [userMenuAnchorEl, setUserMenuAnchorEl] = React.useState(null);
   const [questionsMenuAnchorEl, setQuestionsMenuAnchorEl] = React.useState(null);
@@ -44,6 +44,7 @@ const UserHeader = () => {
       if (response.ok) {
         console.log('Logout succeeded');
         localStorage.removeItem('username');
+        localStorage.removeItem('is_own_company');
         navigate('/login');
       } else {
         console.error('Logout failed');
