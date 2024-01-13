@@ -11,6 +11,7 @@ import MyPage from "./Mypage";
 import Signup from "./Signup";
 import QuestionsAll from "./QuestionsAll";
 import Mycreate from "./Mycreate";
+import Editor from "./Editor.tsx";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/mypage" element = {<MyPage />} />
         <Route path="/signup" element = {<Signup />} />
         <Route path="/questionsAll" element = {<QuestionsAll />} />
+        <Route path="/editor" element = {<Editor />} />
         <Route path="mypage/mycreate" element = {<Mycreate />} />
       </Routes>
     </Router>
