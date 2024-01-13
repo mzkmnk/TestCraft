@@ -77,12 +77,27 @@ export default function Editor() {
 
   // 保存用関数
   function save() {
-    // これを保存してほしい
     workBook = {
       info: {},
       questions: questionTree,
     };
     console.log(JSON.stringify(workBook));
+    const data = JSON.stringify(workBook);
+    fetch('http://localhost:8000/api/save_data',{
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body:data,
+    })
+    .then(response => response.json())
+    .then(data => {
+      if(data.success){
+        console.log("success");
+      }else{
+        console.log("error");
+      }
+    })
   }
 
   // state更新関数群 React Reducerを使うべきではある（コードが分かりにくくなる && 面倒）

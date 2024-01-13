@@ -11,6 +11,9 @@ from .models import *
 
 from django.http import JsonResponse
 
+from pydantic import BaseModel,ValidationError
+from typing import Dict,List,Optional,Union
+
 
 
 api = NinjaAPI()
@@ -31,6 +34,39 @@ class LoginSchema(Schema):
 
 class CompanySignUpSchema(Schema):
     name : str
+class Answer(BaseModel):
+    id: str
+    value: str
+
+class CommonQuestionFields(BaseModel):
+    parentId: Optional[str]
+    question: Optional[str]
+
+class RadioQuestion(CommonQuestionFields):
+    questionType: str = "radio"
+    options: List[Answer]
+    canMultiple: bool
+    answers: List[Answer]
+
+class TextareaQuestion(CommonQuestionFields):
+    questionType: str = "textarea"
+    maxlength: str
+    answers: List[Answer]
+
+class NestedQuestion(CommonQuestionFields):
+    questionType: str = "nested"
+    childIds: List[str]
+
+class Root(BaseModel):
+    questionType: str = "root"
+    title: str
+    childIds: List[str]
+
+Question = Union[Root, NestedQuestion, RadioQuestion, TextareaQuestion]
+
+class JsonFormat(BaseModel):
+    info: Dict
+    questions: Dict[str, Question]
 
 # API
 # ユーザー登録するAPI
@@ -199,3 +235,30 @@ def get_graph_data(request):
         return JsonResponse({'success':True,'data': data},status = 200)
     except Exception as e:
         return JsonResponse({'success':False,'data': None},status = 400)
+    
+@api.post("/save_data")
+def save_data(request,data:JsonFormat):
+    try:
+        return JsonResponse(
+            {
+                'success':True,
+                'error':None,
+            },
+            status = 200
+        )
+    except ValidationError as e:
+        return JsonResponse(
+            {
+                'success':False,
+                'error':e.errors()
+            },
+            status = 400
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                'success':False,
+                'error':str(e)
+            },
+            status = 400
+        )
