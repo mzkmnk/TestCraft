@@ -72,23 +72,22 @@ useEffect(() => {
       marginLeft: '10px',
     },
   };
-
   return (
     <>
-        <UserHeader />
-        <div style={styles.questionsContainer}>
+      <UserHeader />
+      <div style={styles.questionsContainer}>
         {questions.map(question => (
-            <div style={styles.question} key={question.workbook_id} onClick={() => handleQuestionClick(question.workbook_id)}>
-                <div style={styles.questionHeader}>
-                    <h3>{question.workbook_name}</h3>
-                    <span style={styles.createdBy}>created by {question.create_id__username} ({question.create_date})</span>
-                </div>
-                <p>{question.description}</p>
+          <div style={styles.question} key={question.id} onClick={() => handleQuestionClick(question.id)}>
+            <div style={styles.questionHeader}>
+              <h3>{question.workbook_name}</h3>
+              <span style={styles.createdBy}>created by {question.create_id__username} ({question.create_at})</span>
             </div>
+            <p>{question.description}</p>
+          </div>
         ))}
-        </div>
+      </div>
     </>
-    );
+  );
 }
 
 export default Mycreate;

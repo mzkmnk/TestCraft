@@ -41,33 +41,23 @@
     {
         "model":"api.workbook",
         "fields": {
-            "workbook_name":"test1",
-            "description":"test1です",
+            "workbook_name":"テスト1",
+            "description":"テスト1です",
             "create_id": 1,
-            "create_date":"2024-01-11",
-            "is_public":true,
-            "json_data":{
-                "name": "Morpheush",
-                "job": "Leader",
-                "id": "199",
-                "createdAt": "2020-02-20T11:00:28.107Z"
-            }
+            "create_at":"2024-01-01",
+            "update_at":"2024-01-01",
+            "is_public":true
         }
     },
     {
         "model":"api.workbook",
         "fields": {
-            "workbook_name":"test2",
+            "workbook_name":"テスト2",
             "description":"test2です",
             "create_id": 3,
-            "create_date":"2024-01-12",
-            "is_public":false,
-            "json_data":{
-                "name": "Morpheush",
-                "job": "Leader",
-                "id": "199",
-                "createdAt": "2020-02-20T11:00:28.107Z"
-            }
+            "create_at":"2024-01-12",
+            "update_at":"2024-01-12",
+            "is_public":false
         }
     },
     {
@@ -76,14 +66,9 @@
             "workbook_name":"test3",
             "description":"test3です",
             "create_id":3,
-            "create_date":"2024-01-01",
-            "is_public":true,
-            "json_data":{
-                "name": "Morpheush",
-                "job": "Leader",
-                "id": "199",
-                "createdAt": "2020-02-20T11:00:28.107Z"
-            }
+            "create_at":"2024-01-01",
+            "update_at":"2024-01-01",
+            "is_public":true
         }
     },
     {

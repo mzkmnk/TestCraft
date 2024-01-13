@@ -23,16 +23,26 @@ function QuestionsAll() {
       .catch(error => {
         console.error('Error:', error);
       });
-    fetch('http://localhost:8000/api/questionsall')
+    fetch('http://localhost:8000/api/questionsall',{
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    })
       .then(response => response.json())
       .then(data => {
+        console.log(data.success);
         if(data.success)
         {
           setQuestions(data.workbook);
         }
+        else
+        {
+          console.log(data.error);
+        }
       })
       .catch(error => {
-        console.error('Error:', error);
+        console.error('Error:',error);
       });
   }, []);
 
@@ -72,10 +82,10 @@ function QuestionsAll() {
       <UserHeader />
       <div style={styles.questionsContainer}>
         {questions.map(question => (
-          <div style={styles.question} key={question.workbook_id} onClick={() => handleQuestionClick(question.workbook_id)}>
+          <div style={styles.question} key={question.id} onClick={() => handleQuestionClick(question.id)}>
             <div style={styles.questionHeader}>
               <h3>{question.workbook_name}</h3>
-              <span style={styles.createdBy}>created by {question.create_id__username} ({question.create_date})</span>
+              <span style={styles.createdBy}>created by {question.create_id__username} ({question.create_at})</span>
             </div>
             <p>{question.description}</p>
           </div>

@@ -9,6 +9,11 @@ admin.site.register(User,CustomUser)
 
 admin.site.register(Company)
 admin.site.register(UserActivity)
-admin.site.register(Workbook)
+
+class CustomWorkbook(admin.ModelAdmin):
+    list_display = ('workbook_name','id','create_id','is_public')
+    search_fields=('id',)
+
+admin.site.register(Workbook,CustomWorkbook)
 admin.site.register(Category)
 admin.site.register(WorkbookCategory)

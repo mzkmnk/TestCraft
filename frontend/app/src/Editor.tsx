@@ -72,13 +72,17 @@ export default function Editor() {
       },
     };
   }
-  // questionTreeの値は、textareaの入力内容と常に同期する。
-  const [questionTree, setQuestionTree] = useState(workBook.questions);
 
+  // questionTreeの値は、textareaの入力内容と常に同期する。
+  
+  const [questionTree, setQuestionTree] = useState(workBook.questions);
+  const [title, setTitle] = useState("初期タイトル")
   // 保存用関数
   function save() {
     workBook = {
-      info: {},
+      info: {
+        title : title,
+      },
       questions: questionTree,
     };
     console.log(JSON.stringify(workBook));
@@ -89,13 +93,14 @@ export default function Editor() {
         'Content-Type': 'application/json',
       },
       body:data,
+      credentials: 'include',
     })
     .then(response => response.json())
     .then(data => {
       if(data.success){
         console.log("success");
       }else{
-        console.log("error");
+        console.log("error",data.error);
       }
     })
   }
@@ -396,6 +401,15 @@ export default function Editor() {
   return (
     <>
       <UserHeader />
+      <Box sx={{ margin: 2 }}>
+        <Typography variant="h6">タイトル:</Typography>
+        <TextField
+          fullWidth
+          variant="outlined"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+      </Box>
       <Box sx={{ border: 1, margin: 2 }}>
         {questionIds.map((questionId, index) => (
           <QuestionEditor

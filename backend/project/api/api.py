@@ -14,6 +14,8 @@ from django.http import JsonResponse
 from pydantic import BaseModel,ValidationError
 from typing import Dict,List,Optional,Union
 
+from datetime import date
+
 
 
 api = NinjaAPI()
@@ -145,18 +147,17 @@ def company_signup(request,payload: CompanySignUpSchema):
 @api.get("/questionsall")
 def questionsall(request):
     try:
-        workbooks = Workbook.objects.filter(is_public = True).order_by('-create_date').values(
-            'workbook_id',
+        workbooks = Workbook.objects.filter(is_public = True).order_by('-create_at').values(
+            'id',
             'workbook_name',
             'description',
-            'json_data',
             'create_id__username',
-            'create_date',
-            'update_date'
+            'create_at',
+            'update_at',
         )
         workbooks_with_categories = []
         for workbook in workbooks:
-            categories = WorkbookCategory.objects.filter(workbook_id=workbook['workbook_id']).values_list('category__category_name', flat=True)
+            categories = WorkbookCategory.objects.filter(id=workbook['id']).values_list('category__category_name', flat=True)
             workbooks_with_categories.append({
                 **workbook,
                 'categories': list(categories)
@@ -172,7 +173,8 @@ def questionsall(request):
         return JsonResponse(
             {
                 'success' : False,
-                'workbook' : None
+                'workbook' : None,
+                'error' : str(e)
             },
             status = 400
             )
@@ -180,21 +182,18 @@ def questionsall(request):
 # ユーザが作成した問題を取得するAPI
 @api.get("/create_user_workbook")
 def get_create_user_workbook(request):
-    print("session",request.session)
-    print('user',request.user)
     try:
-        workbooks = Workbook.objects.filter(create_id__id = request.user.id).order_by('-create_date').values(
-            'workbook_id',
+        workbooks = Workbook.objects.filter(create_id__id = request.user.id).order_by('-create_at').values(
+            'id',
             'workbook_name',
             'description',
-            'json_data',
             'create_id__username',
-            'create_date',
-            'update_date'
+            'create_at',
+            'update_at'
         )
         workbooks_with_categories = []
         for workbook in workbooks:
-            categories = WorkbookCategory.objects.filter(workbook_id=workbook['workbook_id']).values_list('category__category_name', flat=True)
+            categories = WorkbookCategory.objects.filter(id=workbook['id']).values_list('category__category_name', flat=True)
             workbooks_with_categories.append({
                 **workbook,
                 'categories': list(categories)
@@ -219,13 +218,12 @@ def get_create_user_workbook(request):
 
 @api.get("/get_graph_data")
 def get_graph_data(request):
-    print(request.user.company)
+    print(request.user)
     try:
         activities = UserActivity.objects.filter(user_id = request.user.id).values('date').annotate(
             solve_cnt = Sum('problems_solved_count'),
             create_cnt = Sum('problems_created_count')
         ).order_by('date')
-        print(activities)
         data = [{
             'date': activity['date'].strftime('%Y-%m-%d'),
             'solve_cnt': activity['solve_cnt'],
@@ -239,6 +237,13 @@ def get_graph_data(request):
 @api.post("/save_data")
 def save_data(request,data:JsonFormat):
     try:
+        print(request.user.id)
+        workbook = Workbook.objects.create(
+            workbook_name = data.info['title'],
+            create_id = request.user,
+            create_at = date.today(),
+            update_at = date.today(),
+        ) 
         return JsonResponse(
             {
                 'success':True,
