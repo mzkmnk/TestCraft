@@ -72,6 +72,19 @@ useEffect(() => {
       marginLeft: '10px',
     },
   };
+
+  const likeStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    marginTop: '10px',
+    color: '#1DA1F2',
+    cursor: 'pointer',
+  };
+
+  const likeIconStyle = {
+    marginRight: '5px',
+  };
+
   return (
     <>
       <UserHeader />
@@ -83,6 +96,10 @@ useEffect(() => {
               <span style={styles.createdBy}>created by {question.create_id__username} ({question.create_at})</span>
             </div>
             <p>{question.description}</p>
+            <div style={likeStyle}>
+              <span style={likeIconStyle}>♥</span>
+              <span>{question.like_count}</span>
+            </div>
           </div>
         ))}
       </div>

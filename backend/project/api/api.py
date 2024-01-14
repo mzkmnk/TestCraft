@@ -154,6 +154,7 @@ def questionsall(request):
             'create_id__username',
             'create_at',
             'update_at',
+            'like_count',
         )
         workbooks_with_categories = []
         for workbook in workbooks:
@@ -189,7 +190,8 @@ def get_create_user_workbook(request):
             'description',
             'create_id__username',
             'create_at',
-            'update_at'
+            'update_at',
+            'like_count',   
         )
         workbooks_with_categories = []
         for workbook in workbooks:
@@ -199,7 +201,6 @@ def get_create_user_workbook(request):
                 'categories': list(categories)
             })
         User = request.user
-        print(workbooks_with_categories,User.id)
         return JsonResponse(
             {
                 'success' : True,
@@ -218,7 +219,6 @@ def get_create_user_workbook(request):
 
 @api.get("/get_graph_data")
 def get_graph_data(request):
-    print(request.user)
     try:
         activities = UserActivity.objects.filter(user_id = request.user.id).values('date').annotate(
             solve_cnt = Sum('problems_solved_count'),
@@ -237,7 +237,6 @@ def get_graph_data(request):
 @api.post("/save_data")
 def save_data(request,data:JsonFormat):
     try:
-        print(request.user.id)
         workbook = Workbook.objects.create(
             workbook_name = data.info['title'],
             create_id = request.user,

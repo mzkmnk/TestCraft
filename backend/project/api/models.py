@@ -68,6 +68,7 @@ class Workbook(models.Model):
     create_at = models.DateField()
     update_at = models.DateField()
     is_public = models.BooleanField(default=True)
+    like_count = models.IntegerField(default=0)
     categories = models.ManyToManyField('Category', through='WorkbookCategory')
     
     def __str__(self):
