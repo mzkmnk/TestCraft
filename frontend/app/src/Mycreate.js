@@ -43,7 +43,7 @@ useEffect(() => {
 
   {/*作成画面へ飛ぶように変更する*/}
   const handleQuestionClick = (workbookId) => {
-    navigate(`/questions/${workbookId}`);
+    navigate(`/reeditor/${workbookId}`);
   };
 
   const styles = {
@@ -93,7 +93,7 @@ useEffect(() => {
           <div style={styles.question} key={question.id} onClick={() => handleQuestionClick(question.id)}>
             <div style={styles.questionHeader}>
               <h3>{question.workbook_name}</h3>
-              <span style={styles.createdBy}>created by {question.create_id__username} ({question.create_at})</span>
+              <span style={styles.createdBy}>created by {question.create_id__username} ({question.created_at})</span>
             </div>
             <p>{question.description}</p>
             <div style={likeStyle}>

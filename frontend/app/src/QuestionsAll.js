@@ -47,7 +47,7 @@ function QuestionsAll() {
   }, []);
 
   const handleQuestionClick = (workbookId) => {
-    navigate(`/questionsAll/${workbookId}`);
+    navigate(`/solve/${workbookId}`);
   };
 
   const styles = {
@@ -97,7 +97,7 @@ function QuestionsAll() {
           <div style={styles.question} key={question.id} onClick={() => handleQuestionClick(question.id)}>
             <div style={styles.questionHeader}>
               <h3>{question.workbook_name}</h3>
-              <span style={styles.createdBy}>created by {question.create_id__username} ({question.create_at})</span>
+              <span style={styles.createdBy}>created by {question.create_id__username} ({question.created_at}) </span>
             </div>
             <p>{question.description}</p>
             <div style={likeStyle}>

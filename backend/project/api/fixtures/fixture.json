@@ -44,9 +44,10 @@
             "workbook_name":"テスト1",
             "description":"テスト1です",
             "create_id": 1,
-            "create_at":"2024-01-01",
-            "update_at":"2024-01-01",
-            "is_public":true
+            "created_at":"2024-01-01",
+            "updated_at":"2024-01-01",
+            "is_public":true,
+            "like_count": 4
         }
     },
     {
@@ -55,9 +56,10 @@
             "workbook_name":"テスト2",
             "description":"test2です",
             "create_id": 3,
-            "create_at":"2024-01-12",
-            "update_at":"2024-01-12",
-            "is_public":false
+            "created_at":"2024-01-12",
+            "updated_at":"2024-01-12",
+            "is_public":false,
+            "like_count": 1
         }
     },
     {
@@ -66,9 +68,22 @@
             "workbook_name":"test3",
             "description":"test3です",
             "create_id":3,
-            "create_at":"2024-01-01",
-            "update_at":"2024-01-01",
-            "is_public":true
+            "created_at":"2024-01-01",
+            "updated_at":"2024-01-01",
+            "is_public":true,
+            "like_count": 2
+        }
+    },
+    {
+        "model":"api.workbook",
+        "fields": {
+            "workbook_name":"テスト4",
+            "description":"テスト4です",
+            "create_id": 1,
+            "created_at":"2024-01-09",
+            "updated_at":"2024-01-09",
+            "is_public":true,
+            "like_count":4
         }
     },
     {

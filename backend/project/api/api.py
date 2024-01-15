@@ -70,6 +70,9 @@ class JsonFormat(BaseModel):
     info: Dict
     questions: Dict[str, Question]
 
+class EditorSchema(Schema):
+    workbook_id:int
+
 # API
 # ユーザー登録するAPI
 @api.post("/signup")
@@ -147,13 +150,13 @@ def company_signup(request,payload: CompanySignUpSchema):
 @api.get("/questionsall")
 def questionsall(request):
     try:
-        workbooks = Workbook.objects.filter(is_public = True).order_by('-create_at').values(
+        workbooks = Workbook.objects.filter(is_public = True).order_by('-created_at').values(
             'id',
             'workbook_name',
             'description',
             'create_id__username',
-            'create_at',
-            'update_at',
+            'created_at',
+            'updated_at',
             'like_count',
         )
         workbooks_with_categories = []
@@ -184,13 +187,13 @@ def questionsall(request):
 @api.get("/create_user_workbook")
 def get_create_user_workbook(request):
     try:
-        workbooks = Workbook.objects.filter(create_id__id = request.user.id).order_by('-create_at').values(
+        workbooks = Workbook.objects.filter(create_id__id = request.user.id).order_by('-created_at').values(
             'id',
             'workbook_name',
             'description',
             'create_id__username',
-            'create_at',
-            'update_at',
+            'created_at',
+            'updated_at',
             'like_count',   
         )
         workbooks_with_categories = []
@@ -237,12 +240,20 @@ def get_graph_data(request):
 @api.post("/save_data")
 def save_data(request,data:JsonFormat):
     try:
+        print(data.questions)
+        question_dict = {k:v for k,v in data.questions.items()}
+        for k,v in data.questions.items():
+            print(f"{k=},{type(k)}")
+            print(f"{v=},{type(v)}")
+            print("="*20)
         workbook = Workbook.objects.create(
             workbook_name = data.info['title'],
             create_id = request.user,
-            create_at = date.today(),
-            update_at = date.today(),
-        ) 
+        )
+        Problem.objects.create(
+            workbook_id = Workbook.objects.get(id = workbook.id),
+            problem_json = data.json(),
+        )
         return JsonResponse(
             {
                 'success':True,
@@ -266,3 +277,28 @@ def save_data(request,data:JsonFormat):
             },
             status = 400
         )
+
+import json
+@api.get("/edit_workbook/{workbookId}")
+def edit_workbook(request,workbookId:int):
+    try:
+        json_data = Problem.objects.get(workbook_id = workbookId).problem_json
+        print(json_data)
+        return JsonResponse(
+            {
+                'success': True,
+                'data' : json.loads(json_data),
+                'error' : None,
+            },
+            status = 200
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                'success': False,
+                'data' : None,
+                'error' : str(e),
+            },
+            status = 400
+        )
+        

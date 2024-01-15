@@ -65,20 +65,21 @@ class Workbook(models.Model):
     workbook_name = models.CharField(max_length=48)
     description = models.TextField(blank=True, null=True)
     create_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    create_at = models.DateField()
-    update_at = models.DateField()
+    created_at = models.DateField(auto_now_add=True)
+    updated_at = models.DateField(auto_now=True)
     is_public = models.BooleanField(default=True)
     like_count = models.IntegerField(default=0)
     categories = models.ManyToManyField('Category', through='WorkbookCategory')
     
     def __str__(self):
-        return self.workbook_name
+        return str(self.id)
 
 class Problem(models.Model):
     workbook_id = models.ForeignKey(Workbook, on_delete=models.CASCADE)
-    question = models.TextField()
-    options = JSONField()
-    answer = models.TextField()
+    problem_json = JSONField()
+    
+    def __str__(self):
+        return self.workbook_id.workbook_name
 
 class Category(models.Model):
     category_id = models.AutoField(primary_key=True, unique=True)

@@ -408,6 +408,7 @@ export default function Editor() {
           variant="outlined"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          margin = "normal"
         />
       </Box>
       <Box sx={{ border: 1, margin: 2 }}>
@@ -526,7 +527,7 @@ function QuestionEditor({
       </>
     );
     return (
-      <Box sx={{ border: 1, margin: 2 }}>
+      <Box sx={{ border: 1, margin: 2, padding: 2, borderRadius: 2 }}>
         {questionNumberField}
         {questionTypeSelector}
         {questionField}
@@ -568,8 +569,14 @@ function QuestionEditor({
                 );
               }}
               fullWidth
+              variant="outlined"
+              sx = {{flexGrow:1,merginRight:2}}
             ></TextField>
-            <Button onClick={() => handleRemoveAnswer(questionId, answers.id)}>
+            <Button
+              onClick={() => handleRemoveAnswer(questionId, answers.id)}
+              variant="contained"
+              color="error"
+            >
               解答を削除
             </Button>
           </ListItem>

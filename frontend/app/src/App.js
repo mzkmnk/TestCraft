@@ -12,6 +12,7 @@ import Signup from "./Signup";
 import QuestionsAll from "./QuestionsAll";
 import Mycreate from "./Mycreate";
 import Editor from "./Editor.tsx";
+import Reditor from "./Reeditor.tsx";
 import Mysolve from "./Mysolve";
 import Message from "./Message.js";
 
@@ -24,6 +25,7 @@ function App() {
         <Route path="/signup" element = {<Signup />} />
         <Route path="/questionsAll" element = {<QuestionsAll />} />
         <Route path="/editor" element = {<Editor />} />
+        <Route path="/reeditor/:workbookId" element = {<Reditor />} />
         <Route path="/mypage/mycreate" element = {<Mycreate />} />
         <Route path="/mypage/mysolve" element = {<Mysolve />} />
         <Route path="/mypage/message" element = {<Message />} />
