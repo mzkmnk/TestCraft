@@ -11,6 +11,7 @@ import MyPage from "./Mypage";
 import Signup from "./Signup";
 import QuestionsAll from "./QuestionsAll";
 import Mycreate from "./Mycreate";
+import AddUser from "./add_user";
 
 function App() {
   return (
@@ -21,6 +22,8 @@ function App() {
         <Route path="/signup" element = {<Signup />} />
         <Route path="/questionsAll" element = {<QuestionsAll />} />
         <Route path="mypage/mycreate" element = {<Mycreate />} />
+        <Route path="/add_user" element = {<AddUser />} />
+
       </Routes>
     </Router>
   );

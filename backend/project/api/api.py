@@ -15,6 +15,8 @@ import tempfile
 from django.core.files.uploadedfile import UploadedFile
 import pandas as pd
 
+import numpy as np
+
 api = NinjaAPI()
 
 # ここではスキーマとAPIを同時に設計する。
@@ -37,9 +39,7 @@ class CompanySignUpSchema(Schema):
 
 
 class CsvUploadSchema(Schema):
-    csv_file: UploadedFile
-    class Config:
-        arbitrary_types_allowed = True
+    csv_data :str
 
 
 # API
@@ -186,22 +186,25 @@ def get_create_user_workbook(request):
             )
 
 #社員ユーザをcvsファイルを用いて一斉に登録するAPI
-@api.post("/file_upload")
-def file_upload(request ,payload:CsvUploadSchema):
-    company_id = request.user.company.company_id
+@api.post("/add_user")
+def add_user(request ,payload:CsvUploadSchema):
+    print("Start of the function")
+    company_id = request.user.company.id
     print(company_id)
     try:
         with transaction.atomic():
-            csv_file=payload.csv_file
-            #csv_file = request.data.get('file')
-            #company_id = request.company_id,
             
+            data=payload.csv_data
+            print(data)
             with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-                for chunk in csv_file.chunks():
-                    temp_file.write(chunk)
-            csv_pandas= pd.read_csv(temp_file.name, encoding='utf-8')
+                # CSVデータを一時ファイルに書き込む
+                temp_file.write(data.encode('utf-8'))
+
+            # CSVデータをPandas DataFrameに読み込む
+            csv_pandas = pd.read_csv(temp_file.name, encoding='utf-8')
+
             # デバッグ用
-            # print(df)
+            print(csv_data)
             # print("Before conversion:", company_id)
             user_address = ""
             company_instance = Company.objects.get(company_id=company_id)
@@ -220,13 +223,18 @@ def file_upload(request ,payload:CsvUploadSchema):
             print("-" * 20)
             #serializer.is_valid()
             csv_data = csv_pandas.to_csv(index=False)
-            print(type(csv_data))
+            print(csv_data)
 
                 #response = self.make_url(csv_data)
-            return JsonResponse({"csv_data": csv_data})
+            return JsonResponse({"csv_data": csv_data,"errors":None})
     except Exception as e:
         # logger.error(f"ファイル処理中にエラーが発生しました: {e}")
-        return JsonResponse({"message": "ファイルの処理に失敗しました。", "errors": str(e)})
+        return JsonResponse(
+            {
+                "message": "ファイルの処理に失敗しました。",
+                "errors": str(e),
+            }
+        )
 
 # @transaction.atomic
 # def process_csv_pandas(self, csv_file):
