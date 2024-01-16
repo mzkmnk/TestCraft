@@ -1,4 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, {
+  useState,
+  useEffect
+} from 'react';
+
 import { Line } from 'react-chartjs-2';
 import { useNavigate } from 'react-router-dom';
 import UserHeader from './UserHeader';
@@ -55,7 +59,6 @@ function MyPage() {
       })
         .then(response => response.json())
         .then(userData => {
-          console.log(userData);
           if(userData.success && userData.data){
             const graphdata = userData.data;
             setChartData({
@@ -100,24 +103,54 @@ function MyPage() {
         title: {
           display: true,
           text: 'date'
-        }
+        },
+        ticks: {
+          color: "#000",
+        },
+        grid: {
+          color: 'rgba(0, 0, 0, 0.1)',
+        },
       },
       y: {
         beginAtZero: true,
         title: {
           display: true,
           text: 'count'
-        }
-      }
+        },
+        ticks: {
+          color: '#000',
+        },
+        grid: {
+          color: 'rgba(0, 0, 0, 0.1)',
+        },
+      },
+    },
+    plugins:{
+      legend: {
+        position: 'top',
+        labels: {
+          color: '#000',
+          boxWidth: 20,
+        },
+      },
+    },
+    toolbar: {
+      enabled: true,
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      titleColor: '#fff',
+      bodyColor: '#fff',
+      borderColor: 'rgba(255, 255, 255, 0.3)',
+      borderWidth: 1
     },
     responsive: true,
-    maintainAspectRatio: false
+    maintainAspectRatio: false,
   };
 
   return (
     <>
       <UserHeader />
-      <div style={{ height: '400px', width: '100%' }}>
+      <div style={{ height: '400px', width: '100%'}}>
+        <h2>ユーザアクティビティグラフ</h2>
         {chartData.labels ? (
           <Line data={chartData} options={options} />
         ) : (

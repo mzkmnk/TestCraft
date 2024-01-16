@@ -11,6 +11,11 @@ from .models import *
 
 from django.http import JsonResponse
 
+from pydantic import BaseModel,ValidationError
+from typing import Dict,List,Optional,Union
+
+from datetime import date
+
 
 
 api = NinjaAPI()
@@ -31,6 +36,42 @@ class LoginSchema(Schema):
 
 class CompanySignUpSchema(Schema):
     name : str
+class Answer(BaseModel):
+    id: str
+    value: str
+
+class CommonQuestionFields(BaseModel):
+    parentId: Optional[str]
+    question: Optional[str]
+
+class RadioQuestion(CommonQuestionFields):
+    questionType: str = "radio"
+    options: List[Answer]
+    canMultiple: bool
+    answers: List[Answer]
+
+class TextareaQuestion(CommonQuestionFields):
+    questionType: str = "textarea"
+    maxlength: str
+    answers: List[Answer]
+
+class NestedQuestion(CommonQuestionFields):
+    questionType: str = "nested"
+    childIds: List[str]
+
+class Root(BaseModel):
+    questionType: str = "root"
+    title: str
+    childIds: List[str]
+
+Question = Union[Root, NestedQuestion, RadioQuestion, TextareaQuestion]
+
+class JsonFormat(BaseModel):
+    info: Dict
+    questions: Dict[str, Question]
+
+class EditorSchema(Schema):
+    workbook_id:int
 
 # API
 # ユーザー登録するAPI
@@ -109,18 +150,18 @@ def company_signup(request,payload: CompanySignUpSchema):
 @api.get("/questionsall")
 def questionsall(request):
     try:
-        workbooks = Workbook.objects.filter(is_public = True).order_by('-create_date').values(
-            'workbook_id',
+        workbooks = Workbook.objects.filter(is_public = True).order_by('-created_at').values(
+            'id',
             'workbook_name',
             'description',
-            'json_data',
             'create_id__username',
-            'create_date',
-            'update_date'
+            'created_at',
+            'updated_at',
+            'like_count',
         )
         workbooks_with_categories = []
         for workbook in workbooks:
-            categories = WorkbookCategory.objects.filter(workbook_id=workbook['workbook_id']).values_list('category__category_name', flat=True)
+            categories = WorkbookCategory.objects.filter(id=workbook['id']).values_list('category__category_name', flat=True)
             workbooks_with_categories.append({
                 **workbook,
                 'categories': list(categories)
@@ -136,7 +177,8 @@ def questionsall(request):
         return JsonResponse(
             {
                 'success' : False,
-                'workbook' : None
+                'workbook' : None,
+                'error' : str(e)
             },
             status = 400
             )
@@ -144,27 +186,24 @@ def questionsall(request):
 # ユーザが作成した問題を取得するAPI
 @api.get("/create_user_workbook")
 def get_create_user_workbook(request):
-    print("session",request.session)
-    print('user',request.user)
     try:
-        workbooks = Workbook.objects.filter(create_id__id = request.user.id).order_by('-create_date').values(
-            'workbook_id',
+        workbooks = Workbook.objects.filter(create_id__id = request.user.id).order_by('-created_at').values(
+            'id',
             'workbook_name',
             'description',
-            'json_data',
             'create_id__username',
-            'create_date',
-            'update_date'
+            'created_at',
+            'updated_at',
+            'like_count',   
         )
         workbooks_with_categories = []
         for workbook in workbooks:
-            categories = WorkbookCategory.objects.filter(workbook_id=workbook['workbook_id']).values_list('category__category_name', flat=True)
+            categories = WorkbookCategory.objects.filter(id=workbook['id']).values_list('category__category_name', flat=True)
             workbooks_with_categories.append({
                 **workbook,
                 'categories': list(categories)
             })
         User = request.user
-        print(workbooks_with_categories,User.id)
         return JsonResponse(
             {
                 'success' : True,
@@ -183,13 +222,11 @@ def get_create_user_workbook(request):
 
 @api.get("/get_graph_data")
 def get_graph_data(request):
-    print(request.user.company)
     try:
         activities = UserActivity.objects.filter(user_id = request.user.id).values('date').annotate(
             solve_cnt = Sum('problems_solved_count'),
             create_cnt = Sum('problems_created_count')
         ).order_by('date')
-        print(activities)
         data = [{
             'date': activity['date'].strftime('%Y-%m-%d'),
             'solve_cnt': activity['solve_cnt'],
@@ -199,3 +236,69 @@ def get_graph_data(request):
         return JsonResponse({'success':True,'data': data},status = 200)
     except Exception as e:
         return JsonResponse({'success':False,'data': None},status = 400)
+    
+@api.post("/save_data")
+def save_data(request,data:JsonFormat):
+    try:
+        print(data.questions)
+        question_dict = {k:v for k,v in data.questions.items()}
+        for k,v in data.questions.items():
+            print(f"{k=},{type(k)}")
+            print(f"{v=},{type(v)}")
+            print("="*20)
+        workbook = Workbook.objects.create(
+            workbook_name = data.info['title'],
+            create_id = request.user,
+        )
+        Problem.objects.create(
+            workbook_id = Workbook.objects.get(id = workbook.id),
+            problem_json = data.json(),
+        )
+        return JsonResponse(
+            {
+                'success':True,
+                'error':None,
+            },
+            status = 200
+        )
+    except ValidationError as e:
+        return JsonResponse(
+            {
+                'success':False,
+                'error':e.errors()
+            },
+            status = 400
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                'success':False,
+                'error':str(e)
+            },
+            status = 400
+        )
+
+import json
+@api.get("/edit_workbook/{workbookId}")
+def edit_workbook(request,workbookId:int):
+    try:
+        json_data = Problem.objects.get(workbook_id = workbookId).problem_json
+        print(json_data)
+        return JsonResponse(
+            {
+                'success': True,
+                'data' : json.loads(json_data),
+                'error' : None,
+            },
+            status = 200
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                'success': False,
+                'data' : None,
+                'error' : str(e),
+            },
+            status = 400
+        )
+        

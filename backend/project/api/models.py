@@ -62,18 +62,24 @@ class UserActivity(models.Model):
         return f"{self.user.username} - {self.date}"
 
 class Workbook(models.Model):
-    workbook_id = models.AutoField(primary_key=True)
     workbook_name = models.CharField(max_length=48)
     description = models.TextField(blank=True, null=True)
     create_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    create_date = models.DateField()
-    update_date = models.DateField(null=True, blank=True)
+    created_at = models.DateField(auto_now_add=True)
+    updated_at = models.DateField(auto_now=True)
     is_public = models.BooleanField(default=True)
-    json_data = JSONField()
-    
+    like_count = models.IntegerField(default=0)
     categories = models.ManyToManyField('Category', through='WorkbookCategory')
+    
     def __str__(self):
-        return self.workbook_name
+        return str(self.id)
+
+class Problem(models.Model):
+    workbook_id = models.ForeignKey(Workbook, on_delete=models.CASCADE)
+    problem_json = JSONField()
+    
+    def __str__(self):
+        return self.workbook_id.workbook_name
 
 class Category(models.Model):
     category_id = models.AutoField(primary_key=True, unique=True)
@@ -89,6 +95,7 @@ class WorkbookCategory(models.Model):
 
     def __str__(self):
         return f'{self.workbook} - {self.category}'
+
 
 class Contract(models.Model):
     contract_id = models.IntegerField(primary_key=True, unique=True)
