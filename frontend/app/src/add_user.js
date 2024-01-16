@@ -1,28 +1,60 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
+import ReactFileReader from "react-file-reader";
 import * as ExcelJS from 'exceljs';
 import UserHeader from './UserHeader'; 
 
-const getCookie = (name) => {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
-};
-
 function AddUser() {
-    const [csrftoken, setCsrfToken] = useState(null);
-    const [csvData, setFileData] = useState(null); // fileUrl を格納するステートを追加
+    const navigate = useNavigate();
+    const [csvData, setFileData] = useState(null);
     const [upload_fin, setUploadFin] = useState(null);
 
-
     useEffect(() => {
-        const token = getCookie("csrftoken");
-        setCsrfToken(token);
-    }, []);
+        fetch('http://localhost:8000/api/check_auth', {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            }
+        )
+        .then(response => response.json())
+        .then(data => {
+            if (data.authenticated === false) {
+                navigate('/login');
+                }
+            }
+        )
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }, [navigate]);
 
+    const uploadFile = (files) => {
+        var read = new FileReader();
+        read.onload = function(e) {
+            fetch('http://localhost/8000/api/add_user',{
+                headers:{
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success){
+                    console.log("Ok");
+                }
+                else{
+                    console.log("error");
+                }
+            })
+        };
+        read.readAsText(files[0]);
+    };
 
     //取得したデータをサーバへ送る処理
     const submitForm = async (cvs_data) => {
         const formData = new FormData();
+
         formData.append('cvs_data', cvs_data);
         try {
             const response = await fetch('http://localhost:8000/api/add_user', {
@@ -61,19 +93,19 @@ function AddUser() {
 
     const handleFileUpload = () => {//データを取得し型を整える処理
         const inputElement = document.getElementById("fileInput");
+
         if (inputElement) {
             const file = inputElement.files[0];
             if (file) {
                 // FileReaderを使用してCSVファイルを読み込む
                 const reader = new FileReader();
-    
                 reader.onload = (event) => {
                     const csvData = event.target.result;
                     // CSVデータを文字列に変換し、サーバに送信
                     submitForm(csvData);
                 };
     
-                reader.readAsText(file);
+                reader.readAsText(csvData);
             } else {
                 console.error('入力されていません');
                 setUploadFin('入力されていません');
@@ -123,8 +155,11 @@ function AddUser() {
         <UserHeader />
             <div>
                 <h1>File Upload Page</h1>
-                <input type="file" id="fileInput" />
-                <button onClick={handleFileUpload}>データベースに登録</button>
+                {/* <input type="file" id="fileInput" /> */}
+                <ReactFileReader handleFiles = {uploadFile} fileTypes={".csv"}>
+                    <button>データベースに登録</button>
+                    {/* <button onClick={handleFileUpload}>データベースに登録</button> */}
+                </ReactFileReader>
                 <button onClick={handleFileDownload}>ファイルをダウンロード</button>
                 {upload_fin && (
                 <div>
