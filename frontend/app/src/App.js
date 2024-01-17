@@ -14,19 +14,21 @@ import Mycreate from "./Mycreate";
 import Editor from "./Editor.tsx";
 import Mysolve from "./Mysolve";
 import Message from "./Message.js";
+import ReadWorkbook from "./ReadWorkbook.js";
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/login" element = {<LoginForm />} />
-        <Route path="/mypage" element = {<MyPage />} />
-        <Route path="/signup" element = {<Signup />} />
-        <Route path="/questionsAll" element = {<QuestionsAll />} />
-        <Route path="/editor" element = {<Editor />} />
-        <Route path="/mypage/mycreate" element = {<Mycreate />} />
-        <Route path="/mypage/mysolve" element = {<Mysolve />} />
-        <Route path="/mypage/message" element = {<Message />} />
+        <Route path="/login" element={<LoginForm />} />
+        <Route path="/mypage" element={<MyPage />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/questionsAll" element={<QuestionsAll />} />
+        <Route path="/editor" element={<Editor />} />
+        <Route path="/editor/:workbookId" element={<ReadWorkbook />} />
+        <Route path="/mypage/mycreate" element={<Mycreate />} />
+        <Route path="/mypage/mysolve" element={<Mysolve />} />
+        <Route path="/mypage/message" element={<Message />} />
       </Routes>
     </Router>
   );
