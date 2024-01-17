@@ -59,7 +59,6 @@ const createId = () =>
   new Date().getTime().toString(32) + Math.random().toString(32);
 
 export default function Editor({ workBook }) {
-  console.log(workBook);
   if (!workBook) {
     workBook = {
       info: {},
