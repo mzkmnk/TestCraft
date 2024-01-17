@@ -9,10 +9,10 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import TextField from "@mui/material/TextField";
 
 export default function InputAnswer({
-  answers,
-  setAnswers,
   questionTree,
   questionIds,
+  answers,
+  setAnswers,
 }) {
   // questionIdsのindex
   const [displayQuestionIndex, setDisplayQuestionIndex] = useState(0);

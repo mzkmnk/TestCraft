@@ -4,7 +4,7 @@ import Editor from "./Editor.tsx";
 import QuestionsSolve from "./QuestionsSolve/QuestionsSolve";
 
 export default function ReadWorkbook({ next }) {
-  let [workBook, setWorkbook] = useState(undefined);
+  let [workbook, setWorkbook] = useState(undefined);
   const { workbookId } = useParams();
 
   const navigate = useNavigate();
@@ -44,10 +44,10 @@ export default function ReadWorkbook({ next }) {
   }, [navigate]);
 
   if (next === "Editor") {
-    return workBook ? <Editor workBook={workBook} /> : <div>Loading...</div>;
+    return workbook ? <Editor workBook={workbook} /> : <div>Loading...</div>;
   } else if (next === "QuestionsSolve") {
-    return workBook ? (
-      <QuestionsSolve workBook={workBook} />
+    return workbook ? (
+      <QuestionsSolve workbook={workbook} />
     ) : (
       <div>Loading...</div>
     );
