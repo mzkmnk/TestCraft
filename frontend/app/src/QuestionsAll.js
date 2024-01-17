@@ -84,7 +84,8 @@ function QuestionsAll() {
   };
   const getLikeStyle = (liked) => ({
     ...styles.likeStyle,
-    color: liked ? '#E0245E' : '#1DA1F2',
+    color: liked ? '#E0245E' : 'transparent',
+    border: liked ? 'none' : '2px solid #1DA1F2',
   });
 
   const styles = {
@@ -156,14 +157,6 @@ function QuestionsAll() {
               style={styles.likeButton}
               onClick={(e) => handleLikeClick(e, question.id)}
             >
-              {/* <div style={styles.lottieContainer}> */}
-                {/* <Lottie
-                  options={defaultOptions}
-                  height={130}
-                  width={130}
-                  isStopped={!question.liked}
-                /> */}
-              {/* </div> */}
               {question.liked ? <FaHeart /> : <FaRegHeart />}
               <span style={styles.likeCount}>{question.like_count}</span>
             </div>
