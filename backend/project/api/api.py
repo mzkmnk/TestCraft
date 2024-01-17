@@ -180,20 +180,6 @@ def questionsall(request):
             },
             status = 200
         )
-        workbooks_with_categories = []
-        for workbook in workbooks:
-            categories = WorkbookCategory.objects.filter(id=workbook['id']).values_list('category__category_name', flat=True)
-            workbooks_with_categories.append({
-                **workbook,
-                'categories': list(categories)
-            })
-        return JsonResponse(
-            {
-                'success' : True,
-                'workbook' : workbooks_with_categories
-            },
-            status = 200
-            )
     except Exception as e:
         return JsonResponse(
             {
