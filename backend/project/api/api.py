@@ -5,6 +5,8 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login as django_login
 from django.contrib.auth import logout as django_logout
 
+from django.shortcuts import get_object_or_404
+
 from django.db.models import Sum
 
 from .models import *
@@ -71,6 +73,12 @@ class JsonFormat(BaseModel):
     questions: Dict[str, Question]
 
 class EditorSchema(Schema):
+    workbook_id:int
+    
+class likeAddSchema(Schema):
+    workbook_id:int
+
+class likeDeleteSchema(Schema):
     workbook_id:int
 
 # API
@@ -159,6 +167,19 @@ def questionsall(request):
             'updated_at',
             'like_count',
         )
+        workbooks_with_likes = []
+        for workbook in workbooks:
+            liked_by_user = Like.objects.filter(user=request.user, workbook_id=workbook['id']).exists()
+            workbook['liked_by_user'] = liked_by_user
+            workbooks_with_likes.append(workbook)
+        print(workbooks_with_likes)
+        return JsonResponse(
+            {
+                'success':True,
+                'workbooks':workbooks_with_likes,
+            },
+            status = 200
+        )
         workbooks_with_categories = []
         for workbook in workbooks:
             categories = WorkbookCategory.objects.filter(id=workbook['id']).values_list('category__category_name', flat=True)
@@ -240,12 +261,7 @@ def get_graph_data(request):
 @api.post("/save_data")
 def save_data(request,data:JsonFormat):
     try:
-        print(data.questions)
         question_dict = {k:v for k,v in data.questions.items()}
-        for k,v in data.questions.items():
-            print(f"{k=},{type(k)}")
-            print(f"{v=},{type(v)}")
-            print("="*20)
         workbook = Workbook.objects.create(
             workbook_name = data.info['title'],
             create_id = request.user,
@@ -278,12 +294,12 @@ def save_data(request,data:JsonFormat):
             status = 400
         )
 
+#問題編集画面を表示する。
 import json
 @api.get("/edit_workbook/{workbookId}")
 def edit_workbook(request,workbookId:int):
     try:
         json_data = Problem.objects.get(workbook_id = workbookId).problem_json
-        print(json_data)
         return JsonResponse(
             {
                 'success': True,
@@ -301,4 +317,47 @@ def edit_workbook(request,workbookId:int):
             },
             status = 400
         )
+
+#like機能
+@api.post("/questionsall/{workbookId}/like")
+def add_like(request,workbookId:int):
+    try:
+        user = request.user
+        # workbook = get_object_or_404(Workbook,id=payload.workbook_id)
+        workbook = get_object_or_404(Workbook,id=workbookId)
+        like = Like.objects.filter(user=user,workbook=workbook)
+        if like.exists():
+            like.delete()
+            workbook.like_count = max(0,workbook.like_count - 1)
+            workbook.save()
+            return JsonResponse(
+                {
+                    "success":True,
+                    "error":None,
+                    "like_count":workbook.like_count,
+                },
+                status = 200,
+            )
         
+        Like.objects.create(
+            user = user,
+            workbook = workbook,
+        )
+        workbook.like_count += 1
+        workbook.save()
+        return JsonResponse(
+            {
+                "success":True,
+                "error":None,
+                "like_count":workbook.like_count,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "error":str(e),
+            },
+            status = 400,
+        )

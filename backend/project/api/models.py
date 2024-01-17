@@ -74,6 +74,16 @@ class Workbook(models.Model):
     def __str__(self):
         return str(self.id)
 
+class Like(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    workbook = models.ForeignKey(Workbook, on_delete=models.CASCADE)
+    
+    class Meta:
+        unique_together = (('user', 'workbook'),)
+        
+    def __str__(self):
+        return f"{self.user.username} - {self.workbook.workbook_name}"
+
 class Problem(models.Model):
     workbook_id = models.ForeignKey(Workbook, on_delete=models.CASCADE)
     problem_json = JSONField()
