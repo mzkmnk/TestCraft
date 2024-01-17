@@ -36,7 +36,6 @@ export default function QuestionsSolve({ workbook }) {
     setIsSettingsOpen(false);
     // 0分0秒の場合でタイマーを開始するとエラーになるので、その場合は動かさず結果画面を表示する。
     if (answerSettings.time_min === 0 && answerSettings.time_sec === 0) {
-      console.log(Timer.seconds);
       setIsResultOpen(true);
       return;
     }
