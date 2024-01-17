@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  navigate,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import LoginForm from "./LoginForm";
 import MyPage from "./Mypage";
@@ -25,10 +20,17 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/questionsAll" element={<QuestionsAll />} />
         <Route path="/editor" element={<Editor />} />
-        <Route path="/editor/:workbookId" element={<ReadWorkbook />} />
+        <Route
+          path="/editor/:workbookId"
+          element={<ReadWorkbook next={"Editor"} />}
+        />
         <Route path="/mypage/mycreate" element={<Mycreate />} />
         <Route path="/mypage/mysolve" element={<Mysolve />} />
         <Route path="/mypage/message" element={<Message />} />
+        <Route
+          path="/solve/:workbookId"
+          element={<ReadWorkbook next={"QuestionsSolve"} />}
+        />
       </Routes>
     </Router>
   );

@@ -1,8 +1,9 @@
 import { useState, useEffect, React } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Editor from "./Editor.tsx";
+import QuestionsSolve from "./QuestionsSolve/QuestionsSolve";
 
-export default function ReadWorkbook() {
+export default function ReadWorkbook({ next }) {
   let [workBook, setWorkbook] = useState(undefined);
   const { workbookId } = useParams();
 
@@ -41,7 +42,14 @@ export default function ReadWorkbook() {
         console.error("Error:", error);
       });
   }, [navigate]);
-  console.log(workBook);
-  // workbook が undefined の場合は、loading を表示し、そうでない場合は、Editor を表示する
-  return workBook ? <Editor workBook={workBook} /> : <div>Loading...</div>;
+
+  if (next === "Editor") {
+    return workBook ? <Editor workBook={workBook} /> : <div>Loading...</div>;
+  } else if (next === "QuestionsSolve") {
+    return workBook ? (
+      <QuestionsSolve workBook={workBook} />
+    ) : (
+      <div>Loading...</div>
+    );
+  }
 }
