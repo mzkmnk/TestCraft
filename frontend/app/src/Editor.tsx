@@ -1,4 +1,5 @@
 import { useState } from "react";
+import React from "react";
 import Box from "@mui/material/Box";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -56,10 +57,9 @@ type JsonFormat = {
 
 const createId = () =>
   new Date().getTime().toString(32) + Math.random().toString(32);
-// JSONデータの取得
-let workBook: JsonFormat | undefined = undefined;
 
-export default function Editor() {
+export default function Editor({ workBook }) {
+  console.log(workBook);
   if (!workBook) {
     workBook = {
       info: {},
@@ -74,35 +74,35 @@ export default function Editor() {
   }
 
   // questionTreeの値は、textareaの入力内容と常に同期する。
-  
+
   const [questionTree, setQuestionTree] = useState(workBook.questions);
-  const [title, setTitle] = useState("初期タイトル")
+  const [title, setTitle] = useState("初期タイトル");
   // 保存用関数
   function save() {
     workBook = {
       info: {
-        title : title,
+        title: title,
       },
       questions: questionTree,
     };
     console.log(JSON.stringify(workBook));
     const data = JSON.stringify(workBook);
-    fetch('http://localhost:8000/api/save_data',{
-      method: 'POST',
+    fetch("http://localhost:8000/api/save_data", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body:data,
-      credentials: 'include',
+      body: data,
+      credentials: "include",
     })
-    .then(response => response.json())
-    .then(data => {
-      if(data.success){
-        console.log("success");
-      }else{
-        console.log("error",data.error);
-      }
-    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          console.log("success");
+        } else {
+          console.log("error", data.error);
+        }
+      });
   }
 
   // state更新関数群 React Reducerを使うべきではある（コードが分かりにくくなる && 面倒）
@@ -408,7 +408,7 @@ export default function Editor() {
           variant="outlined"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          margin = "normal"
+          margin="normal"
         />
       </Box>
       <Box sx={{ border: 1, margin: 2 }}>
@@ -570,7 +570,7 @@ function QuestionEditor({
               }}
               fullWidth
               variant="outlined"
-              sx = {{flexGrow:1,merginRight:2}}
+              sx={{ flexGrow: 1, merginRight: 2 }}
             ></TextField>
             <Button
               onClick={() => handleRemoveAnswer(questionId, answers.id)}
