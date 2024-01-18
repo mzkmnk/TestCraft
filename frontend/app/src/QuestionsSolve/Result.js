@@ -1,6 +1,3 @@
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import InputAnswer from "./InputAnswer";
 import ResultQuestion from "./ResultQuestion";
 
 export default function Result({ answers, questionTree, questionIds }) {
