@@ -7,11 +7,12 @@ import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import TextField from "@mui/material/TextField";
 
-export default function InputAnswer({
-  questionTree,
+// ほぼInputAnswer.jsと同じ
+export default function ResultQuestion({
   questionIds,
+  questionTree,
+  correctIds,
   answers,
-  setAnswers,
 }) {
   // questionIdsのindex
   const [displayQuestionIndex, setDisplayQuestionIndex] = useState(0);
@@ -44,10 +45,10 @@ export default function InputAnswer({
         }}
       >
         <DisplayQuestion
-          questionTree={questionTree}
           questionId={questionIds[displayQuestionIndex]}
+          questionTree={questionTree}
+          correctIds={correctIds}
           answers={answers}
-          setAnswers={setAnswers}
         />
       </Box>
       <Box
@@ -68,12 +69,14 @@ export default function InputAnswer({
   );
 }
 
-function DisplayQuestion({ questionTree, questionId, answers, setAnswers }) {
+function DisplayQuestion({ questionTree, questionId, correctIds, answers }) {
   const question = questionTree[questionId];
-
-  const handleSetAnswers = (event) => {
-    setAnswers({ ...answers, [questionId]: event.target.value });
-  };
+  let color;
+  if (correctIds.includes(questionId)) {
+    color = "success";
+  } else {
+    color = "error";
+  }
 
   if (questionTree[questionId].questionType === "root") {
     return (
@@ -90,10 +93,10 @@ function DisplayQuestion({ questionTree, questionId, answers, setAnswers }) {
         {question.childIds.map((childId) => (
           <DisplayQuestion
             key={childId}
-            questionTree={questionTree}
             questionId={childId}
+            questionTree={questionTree}
+            correctIds={correctIds}
             answers={answers}
-            setAnswers={setAnswers}
           />
         ))}
       </>
@@ -102,16 +105,13 @@ function DisplayQuestion({ questionTree, questionId, answers, setAnswers }) {
     return (
       <>
         <Typography>{question.question}</Typography>
-        <RadioGroup
-          name={questionId}
-          onChange={(event) => handleSetAnswers(event)}
-          value={answers[questionId] || ""}
-        >
+
+        <RadioGroup name={questionId} value={answers[questionId] || ""}>
           {question.options.map((option) => (
             <FormControlLabel
               key={option.id}
               value={option.value}
-              control={<Radio />}
+              control={<Radio inputProps={{ readOnly: true }} color={color} />}
               label={option.value}
             />
           ))}
@@ -125,9 +125,10 @@ function DisplayQuestion({ questionTree, questionId, answers, setAnswers }) {
           <Typography>{question.question}</Typography>
         )}
         <TextField
-          inputProps={{ maxLength: question.maxlength }}
-          onChange={(event) => handleSetAnswers(event)}
+          inputProps={{ maxLength: question.maxlength, readOnly: true }}
           defaultValue={answers[questionId] || ""}
+          color={color}
+          focused
         />
       </>
     );
