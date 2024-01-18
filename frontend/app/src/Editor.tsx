@@ -477,7 +477,12 @@ function QuestionEditor({
     return <p>error</p>;
   }
   const questionNumberField = (
-    <Typography>{"問題" + questionNumber.join("-") + "："}</Typography>
+    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+      <Typography>{"問題" + questionNumber.join("-") + "："}</Typography>
+      <Button onClick={() => handleRemoveQuestion(questionId)} color="error">
+        問題を削除
+      </Button>
+    </Box>
   );
   const questionField = (
     <>
