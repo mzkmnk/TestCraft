@@ -36,7 +36,6 @@ export default function Result({ answers, questionTree, questionIds }) {
     }
   };
 
-  console.log(correctIds);
   grade(questionIds);
 
   return (

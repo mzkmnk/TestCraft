@@ -5,6 +5,7 @@ import InputAnswer from "./InputAnswer";
 import Result from "./Result";
 import Watch from "./Watch";
 import Button from "@mui/material/Button";
+import UserHeader from "../UserHeader";
 
 export default function QuestionsSolve({ workbook }) {
   // JSONはroot が先頭であることを保証しないとする。
@@ -55,6 +56,7 @@ export default function QuestionsSolve({ workbook }) {
 
   return (
     <>
+      <UserHeader />
       {!isSettingsOpen && !isResultOpen ? <Watch time={Timer.seconds} /> : null}
       <SettingsModal
         isSettingsOpen={isSettingsOpen}
