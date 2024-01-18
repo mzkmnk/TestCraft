@@ -6,7 +6,7 @@ import UserHeader from './UserHeader';
 
 function AddUser() {
     const navigate = useNavigate();
-    const [csvData, setFileData] = useState(null);
+    const [CsvData, setFileData] = useState(null);
     const [upload_fin, setUploadFin] = useState(null);
 
     useEffect(() => {
@@ -28,106 +28,26 @@ function AddUser() {
             console.error('Error:', error);
         });
     }, [navigate]);
-
-    const uploadFile = (files) => {
-        var read = new FileReader();
-        read.onload = function(e) {
-            fetch('http://localhost/8000/api/add_user',{
-                headers:{
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'include'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.success){
-                    console.log("Ok");
-                }
-                else{
-                    console.log("error");
-                }
-            })
-        };
-        read.readAsText(files[0]);
-    };
-
-    //取得したデータをサーバへ送る処理
-    const submitForm = async (cvs_data) => {
-        const formData = new FormData();
-
-        formData.append('cvs_data', cvs_data);
-        try {
-            const response = await fetch('http://localhost:8000/api/add_user', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ cvs_data }),
-                // mode: 'cors'
-            });
-    
-            if (!response.ok) {
-                const data = await response.json();
-                console.error('サーバーエラー:', response.status, response.statusText, data);
-                
-                setUploadFin('入力エラーが発生しました。正しい情報を入力してください。');
-                return;
-            }
-    
-            console.log('サーバーレスポンス:', response.status, response.statusText);
-            const responseData = await response.json();
-            console.log('ファイルが正常に処理されました', responseData);
-            
-             // ここで fileUrl をセットしていることを確認
-            const csvData = responseData["csv_data"];
-            setFileData(csvData);
-            if(csvData){
-                setUploadFin('データの登録が完了しました！ファイルをダウンロードする場合はダウンロードボタンを押してください。');
-            }
-    
-        } catch (error) {
-            setUploadFin('登録に失敗しました。');
-            console.error('ファイルの処理中にエラーが発生しました', error);
-        }
-    };
-
-    const handleFileUpload = () => {//データを取得し型を整える処理
-        const inputElement = document.getElementById("fileInput");
-
-        if (inputElement) {
-            const file = inputElement.files[0];
-            if (file) {
-                // FileReaderを使用してCSVファイルを読み込む
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const csvData = event.target.result;
-                    // CSVデータを文字列に変換し、サーバに送信
-                    submitForm(csvData);
-                };
-    
-                reader.readAsText(csvData);
-            } else {
-                console.error('入力されていません');
-                setUploadFin('入力されていません');
-
-            }
-        }
-        //ステートから fileUrl を利用
-    };
-    //返ってきたcsvのデータをExcelファイルに変換し、ダウンロードさせる処理
+     //返ってきたcsvのデータをExcelファイルに変換し、ダウンロードさせる処理
     const handleFileDownload = () => {
-        if (csvData) {
+        if (CsvData) {
             // ExcelJSを使用してExcelファイルを作成
             const workbook = new ExcelJS.Workbook();
             const worksheet = workbook.addWorksheet('Sheet 1');
 
             // CSVデータをExcelファイルに書き込む
-            const csvFile = csvData; // ここを実際のCSVデータに置き換える
-            const csvRows = csvFile.split('\n');
-            csvRows.forEach((row) => {
-                const columns = row.split(',');
-                worksheet.addRow(columns);
-            });
+            //const csvFile = data ? data.csv_data : undefined;
+            console.log(typeof CsvData)
+            if(typeof CsvData=='string'){
+                const csvFile = CsvData.replace(/^"(.*)"$/, '$1');;
+                const csvRows = csvFile.split('\\r\\n');
+                console.log(csvRows)
+                csvRows.forEach((row) => {
+                    const columns = row.split(',');
+                    worksheet.addRow(columns);
+                });
+            }
+            
 
             // ExcelファイルをBlobとして生成
             workbook.xlsx.writeBuffer().then((buffer) => {
@@ -148,6 +68,55 @@ function AddUser() {
         }else{
             setUploadFin('ファイルがアップロードされていません');
         }
+    };
+
+    const uploadFile = (files) => {
+        var read = new FileReader();
+        const file = files[0]; 
+        const formData = new FormData();
+        // formData.append('file',file);
+        read.onload =  async function(e) {
+            // formData.append('file',read.result);
+            console.log(e.target.result);
+            const response= await fetch('http://localhost:8000/api/add_user',{
+                method: "POST",
+                headers:{
+                    'Content-Type': 'application/json',
+                    // 'Content-Type': 'multipart/form-data',
+                },
+                credentials: 'include',
+                body: JSON.stringify(
+                    {
+                        csv_data:e.target.result,
+                    }
+                )
+                
+            });
+            const data = await response.json()
+            const CsvData = JSON.stringify(data.csv_data)
+            if (data.success) {
+                console.log("success")
+
+                console.log(CsvData);
+                setFileData(CsvData);
+                setUploadFin(e.target.result);  // 何かしらのstateにデータをセットするなど適切な処理を行う
+            } else {
+                console.log("error")
+                console.log("Error:", data.error);
+            }
+            // .then(response => response.json())
+            // .then(data => {
+            //     if(data.success){
+                    
+            //         console.log(data);
+
+            //     }
+            //     else{
+            //         console.log("error",read.result);
+            //     }
+            // })
+        };
+        read.readAsText(files[0]);
     };
 
     return (

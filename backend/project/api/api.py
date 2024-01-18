@@ -1,5 +1,6 @@
 from django.contrib.auth.hashers import make_password
 from ninja import NinjaAPI,Schema
+from ninja.files import UploadedFile
 
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as django_login
@@ -12,8 +13,9 @@ from django.http import JsonResponse
 
 from django.db import transaction
 import tempfile
-from django.core.files.uploadedfile import UploadedFile
+# from django.core.files.uploadedfile import UploadedFile
 import pandas as pd
+from io import StringIO
 
 import numpy as np
 
@@ -37,10 +39,8 @@ class CompanySignUpSchema(Schema):
     company_id : str
     name : str
 
-
 class CsvUploadSchema(Schema):
-    csv_data :str
-
+    csv_data:str
 
 # API
 # ユーザー登録するAPI
@@ -188,66 +188,45 @@ def get_create_user_workbook(request):
 #社員ユーザをcvsファイルを用いて一斉に登録するAPI
 @api.post("/add_user")
 def add_user(request ,payload:CsvUploadSchema):
-    print("Start of the function")
-    company_id = request.user.company.id
-    print(company_id)
     try:
-        with transaction.atomic():
+        
+        data_str = payload.csv_data
+        
+        
+        df = pd.read_csv(StringIO(data_str))
+        df["ユーザー名"]=""
+        for index, row in df.iterrows():
+            #data_str3=r.split(",")
             
-            data=payload.csv_data
-            print(data)
-            with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-                # CSVデータを一時ファイルに書き込む
-                temp_file.write(data.encode('utf-8'))
-
-            # CSVデータをPandas DataFrameに読み込む
-            csv_pandas = pd.read_csv(temp_file.name, encoding='utf-8')
-
-            # デバッグ用
-            print(csv_data)
-            # print("Before conversion:", company_id)
-            user_address = ""
-            company_instance = Company.objects.get(company_id=company_id)
-            if csv_pandas is None:
-                raise ValueError("DataFrame is None. Check CSV file format.")
-            csv_pandas[user_address] = ""
-            for index, row in csv_pandas.iterrows():
-                # 列の名前を使用して値を取得
-                company_user_id = row['company_user_id']
-                username = row['username']
-                user_public_id = company_id + str(company_user_id)
-                user_public_name = username + str(user_public_id).zfill(6)
-                # ここでデータベースに書き込み
-                User.objects.create_user(username=username, password="password", company_user_id=company_user_id, user_public_name=user_public_name, company=company_instance, user_public_id=user_public_id, is_company_user=True)
-                csv_pandas.at[index, 'user_address'] = user_public_name
-            print("-" * 20)
-            #serializer.is_valid()
-            csv_data = csv_pandas.to_csv(index=False)
-            print(csv_data)
-
-                #response = self.make_url(csv_data)
-            return JsonResponse({"csv_data": csv_data,"errors":None})
-    except Exception as e:
-        # logger.error(f"ファイル処理中にエラーが発生しました: {e}")
+            user_name=row["社員名"]+str(row["社員番号"])
+            
+            # user = User.objects.create_user(
+            #     username=user_name,
+            #     password=request.user.password, 
+            #     email=request.user.email,
+            #     company=request.user.company,
+            #     is_company_user=True,
+            # )
+            # user.save()
+            
+            df.at[index, 'ユーザー名'] = user_name
+        user_csv=df.to_csv(index=False)
+        print(user_csv)
+        
         return JsonResponse(
             {
-                "message": "ファイルの処理に失敗しました。",
-                "errors": str(e),
-            }
+                "success":True,
+                "csv_data":user_csv,
+                "error":None,
+            },
+            status = 200,
         )
-
-# @transaction.atomic
-# def process_csv_pandas(self, csv_file):
-#         try:
-#             # InMemoryUploadedFileを一時ファイルに保存
-#             with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-#                 for chunk in csv_file.chunks():
-#                     temp_file.write(chunk)
-#             df = pd.read_csv(temp_file.name, encoding='utf-8')
-#             return df
-#         except Exception as e:
-#             logger.error(f"ファイルの処理に失敗: {e}")
-#             return None
-#         finally:
-#             # 一時ファイルを削除
-#             os.remove(temp_file.name)
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "csv_data":None,
+                "error":str(e),
+            },
+            status = 400,
+        )
