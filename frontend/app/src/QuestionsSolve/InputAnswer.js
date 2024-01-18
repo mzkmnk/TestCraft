@@ -74,7 +74,6 @@ function DisplayQuestion({ questionTree, questionId, answers, setAnswers }) {
 
   const handleSetAnswers = (event) => {
     setAnswers({ ...answers, [questionId]: event.target.value });
-    console.log(answers);
   };
 
   if (questionTree[questionId].questionType === "root") {
