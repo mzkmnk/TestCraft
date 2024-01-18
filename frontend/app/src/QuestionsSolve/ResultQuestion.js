@@ -13,6 +13,7 @@ export default function ResultQuestion({
   questionTree,
   correctIds,
   answers,
+  questionCount,
 }) {
   // questionIdsのindex
   const [displayQuestionIndex, setDisplayQuestionIndex] = useState(0);
@@ -49,6 +50,7 @@ export default function ResultQuestion({
           questionTree={questionTree}
           correctIds={correctIds}
           answers={answers}
+          questionCount={questionCount}
         />
       </Box>
       <Box
@@ -69,10 +71,17 @@ export default function ResultQuestion({
   );
 }
 
-function DisplayQuestion({ questionTree, questionId, correctIds, answers }) {
+function DisplayQuestion({
+  questionTree,
+  questionId,
+  correctIds,
+  answers,
+  questionCount,
+}) {
   const question = questionTree[questionId];
   let color;
-  if (correctIds.includes(questionId)) {
+  const isCorrect = correctIds.includes(questionId);
+  if (isCorrect) {
     color = "success";
   } else {
     color = "error";
@@ -81,8 +90,9 @@ function DisplayQuestion({ questionTree, questionId, correctIds, answers }) {
   if (questionTree[questionId].questionType === "root") {
     return (
       <>
-        <Typography align="center" variant="h3">
-          {question.title}
+        <Typography variant="h4">Result</Typography>
+        <Typography>
+          正答率：{correctIds.length} ／ {questionCount}
         </Typography>
       </>
     );
@@ -105,7 +115,7 @@ function DisplayQuestion({ questionTree, questionId, correctIds, answers }) {
     return (
       <>
         <Typography>{question.question}</Typography>
-
+        <Typography color={color}>{isCorrect ? "正解" : "不正解"}</Typography>
         <RadioGroup name={questionId} value={answers[questionId] || ""}>
           {question.options.map((option) => (
             <FormControlLabel
@@ -121,9 +131,8 @@ function DisplayQuestion({ questionTree, questionId, correctIds, answers }) {
   } else if (questionTree[questionId].questionType === "textarea") {
     return (
       <>
-        {question.question === "" ? null : (
-          <Typography>{question.question}</Typography>
-        )}
+        <Typography>{question.question}</Typography>
+        <Typography color={color}>{isCorrect ? "正解" : "不正解"}</Typography>
         <TextField
           inputProps={{ maxLength: question.maxlength, readOnly: true }}
           defaultValue={answers[questionId] || ""}
