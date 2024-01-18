@@ -30,10 +30,18 @@ export default function SettingsModal({
 
   // textfieldの値を取得する
   const handleMinChange = (event) => {
-    setAnswerSettings({ ...answerSettings, time_min: event.target.value });
+    if (event.target.value === "") {
+      setAnswerSettings({ ...answerSettings, time_min: 0 });
+    } else {
+      setAnswerSettings({ ...answerSettings, time_min: event.target.value });
+    }
   };
   const handleSecChange = (event) => {
-    setAnswerSettings({ ...answerSettings, time_sec: event.target.value });
+    if (event.target.value === "") {
+      setAnswerSettings({ ...answerSettings, time_sec: 0 });
+    } else {
+      setAnswerSettings({ ...answerSettings, time_sec: event.target.value });
+    }
   };
 
   return (
