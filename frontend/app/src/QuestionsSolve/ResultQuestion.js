@@ -115,7 +115,9 @@ function DisplayQuestion({
     return (
       <>
         <Typography>{question.question}</Typography>
-        <Typography color={color}>{isCorrect ? "正解" : "不正解"}</Typography>
+        <Typography color={color + ".main"}>
+          {isCorrect ? "正解" : "不正解"}
+        </Typography>
         <RadioGroup name={questionId} value={answers[questionId] || ""}>
           {question.options.map((option) => (
             <FormControlLabel
@@ -132,7 +134,9 @@ function DisplayQuestion({
     return (
       <>
         <Typography>{question.question}</Typography>
-        <Typography color={color}>{isCorrect ? "正解" : "不正解"}</Typography>
+        <Typography color={color + ".main"}>
+          {isCorrect ? "正解" : "不正解"}
+        </Typography>
         <TextField
           inputProps={{ maxLength: question.maxlength, readOnly: true }}
           defaultValue={answers[questionId] || ""}
