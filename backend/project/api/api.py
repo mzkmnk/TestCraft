@@ -42,6 +42,13 @@ class CompanySignUpSchema(Schema):
 class CsvUploadSchema(Schema):
     csv_data:str
 
+# class InformationChangeSchema(Schema):
+#     username : str
+#     email : str
+#     password : str
+#     is_company_user : bool = False
+#     is_own_company : bool = False
+    
 # API
 # ユーザー登録するAPI
 @api.post("/signup")
@@ -200,14 +207,14 @@ def add_user(request ,payload:CsvUploadSchema):
             
             user_name=row["社員名"]+str(row["社員番号"])
             
-            # user = User.objects.create_user(
-            #     username=user_name,
-            #     password=request.user.password, 
-            #     email=request.user.email,
-            #     company=request.user.company,
-            #     is_company_user=True,
-            # )
-            # user.save()
+            user = User.objects.create_user(
+                username=user_name,
+                password=request.user.password, 
+                email=request.user.email,
+                company=request.user.company,
+                is_company_user=True,
+            )
+            user.save()
             
             df.at[index, 'ユーザー名'] = user_name
         user_csv=df.to_csv(index=False)
@@ -230,3 +237,8 @@ def add_user(request ,payload:CsvUploadSchema):
             },
             status = 400,
         )
+
+#登録情報を変更するAPI
+# @api.post("/information_change")
+# def information_change(request,):
+    
