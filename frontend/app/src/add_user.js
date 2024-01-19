@@ -4,11 +4,13 @@ import ReactFileReader from "react-file-reader";
 import * as ExcelJS from 'exceljs';
 import UserHeader from './UserHeader'; 
 
+import Button from "@mui/material/Button";
+
 function AddUser() {
     const navigate = useNavigate();
-    const [CsvData, setFileData] = useState(null);
+    const [csvData, setFileData] = useState(null);
     const [upload_fin, setUploadFin] = useState(null);
-
+    const [upload_data, setUploadData] = useState(null);
     useEffect(() => {
         fetch('http://localhost:8000/api/check_auth', {
             headers: {
@@ -30,23 +32,23 @@ function AddUser() {
     }, [navigate]);
      //返ってきたcsvのデータをExcelファイルに変換し、ダウンロードさせる処理
     const handleFileDownload = () => {
-        if (CsvData) {
+        if (csvData) {
             // ExcelJSを使用してExcelファイルを作成
             const workbook = new ExcelJS.Workbook();
             const worksheet = workbook.addWorksheet('Sheet 1');
 
             // CSVデータをExcelファイルに書き込む
-            //const csvFile = data ? data.csv_data : undefined;
-            console.log(typeof CsvData)
-            if(typeof CsvData=='string'){
-                const csvFile = CsvData.replace(/^"(.*)"$/, '$1');;
-                const csvRows = csvFile.split('\\r\\n');
-                console.log(csvRows)
-                csvRows.forEach((row) => {
-                    const columns = row.split(',');
-                    worksheet.addRow(columns);
-                });
-            }
+            console.log(typeof csvData)
+                // const csvFile = csvData.replace(/^"(.*)"$/, '$1');;
+                // const csvRows = csvFile.split('\\r\\n');
+            const csvFile = csvData.replace(/^"(.*)"$/, '$1');;
+            const csvRows = csvFile.split('\\r\\n');
+            console.log(csvRows)
+            csvRows.forEach((row) => {
+                const columns = row.split(',');
+                worksheet.addRow(columns);
+            });
+            
             
 
             // ExcelファイルをBlobとして生成
@@ -62,11 +64,9 @@ function AddUser() {
                 a.click();
                 document.body.removeChild(a);
 
-                // 画面遷移
-                //navigate('/file_upload_finish');
             });
         }else{
-            setUploadFin('ファイルがアップロードされていません');
+            setUploadFin('ファイルがアップロードされていません。');
         }
     };
 
@@ -93,16 +93,20 @@ function AddUser() {
                 
             });
             const data = await response.json()
-            const CsvData = JSON.stringify(data.csv_data)
+            const csvData = JSON.stringify(data.csv_data)
+            const csvFile = csvData.replace(/^"(.*)"$/, '$1',);;
+            const csvRows = csvFile.split('\\r\\n');
+
             if (data.success) {
                 console.log("success")
 
-                console.log(CsvData);
-                setFileData(CsvData);
-                setUploadFin(e.target.result);  // 何かしらのstateにデータをセットするなど適切な処理を行う
+                console.log(csvData);
+                setFileData(csvData);
+                setUploadFin("データの登録が完了しました。"); 
+                setUploadData(csvRows)
             } else {
-                console.log("error")
                 console.log("Error:", data.error);
+                setUploadFin("データの登録に失敗しました。");
             }
             // .then(response => response.json())
             // .then(data => {
@@ -122,19 +126,43 @@ function AddUser() {
     return (
         <>
         <UserHeader />
-            <div>
+            <div style={{ textAlign: 'center', marginTop: '50px' }}>
                 <h1>File Upload Page</h1>
                 {/* <input type="file" id="fileInput" /> */}
                 <ReactFileReader handleFiles = {uploadFile} fileTypes={".csv"}>
-                    <button>データベースに登録</button>
+                <Button
+                type="submit"
+                
+                variant="contained"
+                sx={{ mt: 3, mb: 2 ,width:'200px'}}
+                >
+                データベースに登録
+                </Button>
                     {/* <button onClick={handleFileUpload}>データベースに登録</button> */}
                 </ReactFileReader>
-                <button onClick={handleFileDownload}>ファイルをダウンロード</button>
+                <Button
+                type="submit"
+                variant="contained"
+                sx={{ mt: 3, mb: 2 ,width:'200px'}}
+                onClick={handleFileDownload}
+                >
+                ファイルのダウンロード
+                </Button>
                 {upload_fin && (
-                <div>
-                    <pre>{JSON.stringify(upload_fin, null, 2)}</pre>
+                <div 
+                    style={{ 
+                    fontFamily: 'Verdana', 
+                    fontSize: '16px' 
+                    }}
+                >
+                    <pre>{JSON.stringify(upload_fin, null, 2).replace(/(^"|"$|\[|\])/g, '')}</pre>
                 </div>
-            )}
+                )}
+                {upload_data && (
+                <div style={{ fontFamily: 'Verdana', fontSize: '16px' }}>
+                    <pre>{JSON.stringify(upload_data, null, 2).replace(/(^"|"$|\[|\])/g, '')}</pre>
+                </div>
+                )}
             </div>
         </>
     );
