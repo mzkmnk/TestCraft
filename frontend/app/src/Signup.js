@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { json, useNavigate } from 'react-router-dom';
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -49,7 +49,7 @@ function Signup() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(
-            {
+        {
             "username" : username,
             "email" : user_email,
             "password" : password,
@@ -57,7 +57,8 @@ function Signup() {
             "is_own_company" : is_own_company,
         }
         ),
-      });
+      }
+      );
       if (response.ok) {
         localStorage.setItem('username', username);
         const is_login_response = await fetch('http://localhost:8000/api/login', {

@@ -139,8 +139,8 @@ const UserHeader = () => {
                   問題一覧
                 </MenuItem>
                 <MenuItem
-                  // component={Link}
-                  // to="/questions/create"
+                  component={Link}
+                  to="/editor"
                   onClick={handleMenuClose}
                 >
                   問題作成

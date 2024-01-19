@@ -6,9 +6,18 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login as django_login
 from django.contrib.auth import logout as django_logout
 
+from django.shortcuts import get_object_or_404
+
+from django.db.models import Sum
+
 from .models import *
 
 from django.http import JsonResponse
+
+from pydantic import BaseModel,ValidationError
+from typing import Dict,List,Optional,Union
+
+from datetime import date
 
 
 from django.db import transaction
@@ -36,18 +45,52 @@ class LoginSchema(Schema):
     password : str
 
 class CompanySignUpSchema(Schema):
-    company_id : str
     name : str
+class Answer(BaseModel):
+    id: str
+    value: str
+
+class CommonQuestionFields(BaseModel):
+    parentId: Optional[str]
+    question: Optional[str]
+
+class RadioQuestion(CommonQuestionFields):
+    questionType: str = "radio"
+    options: List[Answer]
+    canMultiple: bool
+    answers: List[Answer]
+
+class TextareaQuestion(CommonQuestionFields):
+    questionType: str = "textarea"
+    maxlength: str
+    answers: List[Answer]
+
+class NestedQuestion(CommonQuestionFields):
+    questionType: str = "nested"
+    childIds: List[str]
+
+class Root(BaseModel):
+    questionType: str = "root"
+    title: str
+    childIds: List[str]
+
+Question = Union[Root, NestedQuestion, RadioQuestion, TextareaQuestion]
+
+class JsonFormat(BaseModel):
+    info: Dict
+    questions: Dict[str, Question]
+
+class EditorSchema(Schema):
+    workbook_id:int
+    
+class likeAddSchema(Schema):
+    workbook_id:int
+
+class likeDeleteSchema(Schema):
+    workbook_id:int
 
 class CsvUploadSchema(Schema):
     csv_data:str
-
-# class InformationChangeSchema(Schema):
-#     username : str
-#     email : str
-#     password : str
-#     is_company_user : bool = False
-#     is_own_company : bool = False
     
 # API
 # ユーザー登録するAPI
@@ -63,6 +106,13 @@ def signup(request, payload: SignUpSchema):
             )
         user.set_password(payload.password)
         user.save()
+        if payload.is_own_company:
+            company = Company.objects.create(
+                name = payload.username,
+                )
+            company.save()
+            user.company = company
+            user.save()
         return JsonResponse({"success":True, "id" : user.id },status = 200)
     except Exception as e:
         return JsonResponse({"success":False, "message" : str(e) },status = 400)
@@ -108,7 +158,6 @@ def logout_user(request):
 def company_signup(request,payload: CompanySignUpSchema):
     try:
         company = Company.objects.create(
-            company_id = payload.company_id,
             name = payload.name,
             )
         company.save()
@@ -120,34 +169,34 @@ def company_signup(request,payload: CompanySignUpSchema):
 @api.get("/questionsall")
 def questionsall(request):
     try:
-        workbooks = Workbook.objects.filter(is_public = True).order_by('-create_date').values(
-            'workbook_id',
+        workbooks = Workbook.objects.filter(is_public = True).order_by('-created_at').values(
+            'id',
             'workbook_name',
             'description',
-            'json_data',
             'create_id__username',
-            'create_date',
-            'update_date'
+            'created_at',
+            'updated_at',
+            'like_count',
         )
-        workbooks_with_categories = []
+        workbooks_with_likes = []
         for workbook in workbooks:
-            categories = WorkbookCategory.objects.filter(workbook_id=workbook['workbook_id']).values_list('category__category_name', flat=True)
-            workbooks_with_categories.append({
-                **workbook,
-                'categories': list(categories)
-            })
+            liked_by_user = Like.objects.filter(user=request.user, workbook_id=workbook['id']).exists()
+            workbook['liked_by_user'] = liked_by_user
+            workbooks_with_likes.append(workbook)
+        print(workbooks_with_likes)
         return JsonResponse(
             {
-                'success' : True,
-                'workbook' : workbooks_with_categories
+                'success':True,
+                'workbooks':workbooks_with_likes,
             },
             status = 200
-            )
+        )
     except Exception as e:
         return JsonResponse(
             {
                 'success' : False,
-                'workbook' : None
+                'workbook' : None,
+                'error' : str(e)
             },
             status = 400
             )
@@ -155,27 +204,24 @@ def questionsall(request):
 # ユーザが作成した問題を取得するAPI
 @api.get("/create_user_workbook")
 def get_create_user_workbook(request):
-    print("session",request.session)
-    print('user',request.user)
     try:
-        workbooks = Workbook.objects.filter(create_id__id = request.user.id).order_by('-create_date').values(
-            'workbook_id',
+        workbooks = Workbook.objects.filter(create_id__id = request.user.id).order_by('-created_at').values(
+            'id',
             'workbook_name',
             'description',
-            'json_data',
             'create_id__username',
-            'create_date',
-            'update_date'
+            'created_at',
+            'updated_at',
+            'like_count',   
         )
         workbooks_with_categories = []
         for workbook in workbooks:
-            categories = WorkbookCategory.objects.filter(workbook_id=workbook['workbook_id']).values_list('category__category_name', flat=True)
+            categories = WorkbookCategory.objects.filter(id=workbook['id']).values_list('category__category_name', flat=True)
             workbooks_with_categories.append({
                 **workbook,
                 'categories': list(categories)
             })
         User = request.user
-        print(workbooks_with_categories,User.id)
         return JsonResponse(
             {
                 'success' : True,
@@ -196,10 +242,7 @@ def get_create_user_workbook(request):
 @api.post("/add_user")
 def add_user(request ,payload:CsvUploadSchema):
     try:
-        
         data_str = payload.csv_data
-        
-        
         df = pd.read_csv(StringIO(data_str))
         df["ユーザー名"]=""
         for index, row in df.iterrows():
@@ -225,6 +268,127 @@ def add_user(request ,payload:CsvUploadSchema):
                 "success":True,
                 "csv_data":user_csv,
                 "error":None,
+            }
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "csv_data":None,
+                "error":str(e),
+            },
+            status = 400,
+        )
+        
+@api.get("/get_graph_data")
+def get_graph_data(request):
+    try:
+        activities = UserActivity.objects.filter(user_id = request.user.id).values('date').annotate(
+            solve_cnt = Sum('problems_solved_count'),
+            create_cnt = Sum('problems_created_count')
+        ).order_by('date')
+        data = [{
+            'date': activity['date'].strftime('%Y-%m-%d'),
+            'solve_cnt': activity['solve_cnt'],
+            'create_cnt': activity['create_cnt']}
+            for activity in activities]
+        
+        return JsonResponse({'success':True,'data': data},status = 200)
+    except Exception as e:
+        return JsonResponse({'success':False,'data': None},status = 400)
+    
+@api.post("/save_data")
+def save_data(request,data:JsonFormat):
+    try:
+        question_dict = {k:v for k,v in data.questions.items()}
+        workbook = Workbook.objects.create(
+            workbook_name = data.info['title'],
+            create_id = request.user,
+        )
+        Problem.objects.create(
+            workbook_id = Workbook.objects.get(id = workbook.id),
+            problem_json = data.json(),
+        )
+        return JsonResponse(
+            {
+                'success':True,
+                'error':None,
+            },
+            status = 200
+        )
+    except ValidationError as e:
+        return JsonResponse(
+            {
+                'success':False,
+                'error':e.errors()
+            },
+            status = 400
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                'success':False,
+                'error':str(e)
+            },
+            status = 400
+        )
+
+#問題編集画面を表示する。
+import json
+@api.get("/edit_workbook/{workbookId}")
+def edit_workbook(request,workbookId:int):
+    try:
+        json_data = Problem.objects.get(workbook_id = workbookId).problem_json
+        return JsonResponse(
+            {
+                'success': True,
+                'data' : json.loads(json_data),
+                'error' : None,
+            },
+            status = 200
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                'success': False,
+                'data' : None,
+                'error' : str(e),
+            },
+            status = 400
+        )
+
+#like機能
+@api.post("/questionsall/{workbookId}/like")
+def add_like(request,workbookId:int):
+    try:
+        user = request.user
+        # workbook = get_object_or_404(Workbook,id=payload.workbook_id)
+        workbook = get_object_or_404(Workbook,id=workbookId)
+        like = Like.objects.filter(user=user,workbook=workbook)
+        if like.exists():
+            like.delete()
+            workbook.like_count = max(0,workbook.like_count - 1)
+            workbook.save()
+            return JsonResponse(
+                {
+                    "success":True,
+                    "error":None,
+                    "like_count":workbook.like_count,
+                },
+                status = 200,
+            )
+        
+        Like.objects.create(
+            user = user,
+            workbook = workbook,
+        )
+        workbook.like_count += 1
+        workbook.save()
+        return JsonResponse(
+            {
+                "success":True,
+                "error":None,
+                "like_count":workbook.like_count,
             },
             status = 200,
         )
@@ -237,8 +401,3 @@ def add_user(request ,payload:CsvUploadSchema):
             },
             status = 400,
         )
-
-#登録情報を変更するAPI
-# @api.post("/information_change")
-# def information_change(request,):
-    

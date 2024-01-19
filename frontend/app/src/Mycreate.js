@@ -43,7 +43,7 @@ useEffect(() => {
 
   {/*作成画面へ飛ぶように変更する*/}
   const handleQuestionClick = (workbookId) => {
-    navigate(`/questions/${workbookId}`);
+    navigate(`/reeditor/${workbookId}`);
   };
 
   const styles = {
@@ -73,22 +73,38 @@ useEffect(() => {
     },
   };
 
+  const likeStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    marginTop: '10px',
+    color: '#1DA1F2',
+    cursor: 'pointer',
+  };
+
+  const likeIconStyle = {
+    marginRight: '5px',
+  };
+
   return (
     <>
-        <UserHeader />
-        <div style={styles.questionsContainer}>
+      <UserHeader />
+      <div style={styles.questionsContainer}>
         {questions.map(question => (
-            <div style={styles.question} key={question.workbook_id} onClick={() => handleQuestionClick(question.workbook_id)}>
-                <div style={styles.questionHeader}>
-                    <h3>{question.workbook_name}</h3>
-                    <span style={styles.createdBy}>created by {question.create_id__username} ({question.create_date})</span>
-                </div>
-                <p>{question.description}</p>
+          <div style={styles.question} key={question.id} onClick={() => handleQuestionClick(question.id)}>
+            <div style={styles.questionHeader}>
+              <h3>{question.workbook_name}</h3>
+              <span style={styles.createdBy}>created by {question.create_id__username} ({question.created_at})</span>
             </div>
+            <p>{question.description}</p>
+            <div style={likeStyle}>
+              <span style={likeIconStyle}>♥</span>
+              <span>{question.like_count}</span>
+            </div>
+          </div>
         ))}
-        </div>
+      </div>
     </>
-    );
+  );
 }
 
 export default Mycreate;
