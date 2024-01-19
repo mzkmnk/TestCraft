@@ -122,3 +122,17 @@ class Csv(models.Model):
 
     def __str__(self):
         return f"{self.company_user_id} - {self.company_user_name}"
+
+
+# message機能のためのモデル
+class Message(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender')
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='receiver')
+    message = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+    def __str__(self):
+        return f"{self.sender.username} - {self.receiver.username}"
+
+    class Meta:
+        ordering = ('timestamp',)

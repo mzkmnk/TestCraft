@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import UserHeader from "./UserHeader";
 import { useNavigate } from "react-router-dom";
+import { FaHeart } from "react-icons/fa";
 
 function Mycreate() {
   const [questions, setQuestions] = useState([]);
@@ -102,7 +103,7 @@ function Mycreate() {
             </div>
             <p>{question.description}</p>
             <div style={likeStyle}>
-              <span style={likeIconStyle}>♥</span>
+              <FaHeart style={likeIconStyle} />
               <span>{question.like_count}</span>
             </div>
           </div>

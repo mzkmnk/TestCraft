@@ -45,7 +45,7 @@ function QuestionsAll() {
     .catch(error => {
       console.error('Error:', error);
     });
-  }, []);
+  }, [navigate]);
 
   const handleQuestionClick = (workbookId) => {
     navigate(`/solve/${workbookId}`);
@@ -138,6 +138,18 @@ function QuestionsAll() {
     },
   };
 
+  const likeStyle = {
+    display: "flex",
+    alignItems: "center",
+    marginTop: "10px",
+    color: "#1DA1F2",
+    cursor: "pointer",
+  };
+
+  const likeIconStyle = {
+    marginRight: "5px",
+  };
+  
   return (
     <>
       <UserHeader />
@@ -154,10 +166,10 @@ function QuestionsAll() {
             </div>
             <p>{question.description}</p>
             <div
-              style={styles.likeButton}
+              style={likeStyle}
               onClick={(e) => handleLikeClick(e, question.id)}
             >
-              {question.liked ? <FaHeart /> : <FaRegHeart />}
+              {question.liked ? <FaHeart style={likeIconStyle} /> : <FaRegHeart style={likeIconStyle} />}
               <span style={styles.likeCount}>{question.like_count}</span>
             </div>
           </div>

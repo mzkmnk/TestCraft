@@ -7,7 +7,7 @@ import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
-
+import { useNavigate } from 'react-router-dom';
 import UserHeader from "./UserHeader";
 
 type Id = string;
@@ -76,6 +76,7 @@ export default function Editor({ workBook }) {
 
   const [questionTree, setQuestionTree] = useState(workBook.questions);
   const [title, setTitle] = useState("初期タイトル");
+  const navigate = useNavigate();
   // 保存用関数
   function save() {
     workBook = {
@@ -98,6 +99,7 @@ export default function Editor({ workBook }) {
       .then((data) => {
         if (data.success) {
           console.log("success");
+          navigate("/mypage/mycreate")
         } else {
           console.log("error", data.error);
         }

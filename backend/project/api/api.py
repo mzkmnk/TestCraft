@@ -362,7 +362,6 @@ def edit_workbook(request,workbookId:int):
 def add_like(request,workbookId:int):
     try:
         user = request.user
-        # workbook = get_object_or_404(Workbook,id=payload.workbook_id)
         workbook = get_object_or_404(Workbook,id=workbookId)
         like = Like.objects.filter(user=user,workbook=workbook)
         if like.exists():
@@ -377,13 +376,18 @@ def add_like(request,workbookId:int):
                 },
                 status = 200,
             )
-        
         Like.objects.create(
             user = user,
             workbook = workbook,
         )
+        Message.objects.create(
+            sender = user,
+            receiver = workbook.create_id,
+            message = f"{user.username}さんがあなたの問題「{workbook.workbook_name}」をいいねしました。",
+        )
         workbook.like_count += 1
         workbook.save()
+        
         return JsonResponse(
             {
                 "success":True,
@@ -397,6 +401,35 @@ def add_like(request,workbookId:int):
             {
                 "success":False,
                 "csv_data":None,
+                "error":str(e),
+            },
+            status = 400,
+        )
+
+@api.get("/message")
+def message(request):
+    try:
+        message_all = [
+            {"id":i,
+             "message":data.message,
+             "timestamp":data.timestamp,
+            }
+            for i,data in enumerate(Message.objects.filter(receiver = request.user))
+        ]
+        print(message_all)
+        return JsonResponse(
+            {
+                "success":True,
+                "message": message_all,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "message":None,
                 "error":str(e),
             },
             status = 400,
