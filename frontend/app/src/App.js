@@ -9,6 +9,7 @@ import Mycreate from "./Mycreate";
 import Editor from "./Editor.tsx";
 import Mysolve from "./Mysolve";
 import Message from "./Message.js";
+import AddUser from "./add_user";
 import ReadWorkbook from "./ReadWorkbook.js";
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
           element={<ReadWorkbook next={"Editor"} />}
         />
         <Route path="/mypage/mycreate" element={<Mycreate />} />
+        <Route path="/add_user" element = {<AddUser />} />
         <Route path="/mypage/mysolve" element={<Mysolve />} />
         <Route path="/mypage/message" element={<Message />} />
         <Route

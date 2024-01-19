@@ -22,3 +22,8 @@ admin.site.register(Problem,CustomProblem)
 
 admin.site.register(Category)
 admin.site.register(WorkbookCategory)
+
+class CustomLike(admin.ModelAdmin):
+    list_display = ('user','workbook')
+    search_fields=('id',)
+admin.site.register(Like,CustomLike)

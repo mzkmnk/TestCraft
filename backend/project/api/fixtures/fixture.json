@@ -20,7 +20,7 @@
         "fields": {
             "username": "MurakamiCompany",
             "user_public_name": "MurakamiCompany",
-            "company":1,
+            "company": 1,
             "email": "company@company.com", 
             "password": "pbkdf2_sha256$720000$E2bY6le4KUgRNnLz9XbBvm$BARpTsheUHuPoFTDVpQ5mAMqGQTj3MBwZ24YVLlkE1s=",
             "is_company_user": false,
@@ -46,8 +46,7 @@
             "create_id": 1,
             "created_at":"2024-01-01",
             "updated_at":"2024-01-01",
-            "is_public":true,
-            "like_count": 4
+            "is_public":true
         }
     },
     {
@@ -58,8 +57,7 @@
             "create_id": 3,
             "created_at":"2024-01-12",
             "updated_at":"2024-01-12",
-            "is_public":false,
-            "like_count": 1
+            "is_public":false
         }
     },
     {
@@ -70,8 +68,7 @@
             "create_id":3,
             "created_at":"2024-01-01",
             "updated_at":"2024-01-01",
-            "is_public":true,
-            "like_count": 2
+            "is_public":true
         }
     },
     {
@@ -82,8 +79,7 @@
             "create_id": 1,
             "created_at":"2024-01-09",
             "updated_at":"2024-01-09",
-            "is_public":true,
-            "like_count":4
+            "is_public":true
         }
     },
     {
