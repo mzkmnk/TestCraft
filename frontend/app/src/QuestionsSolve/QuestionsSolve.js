@@ -72,8 +72,8 @@ export default function QuestionsSolve({ workbook }) {
             questionIds={questionIds}
             answers={answers}
             setAnswers={setAnswers}
+            finishAnswer={finishAnswer}
           />
-          <Button onClick={() => finishAnswer()}>終了</Button>
         </>
       ) : null}
 

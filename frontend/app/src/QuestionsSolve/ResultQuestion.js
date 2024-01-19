@@ -38,6 +38,7 @@ export default function ResultQuestion({
         height: "100vh",
         width: "100%",
       }}
+      position={"fixed"}
     >
       <Box
         sx={{

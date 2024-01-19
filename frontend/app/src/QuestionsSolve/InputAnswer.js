@@ -12,6 +12,7 @@ export default function InputAnswer({
   questionIds,
   answers,
   setAnswers,
+  finishAnswer,
 }) {
   // questionIdsのindex
   const [displayQuestionIndex, setDisplayQuestionIndex] = useState(0);
@@ -36,6 +37,7 @@ export default function InputAnswer({
         height: "100vh",
         width: "100%",
       }}
+      position={"fixed"}
     >
       <Box
         sx={{
@@ -59,6 +61,9 @@ export default function InputAnswer({
       >
         <Box sx={{ padding: 1, margin: 1 }}>
           <Button onClick={handlePrevQuestion}>前へ</Button>
+        </Box>
+        <Box sx={{ padding: 1, margin: 1 }}>
+          <Button onClick={() => finishAnswer()}>終了</Button>
         </Box>
         <Box sx={{ padding: 1, margin: 1 }}>
           <Button onClick={handleNextQuestion}>次へ</Button>
