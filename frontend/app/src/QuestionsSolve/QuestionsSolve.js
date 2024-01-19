@@ -4,7 +4,6 @@ import useTimer from "./hooks/useTimer";
 import InputAnswer from "./InputAnswer";
 import Result from "./Result";
 import Watch from "./Watch";
-import Button from "@mui/material/Button";
 import UserHeader from "../UserHeader";
 
 export default function QuestionsSolve({ workbook }) {
@@ -56,7 +55,7 @@ export default function QuestionsSolve({ workbook }) {
 
   return (
     <>
-      <UserHeader />
+      <UserHeader position="fixed" />
       {!isSettingsOpen && !isResultOpen ? <Watch time={Timer.seconds} /> : null}
       <SettingsModal
         isSettingsOpen={isSettingsOpen}

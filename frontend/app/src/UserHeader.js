@@ -1,5 +1,5 @@
-import React from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React from "react";
+import { useNavigate, Link } from "react-router-dom";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -9,14 +9,15 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Fade from "@mui/material/Fade";
 
-const UserHeader = () => {
+const UserHeader = ({ position = "static" }) => {
   const navigate = useNavigate();
-  const username = localStorage.getItem('username');
+  const username = localStorage.getItem("username");
   const isLoggedIn = !!username;
-  const isOwnCompany = localStorage.getItem('is_own_company') === 'true';
+  const isOwnCompany = localStorage.getItem("is_own_company") === "true";
 
   const [userMenuAnchorEl, setUserMenuAnchorEl] = React.useState(null);
-  const [questionsMenuAnchorEl, setQuestionsMenuAnchorEl] = React.useState(null);
+  const [questionsMenuAnchorEl, setQuestionsMenuAnchorEl] =
+    React.useState(null);
 
   const handleUserMenuClick = (event) => {
     setUserMenuAnchorEl(event.currentTarget);
@@ -33,30 +34,30 @@ const UserHeader = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/logout', {
-        method: 'POST',
+      const response = await fetch("http://localhost:8000/api/logout", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
       });
-  
+
       if (response.ok) {
-        console.log('Logout succeeded');
-        localStorage.removeItem('username');
-        localStorage.removeItem('is_own_company');
-        navigate('/login');
+        console.log("Logout succeeded");
+        localStorage.removeItem("username");
+        localStorage.removeItem("is_own_company");
+        navigate("/login");
       } else {
-        console.error('Logout failed');
+        console.error("Logout failed");
       }
     } catch (error) {
-      console.error('Error during logout:', error);
+      console.error("Error during logout:", error);
     }
   };
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
+      <AppBar position={position}>
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             TestCraft
@@ -68,22 +69,22 @@ const UserHeader = () => {
                 aria-controls="user-menu-appbar"
                 aria-haspopup="true"
                 onClick={handleUserMenuClick}
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: "pointer" }}
               >
                 {username}
               </Button>
               <Menu
                 id="user-menu-appbar"
                 anchorEl={userMenuAnchorEl}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                transformOrigin={{ vertical: "top", horizontal: "right" }}
                 open={Boolean(userMenuAnchorEl)}
                 onClose={handleMenuClose}
                 TransitionComponent={Fade}
               >
-                <MenuItem 
-                  component={Link} 
-                  to="/mypage" 
+                <MenuItem
+                  component={Link}
+                  to="/mypage"
                   onClick={handleMenuClose}
                 >
                   マイステータス
@@ -95,38 +96,36 @@ const UserHeader = () => {
                 >
                   メッセージ
                 </MenuItem>
-                <MenuItem 
-                  component={Link} 
+                <MenuItem
+                  component={Link}
                   to="/mypage/mycreate"
                   onClick={handleMenuClose}
                 >
                   作成履歴
                 </MenuItem>
-                <MenuItem 
-                  component={Link} 
-                  to="/mypage/mysolve" 
+                <MenuItem
+                  component={Link}
+                  to="/mypage/mysolve"
                   onClick={handleMenuClose}
                 >
                   解答履歴
                 </MenuItem>
-                <MenuItem onClick={handleLogout}>
-                  ログアウト
-                </MenuItem>
+                <MenuItem onClick={handleLogout}>ログアウト</MenuItem>
               </Menu>
               <Button
                 color="inherit"
                 aria-controls="questions-menu-appbar"
                 aria-haspopup="true"
                 onClick={handleQuestionsMenuClick}
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: "pointer" }}
               >
                 問題
               </Button>
               <Menu
                 id="questions-menu-appbar"
                 anchorEl={questionsMenuAnchorEl}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                transformOrigin={{ vertical: "top", horizontal: "right" }}
                 open={Boolean(questionsMenuAnchorEl)}
                 onClose={handleMenuClose}
                 TransitionComponent={Fade}
@@ -162,7 +161,7 @@ const UserHeader = () => {
                 color="inherit"
                 component={Link}
                 to="/login"
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: "pointer" }}
               >
                 ログイン
               </Button>
@@ -170,7 +169,7 @@ const UserHeader = () => {
                 color="inherit"
                 component={Link}
                 to="/signup"
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: "pointer" }}
               >
                 登録
               </Button>
