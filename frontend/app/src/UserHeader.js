@@ -18,6 +18,7 @@ import HistoryIcon from '@mui/icons-material/History';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AddIcon from '@mui/icons-material/Add';
 import SendIcon from '@mui/icons-material/Send';
+import GroupIcon from '@mui/icons-material/Group';
 
 const UserHeader = ({ position = "static" }) => {
   const navigate = useNavigate();
@@ -234,6 +235,16 @@ const UserHeader = ({ position = "static" }) => {
                       <AddIcon style={styles.icon} />
                       ユーザ追加
                     </MenuItem>
+                    {isOwnCompanyUser && (
+                      <MenuItem
+                        component={Link}
+                        to="/all_company_users"
+                        onclick={handleMenuClose}
+                      >
+                        <GroupIcon style={styles.icon} />
+                        社員一覧
+                      </MenuItem>
+                    )}
                     <MenuItem
                       component={Link}
                       to="/send_message"

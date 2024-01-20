@@ -1,11 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import UserHeader from './UserHeader';
 import { useNavigate } from 'react-router-dom';
+import Pagination from '@mui/material/Pagination';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 
 function QuestionsAll() {
   const [questions, setQuestions] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const questionsPerPage = 6;
+  const indexOfLastQuestions = currentPage * questionsPerPage;
+  const indexOfFirstQuestions = indexOfLastQuestions - questionsPerPage;
+  const currentQuestions = questions.slice(indexOfFirstQuestions, indexOfLastQuestions);
   const navigate = useNavigate();
+
+  const handleChangePage = (event, value) => {
+    setCurrentPage(value);
+  };
 
   useEffect(() => {
     fetch('http://localhost:8000/api/check_auth', {
@@ -32,14 +42,13 @@ function QuestionsAll() {
     })
     .then(response => response.json())
     .then(data => {
-      console.log(data);
       if (data.success) {
         setQuestions(data.workbooks.map(question => ({
           ...question,
           liked: question.liked_by_user,
         })));
       } else {
-        console.log(data.error);
+        console.error(data.error);
       }
     })
     .catch(error => {
@@ -70,12 +79,11 @@ function QuestionsAll() {
     .then(data => {
       if(data.success)
       {
-        console.log(data.success);
         setQuestions(questions.map(question =>
           question.id === workbookId ? { ...question, like_count: data.like_count, liked: !question.liked } : question
         ));
       }else{
-        console.log(data.error);
+        console.error(data.error);
       }
     })
     .catch(error => {
@@ -154,7 +162,7 @@ function QuestionsAll() {
     <>
       <UserHeader />
       <div style={styles.questionsContainer}>
-        {questions.map(question => (
+        {currentQuestions.map(question => (
           <div 
             style={styles.question}
             key={question.id}
@@ -175,6 +183,11 @@ function QuestionsAll() {
           </div>
         ))}
       </div>
+      <Pagination 
+          count={Math.ceil(questions.length / questionsPerPage)} 
+          page={currentPage} 
+          onChange={handleChangePage}
+      />
     </>
   );
 }

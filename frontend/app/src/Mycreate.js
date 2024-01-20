@@ -1,11 +1,21 @@
 import React, { useEffect, useState } from "react";
 import UserHeader from "./UserHeader";
 import { useNavigate } from "react-router-dom";
+import Pagination from '@mui/material/Pagination';
 import { FaHeart } from "react-icons/fa";
 
 function Mycreate() {
   const [questions, setQuestions] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const questionsPerPage = 6;
+  const indexOfLastQuestions = currentPage * questionsPerPage;
+  const indexOfFirstQuestions = indexOfLastQuestions - questionsPerPage;
+  const currentQuestions = questions.slice(indexOfFirstQuestions, indexOfLastQuestions);
   const navigate = useNavigate();
+
+  const handleChangePage = (event, value) => {
+    setCurrentPage(value);
+  };
 
   useEffect(() => {
     fetch("http://localhost:8000/api/check_auth", {
@@ -88,7 +98,7 @@ function Mycreate() {
     <>
       <UserHeader />
       <div style={styles.questionsContainer}>
-        {questions.map((question) => (
+        {currentQuestions.map((question) => (
           <div
             style={styles.question}
             key={question.id}
@@ -109,6 +119,11 @@ function Mycreate() {
           </div>
         ))}
       </div>
+      <Pagination 
+          count={Math.ceil(questions.length / questionsPerPage)} 
+          page={currentPage} 
+          onChange={handleChangePage}
+      />
     </>
   );
 }

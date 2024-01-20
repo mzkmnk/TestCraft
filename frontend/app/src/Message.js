@@ -43,7 +43,6 @@ function Message() {
                 setIsCompanyUser(data.is_company_user);
                 setCompanyMessages(data.message.filter(msg => msg.is_company_send));
                 setOtherMessages(data.message.filter(msg => !msg.is_company_send));
-                console.log(data.message);
               }
             })
             .catch((error) => {
@@ -100,6 +99,18 @@ function Message() {
           {currentMessages.map((message) => (
             <div style={styles.message} key={message.id}>
               <p>{message.message}</p>
+              <p>{new Date(message.timestamp).toLocaleString(
+                'ja-JP',
+                  {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  }
+                )
+              }
+              </p>
             </div>
           ))}
         </div>

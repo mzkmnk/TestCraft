@@ -42,7 +42,6 @@ function CompanyMessage() {
                 setIsCompanyUser(data.is_company_user);
                 setCompanyMessages(data.message.filter(msg => msg.is_company_send));
                 setOtherMessages(data.message.filter(msg => !msg.is_company_send));
-                console.log(data.message);
               }
             })
             .catch((error) => {

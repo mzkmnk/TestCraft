@@ -9,6 +9,7 @@ import Mycreate from "./Mycreate.js";
 import Editor from "./Editor.tsx";
 import Mysolve from "./Mysolve.js";
 import Message from "./Message.js";
+import AllCompanyUsers from "./AllCompanyUsers.js";
 import CompanyMessage from "./CompanyMessage.js";
 import SendMessage from "./SendMessage.js";
 import AddUser from "./add_user.js";
@@ -30,6 +31,7 @@ function App() {
         <Route path="/mypage/mycreate" element={<Mycreate />} />
         <Route path="/add_user" element = {<AddUser />} />
         <Route path="/send_message" element={<SendMessage />} />
+        <Route path="/all_company_users" element={<AllCompanyUsers />} />
         <Route path="/mypage/mysolve" element={<Mysolve />} />
         <Route path="/mypage/message" element={<Message />} />
         <Route path="/mypage/company_message" element={<CompanyMessage />} />

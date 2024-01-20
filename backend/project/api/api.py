@@ -539,3 +539,32 @@ def is_company_user(request):
             },
             status = 400,
         )
+
+@api.get("/all_company_users")
+def all_users(request):
+    try:
+        data = [
+            {
+                "id":user.id,
+                "name":user.username, 
+            }
+            for user in User.objects.filter(company=request.user.company)
+        ]
+        print(data)
+        return JsonResponse(
+            {
+                "success":True,
+                "data":data,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "data":None,
+                "error":str(e),
+            },
+            status = 400,
+        )

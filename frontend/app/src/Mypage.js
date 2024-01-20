@@ -106,7 +106,7 @@ function MyPage() {
             ]
           })
           }else{
-            console.log("グラフデータの取得に失敗しました");
+            console.error("グラフデータの取得に失敗しました");
           }
         })
   }, [navigate]);
