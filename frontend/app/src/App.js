@@ -9,6 +9,7 @@ import Mycreate from "./Mycreate";
 import Editor from "./Editor.tsx";
 import Mysolve from "./Mysolve";
 import Message from "./Message.js";
+import CompanyMessage from "./CompanyMessage.js";
 import SendMessage from "./SendMessage.js";
 import AddUser from "./add_user";
 import ReadWorkbook from "./ReadWorkbook.js";
@@ -31,6 +32,7 @@ function App() {
         <Route path="/send_message" element={<SendMessage />} />
         <Route path="/mypage/mysolve" element={<Mysolve />} />
         <Route path="/mypage/message" element={<Message />} />
+        <Route path="/mypage/company_message" element={<CompanyMessage />} />
         <Route
           path="/solve/:workbookId"
           element={<ReadWorkbook next={"QuestionsSolve"} />}

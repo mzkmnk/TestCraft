@@ -419,6 +419,7 @@ def message(request):
              "message":data.message,
              "timestamp":data.timestamp,
              "is_company_send":data.is_company_send,
+             "workbooks":data.is_slv_workbooks,
             }
             for i,data in enumerate(Message.objects.filter(receiver = request.user).order_by('-timestamp'))
         ]
@@ -505,6 +506,27 @@ def send_messsage(request,payload:MessageSchema):
         return JsonResponse(
             {
                 "success":True,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "error":str(e),
+            },
+            status = 400,
+        )
+
+@api.get("is_company_user")
+def is_company_user(request):
+    try:
+        return JsonResponse(
+            {
+                "success":True,
+                "is_own_company":request.user.is_own_company,
+                "is_company_user":request.user.is_company_user,
                 "error":None,
             },
             status = 200,

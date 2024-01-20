@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -13,12 +13,31 @@ const UserHeader = ({ position = "static" }) => {
   const navigate = useNavigate();
   const username = localStorage.getItem("username");
   const isLoggedIn = !!username;
-  const isOwnCompany = localStorage.getItem("is_own_company") === "true";
-
+  // const isOwnCompany = localStorage.getItem("is_own_company") === "true";
+  const [isOwnCompanyUser, setIsOwnCompanyUser] = React.useState(false);
+  const [isCompanyUser, setIsCompanyUser] = React.useState(false);
   const [userMenuAnchorEl, setUserMenuAnchorEl] = React.useState(null);
   const [questionsMenuAnchorEl, setQuestionsMenuAnchorEl] = React.useState(null);
   const [companyMenuAnchorEl, setCompanyMenuAnchorEl] = React.useState(null);
 
+  useEffect(() => {
+    fetch("http://localhost:8000/api/is_company_user",{
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      if(data.success){
+        console.log("data",data);
+        setIsOwnCompanyUser(data.is_own_company);
+        setIsCompanyUser(data.is_company_user);
+      }else{
+        console.error("Error:", data.error);
+      }
+    })
+  },[navigate]);
   const handleUserMenuClick = (event) => {
     setUserMenuAnchorEl(event.currentTarget);
   };
@@ -94,6 +113,15 @@ const UserHeader = ({ position = "static" }) => {
                 >
                   マイステータス
                 </MenuItem>
+                {(isOwnCompanyUser || isCompanyUser) && (
+                  <MenuItem
+                    component={Link}
+                    to="/mypage/company_message"
+                    onClick={handleMenuClose}
+                  >
+                    企業からのお知らせ
+                  </MenuItem>
+                )}
                 <MenuItem
                   component={Link}
                   to="/mypage/message"
@@ -150,7 +178,7 @@ const UserHeader = ({ position = "static" }) => {
                   問題作成
                 </MenuItem>
               </Menu>
-              {isOwnCompany && (
+              {isOwnCompanyUser && (
                 <>
                   <Button
                     color="inherit"
