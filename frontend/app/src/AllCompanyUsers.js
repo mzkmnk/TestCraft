@@ -51,7 +51,8 @@ function AllCompanyUsers() {
     const cardStyle = {
         maxWidth: 400,
         margin: 'auto',
-        border: '1px solid #1876D1',
+        borderRadius: '10px',
+        border: '2px solid #1876D1',
     };
 
     const mediaStyle = {
