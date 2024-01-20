@@ -40,7 +40,6 @@ const UserHeader = ({ position = "static" }) => {
     .then((response) => response.json())
     .then((data) => {
       if(data.success){
-        console.log("data",data);
         setIsOwnCompanyUser(data.is_own_company);
         setIsCompanyUser(data.is_company_user);
       }else{

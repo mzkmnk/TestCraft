@@ -1,17 +1,17 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import LoginForm from "./LoginForm";
-import MyPage from "./Mypage";
-import Signup from "./Signup";
-import QuestionsAll from "./QuestionsAll";
-import Mycreate from "./Mycreate";
+import LoginForm from "./LoginForm.js";
+import MyPage from "./Mypage.js";
+import Signup from "./Signup.js";
+import QuestionsAll from "./QuestionsAll.js";
+import Mycreate from "./Mycreate.js";
 import Editor from "./Editor.tsx";
-import Mysolve from "./Mysolve";
+import Mysolve from "./Mysolve.js";
 import Message from "./Message.js";
 import CompanyMessage from "./CompanyMessage.js";
 import SendMessage from "./SendMessage.js";
-import AddUser from "./add_user";
+import AddUser from "./add_user.js";
 import ReadWorkbook from "./ReadWorkbook.js";
 
 function App() {

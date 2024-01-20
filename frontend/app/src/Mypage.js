@@ -56,18 +56,21 @@ function MyPage() {
       })
       .then(response => response.json())
       .then(userData => {
-        if (userData.success && userData.data) {
+        if (userData.success) {
           const graphdata = userData.data;
-
-          // 現在の日付までの全ての日付を生成する
-          const startDate = new Date(graphdata[0].date);
+          let startDate;
+          if(graphdata.length === 0){
+            const today = new Date();
+            startDate = new Date(today.getFullYear(),today.getMonth(),today.getDate() - 7);
+          }else{
+            startDate = new Date(graphdata[0].date);
+          }
           const endDate = new Date();
           const allDates = eachDayOfInterval({
             start: startDate,
             end: endDate
           }).map(day => format(day, 'yyyy-MM-dd'));
 
-          // 日付に対応するデータを埋め込む
           const solveCounts = allDates.map(date => {
             const data = graphdata.find(item => item.date === date);
             return data ? data.solve_cnt : 0;
