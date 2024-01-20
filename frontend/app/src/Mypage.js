@@ -1,8 +1,5 @@
-import React, {
-  useState,
-  useEffect
-} from 'react';
-
+import React, { useState,useEffect } from 'react';
+import { format, eachDayOfInterval, startOfDay, endOfDay } from 'date-fns';
 import { Line } from 'react-chartjs-2';
 import { useNavigate } from 'react-router-dom';
 import UserHeader from './UserHeader';
@@ -57,35 +54,54 @@ function MyPage() {
         },
         credentials: 'include',
       })
-        .then(response => response.json())
-        .then(userData => {
-          if(userData.success && userData.data){
-            const graphdata = userData.data;
-            setChartData({
-              labels:graphdata.map(item => item.date),
-              datasets: [
-                {
-                  label:'問題回答数',
-                  data: graphdata.map(item => item.solve_cnt),
-                  backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                  ],
-                  borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                  ],
-                },
-                {
-                  label:'問題作成数',
-                  data:graphdata.map(item => item.create_cnt),
-                  backgroundColor: [
-                    'rgba(54, 162, 235, 0.2)',
-                  ],
-                  borderColor: [
-                    'rgba(54, 162, 235, 1)',
-                  ],
-                }
-              ]
-            })
+      .then(response => response.json())
+      .then(userData => {
+        if (userData.success && userData.data) {
+          const graphdata = userData.data;
+
+          // 現在の日付までの全ての日付を生成する
+          const startDate = new Date(graphdata[0].date);
+          const endDate = new Date();
+          const allDates = eachDayOfInterval({
+            start: startDate,
+            end: endDate
+          }).map(day => format(day, 'yyyy-MM-dd'));
+
+          // 日付に対応するデータを埋め込む
+          const solveCounts = allDates.map(date => {
+            const data = graphdata.find(item => item.date === date);
+            return data ? data.solve_cnt : 0;
+          });
+
+          const createCounts = allDates.map(date => {
+            const data = graphdata.find(item => item.date === date);
+            return data ? data.create_cnt : 0;
+          });
+          setChartData({
+            labels:allDates,
+            datasets: [
+              {
+                label:'問題回答数',
+                data: solveCounts,
+                backgroundColor: [
+                  'rgba(255, 99, 132, 0.2)',
+                ],
+                borderColor: [
+                  'rgba(255, 99, 132, 1)',
+                ],
+              },
+              {
+                label:'問題作成数',
+                data:createCounts,
+                backgroundColor: [
+                  'rgba(54, 162, 235, 0.2)',
+                ],
+                borderColor: [
+                  'rgba(54, 162, 235, 1)',
+                ],
+              }
+            ]
+          })
           }else{
             console.log("グラフデータの取得に失敗しました");
           }
@@ -105,6 +121,7 @@ function MyPage() {
           text: 'date'
         },
         ticks: {
+          maxTicksLimit: 10,
           color: "#000",
         },
         grid: {
