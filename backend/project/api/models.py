@@ -131,6 +131,8 @@ class Message(models.Model):
     message = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
+    is_company_send = models.BooleanField(default=False)
+    is_slv_workbooks = models.JSONField(null=True,blank=True)
     def __str__(self):
         return f"{self.sender.username} - {self.receiver.username}"
 

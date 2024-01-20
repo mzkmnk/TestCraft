@@ -16,8 +16,8 @@ const UserHeader = ({ position = "static" }) => {
   const isOwnCompany = localStorage.getItem("is_own_company") === "true";
 
   const [userMenuAnchorEl, setUserMenuAnchorEl] = React.useState(null);
-  const [questionsMenuAnchorEl, setQuestionsMenuAnchorEl] =
-    React.useState(null);
+  const [questionsMenuAnchorEl, setQuestionsMenuAnchorEl] = React.useState(null);
+  const [companyMenuAnchorEl, setCompanyMenuAnchorEl] = React.useState(null);
 
   const handleUserMenuClick = (event) => {
     setUserMenuAnchorEl(event.currentTarget);
@@ -27,9 +27,14 @@ const UserHeader = ({ position = "static" }) => {
     setQuestionsMenuAnchorEl(event.currentTarget);
   };
 
+  const handleCompanyMenuClick = (event) => {
+    setCompanyMenuAnchorEl(event.currentTarget);
+  };
+
   const handleMenuClose = () => {
     setUserMenuAnchorEl(null);
     setQuestionsMenuAnchorEl(null);
+    setCompanyMenuAnchorEl(null);
   };
 
   const handleLogout = async () => {
@@ -94,7 +99,7 @@ const UserHeader = ({ position = "static" }) => {
                   to="/mypage/message"
                   onClick={handleMenuClose}
                 >
-                  メッセージ
+                  お知らせ
                 </MenuItem>
                 <MenuItem
                   component={Link}
@@ -144,16 +149,44 @@ const UserHeader = ({ position = "static" }) => {
                 >
                   問題作成
                 </MenuItem>
-                {isOwnCompany && (
-                  <MenuItem
-                    component={Link}
-                    to="/add_user"
-                    onClick={handleMenuClose}
-                  >
-                    ユーザー追加
-                  </MenuItem>
-                )}
               </Menu>
+              {isOwnCompany && (
+                <>
+                  <Button
+                    color="inherit"
+                    aria-controls="company-menu-appbar"
+                    aria-haspopup="true"
+                    onClick={handleCompanyMenuClick}
+                    style={{ cursor: "pointer" }}
+                  >
+                    企業用
+                  </Button> 
+                  <Menu
+                    id="company-menu-appbar"
+                    anchorEl={companyMenuAnchorEl}
+                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                    transformOrigin={{ vertical: "top", horizontal: "right" }}
+                    open={Boolean(companyMenuAnchorEl)}
+                    onClose={handleMenuClose}
+                    TransitionComponent={Fade}
+                  >
+                    <MenuItem
+                      component={Link}
+                      to="/add_user"
+                      onClick={handleMenuClose}
+                    >
+                      ユーザ追加
+                    </MenuItem>
+                    <MenuItem
+                      component={Link}
+                      to="/send_message"
+                      onClick={handleMenuClose}
+                    >
+                      お知らせ送信
+                    </MenuItem>
+                  </Menu>
+                </>
+              )}
             </>
           ) : (
             <>

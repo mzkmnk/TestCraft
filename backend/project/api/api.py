@@ -92,6 +92,11 @@ class likeDeleteSchema(Schema):
 class CsvUploadSchema(Schema):
     csv_data:str
     
+class MessageSchema(Schema):
+    message:str
+    to:str
+    workbooks:str
+    
 # API
 # ユーザー登録するAPI
 @api.post("/signup")
@@ -413,14 +418,16 @@ def message(request):
             {"id":i,
              "message":data.message,
              "timestamp":data.timestamp,
+             "is_company_send":data.is_company_send,
             }
-            for i,data in enumerate(Message.objects.filter(receiver = request.user))
+            for i,data in enumerate(Message.objects.filter(receiver = request.user).order_by('-timestamp'))
         ]
-        print(message_all)
+        print(f"{request.user.is_company_user = }")
         return JsonResponse(
             {
                 "success":True,
                 "message": message_all,
+                "is_company_user":request.user.is_company_user,
                 "error":None,
             },
             status = 200,
@@ -430,6 +437,82 @@ def message(request):
             {
                 "success":False,
                 "message":None,
+                "error":str(e),
+            },
+            status = 400,
+        )
+
+@api.get("/get_company_user")
+def get_company_user(request):
+    try:
+        company = request.user.company
+        company_user = [
+            {
+                "id":user.id,
+                "username":user.username,
+            }
+            for _i,user in enumerate(User.objects.filter(company = company))
+        ]
+        workbooks = [
+            {
+                "id":workbook.id,
+                "name":workbook.workbook_name,
+            }
+            for _i,workbook in enumerate(Workbook.objects.filter(create_id = request.user))
+        ]
+        print(workbooks)
+        print(company_user)
+        return JsonResponse(
+            {
+                "success":True,
+                "data":company_user,
+                "workbooks":workbooks,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "data":None,
+                "workbooks":None,
+                "error":str(e),
+            },
+            status = 400,
+        )
+    
+@api.post("/send_message")
+def send_messsage(request,payload:MessageSchema):
+    try:
+        message = payload.message
+        users = payload.to.split(',')
+        workbooks = payload.workbooks.split(',')
+        workbook_dict = {}
+        for workbook in workbooks:
+            workbook_id,workbook_name = workbook.split(':')
+            workbook_dict[workbook_id] = workbook_name
+        print(workbook_dict)
+        for user in users:
+            user_id,_username = user.split(':')
+            Message.objects.create(
+                sender = request.user,
+                receiver = User.objects.get(id = user_id),
+                message = message,
+                is_company_send = True,
+                is_slv_workbooks = workbook_dict,
+            )
+        return JsonResponse(
+            {
+                "success":True,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
                 "error":str(e),
             },
             status = 400,

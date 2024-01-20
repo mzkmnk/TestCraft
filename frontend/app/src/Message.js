@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import UserHeader from './UserHeader';
 
 function Message() {
-  const [messages, setMessages] = useState([]);
+  const [companyMessages, setCompanyMessages] = useState([]);
+  const [otherMessages, setOtherMessages] = useState([]);
+  const [isCompanyUser, setIsCompanyUser] = useState(false);
   const navigate = useNavigate();
   useEffect(() => {
     fetch("http://localhost:8000/api/check_auth", {
@@ -26,12 +28,14 @@ function Message() {
             .then((response) => response.json())
             .then((data) => {
               if (data.success === true) {
-                console.log(data.message);
-                setMessages(data.message);
+                console.log('is_company_user',data.is_company_user);
+                setIsCompanyUser(data.is_company_user);
+                setCompanyMessages(data.message.filter(msg => msg.is_company_send));
+                setOtherMessages(data.message.filter(msg => !msg.is_company_send));
               }
             })
             .catch((error) => {
-              console.error("Error:", error);
+              console.error("Error:", data.error,error);
             });
         }
       })
@@ -45,15 +49,13 @@ function Message() {
       display: 'grid',
       gridTemplateColumns: 'repeat(2, 1fr)',
       gridGap: '20px',
-      maxHeight: 'calc(100vh - 70px)',
-      overflowY: 'auto',
       padding: '20px',
     },
     message: {
       border: '1px solid #ccc',
       padding: '20px',
       borderRadius: '8px',
-      position: 'relative',
+      background: '#fff',
     },
   }
 
@@ -61,19 +63,29 @@ function Message() {
     <>
       <UserHeader />
       <div style={styles.messagesContainer}>
-        {messages.map((message) => (
-          <div
-            style = {styles.message}
-            key={message.id}
-          >
-            <span>{message.message}</span>
-            <span>time : {message.timestamp}</span>
+        {isCompanyUser && (
+          <div>
+            <h2>企業からのメッセージ</h2>
+            {companyMessages.map((message) => (
+              <div style={styles.message} key={message.id}>
+                <h3>Message ID: {message.id}</h3>
+                <p>{message.message}</p>
+              </div>
+            ))}
           </div>
-        ))}
+        )}
+        <div>
+          <h2>メッセージ</h2>
+          {otherMessages.map((message) => (
+            <div style={styles.message} key={message.id}>
+              <h3>Message ID: {message.id}</h3>
+              <p>{message.message}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </>
   );
 }
 
 export default Message;
-
