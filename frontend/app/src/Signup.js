@@ -11,6 +11,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import Alert from "@mui/material/Alert";
 import UserHeader from './UserHeader';
 
 const theme = createTheme();
@@ -22,6 +23,7 @@ function Signup() {
   const [password, setPassword] = useState('');
   const [is_company_user,setIsCompanyUser] = useState(false);
   const [is_own_company, setIsOwnCompany] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     fetch('http://localhost:8000/api/check_auth', {
@@ -91,6 +93,14 @@ function Signup() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    if(!username || !user_email || !password){
+      setError("ユーザネーム、メールアドレス、パスワードを全て入力してください。");
+      return;
+    }
+    if (is_company_user && is_own_company) {
+      setError('企業の代表者と企業のメンバーの両方にチェックすることはできません。');
+      return;
+    }
     handleSignup();
   };
 
@@ -150,12 +160,17 @@ function Signup() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
+              {error &&
+                <Alert severity="error" sx={{ mt: 1, mb: 1 }}>
+                  {error}
+                </Alert>
+              }
               <FormControlLabel
-                control={<Checkbox value={is_own_company} onChange={(e) => setIsOwnCompany(e.target.checked)} color="primary" />}
+                control={<Checkbox checked={is_own_company} onChange={(e) => setIsOwnCompany(e.target.checked)} color="primary" />}
                 label="企業の代表の方はチェックを入れてください"
               />
               <FormControlLabel 
-                control={<Checkbox value={is_company_user} onChange={(e) => setIsCompanyUser(e.target.checked)} color="primary" />}
+                control={<Checkbox checked={is_company_user} onChange={(e) => setIsCompanyUser(e.target.checked)} color="primary" />}
                 label="企業の代表ではないが、企業のメンバーの方はチェックを入れてください"
               />
               <Button
