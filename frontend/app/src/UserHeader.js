@@ -9,6 +9,16 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Fade from "@mui/material/Fade";
 
+// アイコンimport
+import BorderColorIcon from '@mui/icons-material/BorderColor';
+import BookIcon from '@mui/icons-material/Book';
+import EqualizerIcon from '@mui/icons-material/Equalizer';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+import HistoryIcon from '@mui/icons-material/History';
+import LogoutIcon from '@mui/icons-material/Logout';
+import AddIcon from '@mui/icons-material/Add';
+import SendIcon from '@mui/icons-material/Send';
+
 const UserHeader = ({ position = "static" }) => {
   const navigate = useNavigate();
   const username = localStorage.getItem("username");
@@ -79,6 +89,13 @@ const UserHeader = ({ position = "static" }) => {
     }
   };
 
+  const styles = {
+    icon : {
+      marginRight: '10px',
+      color:'#1876D2',
+    }
+  }
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position={position}>
@@ -111,7 +128,8 @@ const UserHeader = ({ position = "static" }) => {
                   to="/mypage"
                   onClick={handleMenuClose}
                 >
-                  マイステータス
+                  <EqualizerIcon style={styles.icon} />
+                  アクティビティ
                 </MenuItem>
                 {(isOwnCompanyUser || isCompanyUser) && (
                   <MenuItem
@@ -119,6 +137,7 @@ const UserHeader = ({ position = "static" }) => {
                     to="/mypage/company_message"
                     onClick={handleMenuClose}
                   >
+                    <NotificationsActiveIcon style={styles.icon} />
                     企業からのお知らせ
                   </MenuItem>
                 )}
@@ -127,6 +146,7 @@ const UserHeader = ({ position = "static" }) => {
                   to="/mypage/message"
                   onClick={handleMenuClose}
                 >
+                  <NotificationsActiveIcon style={styles.icon} />
                   お知らせ
                 </MenuItem>
                 <MenuItem
@@ -134,6 +154,7 @@ const UserHeader = ({ position = "static" }) => {
                   to="/mypage/mycreate"
                   onClick={handleMenuClose}
                 >
+                  <HistoryIcon style={styles.icon} />
                   作成履歴
                 </MenuItem>
                 <MenuItem
@@ -141,9 +162,15 @@ const UserHeader = ({ position = "static" }) => {
                   to="/mypage/mysolve"
                   onClick={handleMenuClose}
                 >
+                  <HistoryIcon style={styles.icon} />
                   解答履歴
                 </MenuItem>
-                <MenuItem onClick={handleLogout}>ログアウト</MenuItem>
+                <MenuItem 
+                  onClick={handleLogout}
+                >
+                  <LogoutIcon style={styles.icon} />
+                  ログアウト
+                </MenuItem>
               </Menu>
               <Button
                 color="inherit"
@@ -168,6 +195,7 @@ const UserHeader = ({ position = "static" }) => {
                   to="/questionsAll"
                   onClick={handleMenuClose}
                 >
+                  <BorderColorIcon style={styles.icon} />
                   問題一覧
                 </MenuItem>
                 <MenuItem
@@ -175,6 +203,7 @@ const UserHeader = ({ position = "static" }) => {
                   to="/editor"
                   onClick={handleMenuClose}
                 >
+                  <BookIcon style={styles.icon} />
                   問題作成
                 </MenuItem>
               </Menu>
@@ -203,6 +232,7 @@ const UserHeader = ({ position = "static" }) => {
                       to="/add_user"
                       onClick={handleMenuClose}
                     >
+                      <AddIcon style={styles.icon} />
                       ユーザ追加
                     </MenuItem>
                     <MenuItem
@@ -210,6 +240,7 @@ const UserHeader = ({ position = "static" }) => {
                       to="/send_message"
                       onClick={handleMenuClose}
                     >
+                      <SendIcon style={styles.icon} />
                       お知らせ送信
                     </MenuItem>
                   </Menu>
