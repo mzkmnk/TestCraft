@@ -547,6 +547,7 @@ def all_users(request):
             {
                 "id":user.id,
                 "name":user.username, 
+                "created_at":user.created_at,
             }
             for user in User.objects.filter(company=request.user.company)
         ]

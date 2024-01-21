@@ -22,7 +22,7 @@ class User(AbstractUser):
     company_user_id = models.CharField(max_length = 255, null = True, blank = True) # いる？
     is_company_user = models.BooleanField(default = False)
     is_own_company = models.BooleanField(default = False)
-    
+    created_at = models.DateField(auto_now_add = True)
     problem_create_cnt = models.IntegerField(default = 0)
     problem_slv_cnt = models.IntegerField(default = 0)
     
