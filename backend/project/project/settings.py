@@ -42,8 +42,6 @@ INSTALLED_APPS = [
     'corsheaders',
 ]
 
-NINJA_DOCS_VIEW = 'redoc'
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
