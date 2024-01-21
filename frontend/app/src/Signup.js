@@ -85,7 +85,8 @@ function Signup() {
           localStorage.setItem('is_own_company', is_own_company);
           navigate('/mypage',{
             state:{
-              message:'ユーザー登録に成功しました。'
+              message:'ユーザー登録に成功しました。',
+              severity:'success',
             }
           });
         }

@@ -94,7 +94,8 @@ function SendMessage() {
         navigate("/mypage",
         {
           state:{
-            message:'メッセージを送信しました。'
+            message:'メッセージを送信しました。',
+            severity:'success',
           }
         });
       }

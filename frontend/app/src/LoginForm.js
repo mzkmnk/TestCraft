@@ -28,7 +28,8 @@ function LoginForm() {
           navigate('/mypage',
           {
             state:{
-              message:'ログインしています。'
+              message:'ログインしています。',
+              severity:'success'
             }
           });
         }
@@ -57,7 +58,8 @@ function LoginForm() {
         navigate('/mypage',
         {
           state:{
-            message:'ログインに成功しました。'
+            message:'ログインに成功しました。',
+            severity:'success'
           }
         });
       } else {

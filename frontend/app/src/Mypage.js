@@ -197,7 +197,11 @@ function MyPage() {
           onClose={handleCloseSnackbar}
           anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         >
-          <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
+          <Alert
+            onClose={handleCloseSnackbar}
+            severity={location.state.severity}
+            sx={{ width: '100%' }}
+          >
             {location.state.message}
           </Alert>
         </Snackbar>
