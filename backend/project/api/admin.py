@@ -27,8 +27,3 @@ class CustomLike(admin.ModelAdmin):
     list_display = ('user','workbook')
     search_fields=('id',)
 admin.site.register(Like,CustomLike)
-
-class CustomMessage(admin.ModelAdmin):
-    list_display = ('sender','receiver','timestamp')
-    search_fields=('id',)
-admin.site.register(Message,CustomMessage)

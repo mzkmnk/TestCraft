@@ -33,20 +33,7 @@
             "username":"MurakamiCompany_user_0001",
             "user_public_name":"MurakamiCompany_user_0001",
             "email":"company@company.com",
-            "company":1,
             "password": "pbkdf2_sha256$720000$E2bY6le4KUgRNnLz9XbBvm$BARpTsheUHuPoFTDVpQ5mAMqGQTj3MBwZ24YVLlkE1s=",
-            "is_company_user":true,
-            "is_own_company": false
-        }
-    },
-    {
-        "model":"api.user",
-        "fields": {
-            "username":"MurakamiCompany_user_0002",
-            "user_public_name":"MurakamiCompany_user_0002",
-            "email":"company@company.com",
-            "company":1,
-            "password":"pbkdf2_sha256$720000$E2bY6le4KUgRNnLz9XbBvm$BARpTsheUHuPoFTDVpQ5mAMqGQTj3MBwZ24YVLlkE1s=",
             "is_company_user":true,
             "is_own_company": false
         }

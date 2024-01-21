@@ -1,27 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import UserHeader from './UserHeader';
 import { useNavigate } from 'react-router-dom';
-import Pagination from '@mui/material/Pagination';
-import Snackbar from '@mui/material/Snackbar';
-import Alert from "@mui/material/Alert";
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 
 function QuestionsAll() {
   const [questions, setQuestions] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const questionsPerPage = 6;
-  const indexOfLastQuestions = currentPage * questionsPerPage;
-  const indexOfFirstQuestions = indexOfLastQuestions - questionsPerPage;
-  const currentQuestions = questions.slice(indexOfFirstQuestions, indexOfLastQuestions);
   const navigate = useNavigate();
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-
-
-
-  const handleChangePage = (event, value) => {
-    setCurrentPage(value);
-  };
 
   useEffect(() => {
     fetch('http://localhost:8000/api/check_auth', {
@@ -48,19 +32,20 @@ function QuestionsAll() {
     })
     .then(response => response.json())
     .then(data => {
+      console.log(data);
       if (data.success) {
         setQuestions(data.workbooks.map(question => ({
           ...question,
           liked: question.liked_by_user,
         })));
       } else {
-        console.error(data.error);
+        console.log(data.error);
       }
     })
     .catch(error => {
       console.error('Error:', error);
     });
-  }, [navigate]);
+  }, []);
 
   const handleQuestionClick = (workbookId) => {
     navigate(`/solve/${workbookId}`);
@@ -85,13 +70,12 @@ function QuestionsAll() {
     .then(data => {
       if(data.success)
       {
+        console.log(data.success);
         setQuestions(questions.map(question =>
           question.id === workbookId ? { ...question, like_count: data.like_count, liked: !question.liked } : question
         ));
-        setSnackbarMessage('いいねしました');
-        setOpenSnackbar(true);
       }else{
-        console.error(data.error);
+        console.log(data.error);
       }
     })
     .catch(error => {
@@ -154,23 +138,11 @@ function QuestionsAll() {
     },
   };
 
-  const likeStyle = {
-    display: "flex",
-    alignItems: "center",
-    marginTop: "10px",
-    color: "#1DA1F2",
-    cursor: "pointer",
-  };
-
-  const likeIconStyle = {
-    marginRight: "5px",
-  };
-  
   return (
     <>
       <UserHeader />
       <div style={styles.questionsContainer}>
-        {currentQuestions.map(question => (
+        {questions.map(question => (
           <div 
             style={styles.question}
             key={question.id}
@@ -182,30 +154,15 @@ function QuestionsAll() {
             </div>
             <p>{question.description}</p>
             <div
-              style={likeStyle}
+              style={styles.likeButton}
               onClick={(e) => handleLikeClick(e, question.id)}
             >
-              {question.liked ? <FaHeart style={likeIconStyle} /> : <FaRegHeart style={likeIconStyle} />}
+              {question.liked ? <FaHeart /> : <FaRegHeart />}
               <span style={styles.likeCount}>{question.like_count}</span>
             </div>
           </div>
         ))}
       </div>
-      <Pagination 
-          count={Math.ceil(questions.length / questionsPerPage)} 
-          page={currentPage} 
-          onChange={handleChangePage}
-      />
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={4000}
-        onClose={() => setOpenSnackbar(false)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-      >
-        <Alert onClose={() => setOpenSnackbar(false)} severity="success" sx={{ width: '100%' }}>
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
     </>
   );
 }
