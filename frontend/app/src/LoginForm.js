@@ -4,13 +4,12 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import Alert from "@mui/material/Alert";
 
 import UserHeader from './UserHeader';
 
@@ -20,12 +19,18 @@ function LoginForm() {
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
     fetch('http://localhost:8000/api/check_auth', { credentials: 'include' })
       .then(response => {
         if (response.ok) {
-          navigate('/mypage');
+          navigate('/mypage',
+          {
+            state:{
+              message:'ログインしています。'
+            }
+          });
         }
       })
       .catch(error => {
@@ -34,6 +39,7 @@ function LoginForm() {
   }, [navigate]);
 
   const handleLogin = async () => {
+    setError('');
     try {
         const response = await fetch('http://localhost:8000/api/login', {
         method: 'POST',
@@ -48,11 +54,18 @@ function LoginForm() {
         console.log('Login succeeded');
         localStorage.setItem('username', data.username);
         localStorage.setItem('is_own_company',data.is_own_company);
-        navigate('/mypage');
+        navigate('/mypage',
+        {
+          state:{
+            message:'ログインに成功しました。'
+          }
+        });
       } else {
+        setError("ログイン失敗しました。ユーザネームかパスワードが違います。");
         console.error('Login failed');
       }
     } catch (error) {
+      setError("ログイン失敗しました。ユーザネームかパスワードが違います。"); 
       console.error('Error during login:', error);
     }
   };
@@ -107,10 +120,11 @@ function LoginForm() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
-                {/* <FormControlLabel
-                    control={<Checkbox value="remember" color="primary" />}
-                    label="Remember me"
-                /> */}
+                {error && (
+                  <Alert severity="error" sx={{ width: '100%'}}>
+                    {error}
+                  </Alert>
+                )}
                 <Button
                     type="submit"
                     fullWidth

@@ -92,6 +92,11 @@ class likeDeleteSchema(Schema):
 class CsvUploadSchema(Schema):
     csv_data:str
     
+class MessageSchema(Schema):
+    message:str
+    to:str
+    workbooks:str
+    
 # API
 # ユーザー登録するAPI
 @api.post("/signup")
@@ -362,7 +367,6 @@ def edit_workbook(request,workbookId:int):
 def add_like(request,workbookId:int):
     try:
         user = request.user
-        # workbook = get_object_or_404(Workbook,id=payload.workbook_id)
         workbook = get_object_or_404(Workbook,id=workbookId)
         like = Like.objects.filter(user=user,workbook=workbook)
         if like.exists():
@@ -377,13 +381,18 @@ def add_like(request,workbookId:int):
                 },
                 status = 200,
             )
-        
         Like.objects.create(
             user = user,
             workbook = workbook,
         )
+        Message.objects.create(
+            sender = user,
+            receiver = workbook.create_id,
+            message = f"{user.username}さんがあなたの問題「{workbook.workbook_name}」をいいねしました。",
+        )
         workbook.like_count += 1
         workbook.save()
+        
         return JsonResponse(
             {
                 "success":True,
@@ -397,6 +406,164 @@ def add_like(request,workbookId:int):
             {
                 "success":False,
                 "csv_data":None,
+                "error":str(e),
+            },
+            status = 400,
+        )
+
+@api.get("/message")
+def message(request):
+    try:
+        message_all = [
+            {"id":i,
+             "message":data.message,
+             "timestamp":data.timestamp,
+             "is_company_send":data.is_company_send,
+             "workbooks":data.is_slv_workbooks,
+            }
+            for i,data in enumerate(Message.objects.filter(receiver = request.user).order_by('-timestamp'))
+        ]
+        print(f"{request.user.is_company_user = }")
+        return JsonResponse(
+            {
+                "success":True,
+                "message": message_all,
+                "is_company_user":request.user.is_company_user,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "message":None,
+                "error":str(e),
+            },
+            status = 400,
+        )
+
+@api.get("/get_company_user")
+def get_company_user(request):
+    try:
+        company = request.user.company
+        company_user = [
+            {
+                "id":user.id,
+                "username":user.username,
+            }
+            for _i,user in enumerate(User.objects.filter(company = company))
+        ]
+        workbooks = [
+            {
+                "id":workbook.id,
+                "name":workbook.workbook_name,
+            }
+            for _i,workbook in enumerate(Workbook.objects.filter(create_id = request.user))
+        ]
+        print(workbooks)
+        print(company_user)
+        return JsonResponse(
+            {
+                "success":True,
+                "data":company_user,
+                "workbooks":workbooks,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "data":None,
+                "workbooks":None,
+                "error":str(e),
+            },
+            status = 400,
+        )
+    
+@api.post("/send_message")
+def send_messsage(request,payload:MessageSchema):
+    try:
+        message = payload.message
+        users = payload.to.split(',')
+        workbooks = payload.workbooks.split(',')
+        workbook_dict = {}
+        for workbook in workbooks:
+            workbook_id,workbook_name = workbook.split(':')
+            workbook_dict[workbook_id] = workbook_name
+        print(workbook_dict)
+        for user in users:
+            user_id,_username = user.split(':')
+            Message.objects.create(
+                sender = request.user,
+                receiver = User.objects.get(id = user_id),
+                message = message,
+                is_company_send = True,
+                is_slv_workbooks = workbook_dict,
+            )
+        return JsonResponse(
+            {
+                "success":True,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "error":str(e),
+            },
+            status = 400,
+        )
+
+@api.get("is_company_user")
+def is_company_user(request):
+    try:
+        return JsonResponse(
+            {
+                "success":True,
+                "is_own_company":request.user.is_own_company,
+                "is_company_user":request.user.is_company_user,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "error":str(e),
+            },
+            status = 400,
+        )
+
+@api.get("/all_company_users")
+def all_users(request):
+    try:
+        data = [
+            {
+                "id":user.id,
+                "name":user.username, 
+            }
+            for user in User.objects.filter(company=request.user.company)
+        ]
+        print(data)
+        return JsonResponse(
+            {
+                "success":True,
+                "data":data,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "data":None,
                 "error":str(e),
             },
             status = 400,
