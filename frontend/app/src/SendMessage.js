@@ -91,7 +91,12 @@ function SendMessage() {
         console.log("Message sent");
         setMessage("");
         setSelectedRecipients([]); 
-        navigate("/mypage");
+        navigate("/mypage",
+        {
+          state:{
+            message:'メッセージを送信しました。'
+          }
+        });
       }
     })
     .catch((error) => {

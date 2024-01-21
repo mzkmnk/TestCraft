@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import UserHeader from './UserHeader';
 import { useNavigate } from 'react-router-dom';
 import Pagination from '@mui/material/Pagination';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from "@mui/material/Alert";
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 
 function QuestionsAll() {
@@ -12,6 +14,10 @@ function QuestionsAll() {
   const indexOfFirstQuestions = indexOfLastQuestions - questionsPerPage;
   const currentQuestions = questions.slice(indexOfFirstQuestions, indexOfLastQuestions);
   const navigate = useNavigate();
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+
+
 
   const handleChangePage = (event, value) => {
     setCurrentPage(value);
@@ -82,6 +88,8 @@ function QuestionsAll() {
         setQuestions(questions.map(question =>
           question.id === workbookId ? { ...question, like_count: data.like_count, liked: !question.liked } : question
         ));
+        setSnackbarMessage('いいねしました');
+        setOpenSnackbar(true);
       }else{
         console.error(data.error);
       }
@@ -188,6 +196,16 @@ function QuestionsAll() {
           page={currentPage} 
           onChange={handleChangePage}
       />
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={4000}
+        onClose={() => setOpenSnackbar(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert onClose={() => setOpenSnackbar(false)} severity="success" sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </>
   );
 }

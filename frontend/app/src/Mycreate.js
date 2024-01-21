@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import UserHeader from "./UserHeader";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useLocation } from "react-router-dom";
 import Pagination from '@mui/material/Pagination';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from "@mui/material/Alert";
 import { FaHeart } from "react-icons/fa";
 
 function Mycreate() {
@@ -12,6 +14,8 @@ function Mycreate() {
   const indexOfFirstQuestions = indexOfLastQuestions - questionsPerPage;
   const currentQuestions = questions.slice(indexOfFirstQuestions, indexOfLastQuestions);
   const navigate = useNavigate();
+  const location = useLocation();
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
   const handleChangePage = (event, value) => {
     setCurrentPage(value);
@@ -50,6 +54,16 @@ function Mycreate() {
         console.error("Error:", error);
       });
   }, [navigate]);
+
+  useEffect(() => {
+    if (location.state?.message) {
+      setOpenSnackbar(true);
+    }
+  }, [location]);
+  
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
+  };
 
   const handleQuestionClick = (workbookId) => {
     navigate(`/editor/${workbookId}`);
@@ -124,6 +138,18 @@ function Mycreate() {
           page={currentPage} 
           onChange={handleChangePage}
       />
+      {openSnackbar && (
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={4000}
+          onClose={handleCloseSnackbar}
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        >
+          <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
+            {location.state.message}
+          </Alert>
+        </Snackbar>
+      )}
     </>
   );
 }

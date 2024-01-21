@@ -25,7 +25,12 @@ function LoginForm() {
     fetch('http://localhost:8000/api/check_auth', { credentials: 'include' })
       .then(response => {
         if (response.ok) {
-          navigate('/mypage');
+          navigate('/mypage',
+          {
+            state:{
+              message:'ログインしています。'
+            }
+          });
         }
       })
       .catch(error => {
@@ -49,7 +54,12 @@ function LoginForm() {
         console.log('Login succeeded');
         localStorage.setItem('username', data.username);
         localStorage.setItem('is_own_company',data.is_own_company);
-        navigate('/mypage');
+        navigate('/mypage',
+        {
+          state:{
+            message:'ログインに成功しました。'
+          }
+        });
       } else {
         setError("ログイン失敗しました。ユーザネームかパスワードが違います。");
         console.error('Login failed');

@@ -99,9 +99,15 @@ export default function Editor({ workBook }) {
       .then((data) => {
         if (data.success) {
           console.log("success");
-          navigate("/mypage/mycreate")
+          navigate("/mypage/mycreate",
+          {
+            state: { 
+              message: `${title}を保存しました`,
+              severity: "success"
+            }
+          })
         } else {
-          console.log("error", data.error);
+          console.error("error", data.error);
         }
       });
   }

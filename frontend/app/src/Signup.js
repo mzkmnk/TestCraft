@@ -35,7 +35,12 @@ function Signup() {
       .then(response => response.json())
       .then(data => {
         if (data.authenticated === true) {
-          navigate('/mypage');
+          navigate('/mypage',
+          {
+            state:{
+              message:'ログインしています。'
+            }
+          });
         }
       })
       .catch(error => {
@@ -78,7 +83,11 @@ function Signup() {
         });
         if(is_login_response.ok){
           localStorage.setItem('is_own_company', is_own_company);
-          navigate('/mypage');
+          navigate('/mypage',{
+            state:{
+              message:'ユーザー登録に成功しました。'
+            }
+          });
         }
         else{
           console.error('Login failed');

@@ -1,7 +1,9 @@
 import React, { useState,useEffect } from 'react';
 import { format, eachDayOfInterval, startOfDay, endOfDay } from 'date-fns';
 import { Line } from 'react-chartjs-2';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,useLocation } from 'react-router-dom';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from "@mui/material/Alert";
 import UserHeader from './UserHeader';
 import 'chartjs-adapter-date-fns';
 import { 
@@ -28,6 +30,8 @@ ChartJS.register(
 
 function MyPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [openSnackbar, setOpenSnackbar] = useState(false);
   const [chartData, setChartData] = useState({}); 
 
   useEffect(() => {
@@ -47,7 +51,6 @@ function MyPage() {
         console.error('Error:', error);
       });
 
-      //　グラフのデータを取得する
       fetch('http://localhost:8000/api/get_graph_data',{
         headers: {
           'Content-Type': 'application/json',
@@ -110,6 +113,16 @@ function MyPage() {
           }
         })
   }, [navigate]);
+
+  useEffect(() => {
+    if (location.state?.message) {
+      setOpenSnackbar(true);
+    }
+  }, [location]);
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
+  };
 
   const options = {
     scales: {
@@ -177,6 +190,18 @@ function MyPage() {
           <p>グラフデータがありません or ロード中</p>
         )}
       </div>
+      {openSnackbar && (
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={4000}
+          onClose={handleCloseSnackbar}
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        >
+          <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
+            {location.state.message}
+          </Alert>
+        </Snackbar>
+      )}
     </>
   );
 }
