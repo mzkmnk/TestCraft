@@ -411,9 +411,11 @@ def add_like(request,workbookId:int):
 def save_answer(request,payload:SaveAnswerSchema):
     try:
         workbook_id = payload.workbook_id
-        base_answers = payload.answers
-        answers = json.loads(base_answers)
+        answers = json.loads(payload.answers)
         UserAnswer.objects.create(
+            user = request.user,
+            workbook = Workbook.objects.get(id = workbook_id),
+            answer_json = answers,
         )
         JsonResponse(
             {

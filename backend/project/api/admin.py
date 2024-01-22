@@ -27,3 +27,8 @@ class CustomLike(admin.ModelAdmin):
     list_display = ('user','workbook')
     search_fields=('id',)
 admin.site.register(Like,CustomLike)
+
+class CustomUserAnswer(admin.ModelAdmin):
+    list_display = ('user','workbook')
+    search_fields=('id',)
+admin.site.register(UserAnswer,CustomUserAnswer)

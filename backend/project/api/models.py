@@ -97,8 +97,6 @@ class UserAnswer(models.Model):
     answer_json = JSONField()
     created_at = models.DateField(auto_now_add=True)
     
-    def __str__(self):
-        return f"{self.user.username} - {self.problem.workbook_id.workbook_name}"
 
 class Category(models.Model):
     category_id = models.AutoField(primary_key=True, unique=True)

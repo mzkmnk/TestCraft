@@ -1,10 +1,11 @@
-import Ract, { useEffect } from "react";
+import Ract, { useState,useEffect } from "react";
 import ResultQuestion from "./ResultQuestion";
 
 export default function Result({ answers, questionTree, questionIds,workbookId }) {
   // すべての問題数。questionIdsの長さではnestedに対応できない。
   let questionCount = 0;
   const correctIds = [];
+  const [controller, setController] = useState(null);
 
   console.log("answers", answers);
   console.log("workbookId", workbookId);
@@ -56,7 +57,10 @@ export default function Result({ answers, questionTree, questionIds,workbookId }
     .then((data) => {
       console.log(data);
     })
-  })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+  },[answers, workbookId]);
 
   return (
     <>
