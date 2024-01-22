@@ -155,7 +155,10 @@ function AddUser() {
                     fontSize: '16px' 
                     }}
                 >
-                    <pre>{JSON.stringify(upload_fin, null, 2).replace(/(^"|"$|\[|\])/g, '')}</pre>
+                    <pre>{JSON.stringify
+                    (upload_fin, null, 2)
+                    .replace(/(^"|"$|\[|\])/g, '')}
+                    </pre>
                 </div>
                 )}
                 {upload_data && (

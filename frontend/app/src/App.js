@@ -10,6 +10,7 @@ import Editor from "./Editor.tsx";
 import Mysolve from "./Mysolve";
 import Message from "./Message.js";
 import AddUser from "./add_user";
+import UserChange from "./user_change.js";
 import ReadWorkbook from "./ReadWorkbook.js";
 
 function App() {
@@ -20,7 +21,9 @@ function App() {
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/questionsAll" element={<QuestionsAll />} />
+        <Route path="/user_change" element={<UserChange />} />
         <Route path="/editor" element={<Editor />} />
+        
         <Route
           path="/editor/:workbookId"
           element={<ReadWorkbook next={"Editor"} />}

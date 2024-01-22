@@ -91,6 +91,13 @@ const UserHeader = ({ position = "static" }) => {
                 </MenuItem>
                 <MenuItem
                   component={Link}
+                  to="/user_change"
+                  onClick={handleMenuClose}
+                >
+                  登録情報変更
+                </MenuItem>
+                <MenuItem
+                  component={Link}
                   to="/mypage/message"
                   onClick={handleMenuClose}
                 >
