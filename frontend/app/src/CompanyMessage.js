@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Pagination from '@mui/material/Pagination';
 import UserHeader from './UserHeader';
 
-function Message() {
+function CompanyMessage() {
   const [companyMessages, setCompanyMessages] = useState([]);
   const [otherMessages, setOtherMessages] = useState([]);
   const [isCompanyUser, setIsCompanyUser] = useState(false);
@@ -11,7 +11,7 @@ function Message() {
   const messagesPerPage = 4;
   const indexOfLastMessage = currentPage * messagesPerPage;
   const indexOfFirstMessage = indexOfLastMessage - messagesPerPage;
-  const currentMessages = otherMessages.slice(indexOfFirstMessage, indexOfLastMessage);
+  const currentMessages = companyMessages.slice(indexOfFirstMessage, indexOfLastMessage);
   const navigate = useNavigate();
 
   const handleChangePage = (event, value) => {
@@ -39,7 +39,6 @@ function Message() {
             .then((response) => response.json())
             .then((data) => {
               if (data.success === true) {
-                console.log('is_company_user',data.is_company_user);
                 setIsCompanyUser(data.is_company_user);
                 setCompanyMessages(data.message.filter(msg => msg.is_company_send));
                 setOtherMessages(data.message.filter(msg => !msg.is_company_send));
@@ -95,27 +94,33 @@ function Message() {
       <UserHeader />
       <div style={styles.messagesContainer}>
         <div>
-          <h2>メッセージ</h2>
-          {currentMessages.map((message) => (
+        <h2>企業からのメッセージ</h2>
+        {currentMessages.map((message) => (
             <div style={styles.message} key={message.id}>
-              <p>{message.message}</p>
-              <p>{new Date(message.timestamp).toLocaleString(
-                'ja-JP',
-                  {
+            <p>{message.message}</p>
+            <p>{new Date(message.timestamp).toLocaleString('ja-JP',
+                {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric',
                     hour: '2-digit',
                     minute: '2-digit'
-                  }
-                )
-              }
-              </p>
+                }
+            )}
+            </p>
+            <ul>
+                {message.workbooks && Object.entries(message.workbooks).map(([id, workbookName]) => (
+                <li key={id}>
+                    {`ワークブック名: ${workbookName}`}
+                    <a href={`http://localhost:3000/solve/${id}`} target="_blank" rel="noopener noreferrer">問題を解く</a>
+                </li>
+                ))}
+            </ul>
             </div>
-          ))}
+        ))}
         </div>
         <Pagination 
-          count={Math.ceil(otherMessages.length / messagesPerPage)} 
+          count={Math.ceil(companyMessages.length / messagesPerPage)} 
           page={currentPage} 
           onChange={handleChangePage}
         />
@@ -124,4 +129,4 @@ function Message() {
   );
 }
 
-export default Message;
+export default CompanyMessage;

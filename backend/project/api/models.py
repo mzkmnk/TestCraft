@@ -22,7 +22,7 @@ class User(AbstractUser):
     company_user_id = models.CharField(max_length = 255, null = True, blank = True) # いる？
     is_company_user = models.BooleanField(default = False)
     is_own_company = models.BooleanField(default = False)
-    
+    created_at = models.DateField(auto_now_add = True)
     problem_create_cnt = models.IntegerField(default = 0)
     problem_slv_cnt = models.IntegerField(default = 0)
     
@@ -122,3 +122,19 @@ class Csv(models.Model):
 
     def __str__(self):
         return f"{self.company_user_id} - {self.company_user_name}"
+
+
+# message機能のためのモデル
+class Message(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender')
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='receiver')
+    message = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+    is_company_send = models.BooleanField(default=False)
+    is_slv_workbooks = models.JSONField(null=True,blank=True)
+    def __str__(self):
+        return f"{self.sender.username} - {self.receiver.username}"
+
+    class Meta:
+        ordering = ('timestamp',)
