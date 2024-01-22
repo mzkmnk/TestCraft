@@ -40,7 +40,12 @@ function UserChange() {
         const data = await response.json();
         if (response.ok) {
             localStorage.setItem('username', data.username);
-            navigate('/mypage');
+            navigate('/mypage',{
+                state: {
+                    message: `ユーザ情報を変更しました`,
+                    severity: 'success',
+                }
+            });
         } else {
             console.error('Change failed',data.message);
         }
