@@ -97,6 +97,10 @@ class MessageSchema(Schema):
     to:str
     workbooks:str
     
+class UserChangeSchema(Schema):
+    username : str
+    password : str
+    
 # API
 # ユーザー登録するAPI
 @api.post("/signup")
@@ -158,6 +162,28 @@ def logout_user(request):
         status=200
     )
 
+#登録情報を変更するAPI
+@api.post("/user_change")
+def user_change(request,payload: UserChangeSchema):
+    try:
+        user = User.objects.get(
+            pk=request.user.id,
+        )
+        print("*"*20)
+        user.username = payload.username
+        user.set_password(payload.password)
+        user.save()
+        django_login(request,user)
+        return JsonResponse({
+            "success":True,
+            "id" : user.id,
+            "username":user.username,
+            },
+                status = 200
+        )
+    except Exception as e:
+        return JsonResponse({"success":False, "message" : str(e) },status = 400)
+        
 # 会社登録するAPI
 @api.post("/company_signup")
 def company_signup(request,payload: CompanySignUpSchema):
@@ -166,9 +192,11 @@ def company_signup(request,payload: CompanySignUpSchema):
             name = payload.name,
             )
         company.save()
+        
         return JsonResponse({"success":True, "id" : company.company_id },status = 200)
     except Exception as e:
         return JsonResponse({"success":False, "message" : str(e) },status = 400)
+
 
 # 問題を取得するAPI
 @api.get("/questionsall")
