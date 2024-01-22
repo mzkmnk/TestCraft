@@ -1,10 +1,13 @@
+import Ract, { useEffect } from "react";
 import ResultQuestion from "./ResultQuestion";
 
-export default function Result({ answers, questionTree, questionIds }) {
+export default function Result({ answers, questionTree, questionIds,workbookId }) {
   // すべての問題数。questionIdsの長さではnestedに対応できない。
   let questionCount = 0;
   const correctIds = [];
 
+  console.log("answers", answers);
+  console.log("workbookId", workbookId);
   // 正答判定
   const grade = (questionIds) => {
     for (const id of questionIds) {
@@ -34,6 +37,26 @@ export default function Result({ answers, questionTree, questionIds }) {
   };
 
   grade(questionIds);
+
+  useEffect(() => {
+    const data = {
+      workbook_id: workbookId,
+      answers: JSON.stringify(answers),
+    }
+    console.log(data);
+    fetch("http://localhost:8000/api/save_answer", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(data),
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+    })
+  })
 
   return (
     <>

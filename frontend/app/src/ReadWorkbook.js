@@ -5,6 +5,7 @@ import QuestionsSolve from "./QuestionsSolve/QuestionsSolve";
 
 export default function ReadWorkbook({ next }) {
   let [workbook, setWorkbook] = useState(undefined);
+
   const { workbookId } = useParams();
 
   const navigate = useNavigate();
@@ -41,13 +42,13 @@ export default function ReadWorkbook({ next }) {
       .catch((error) => {
         console.error("Error:", error);
       });
-  }, [navigate]);
+  }, [navigate, workbookId]);
 
   if (next === "Editor") {
-    return workbook ? <Editor workBook={workbook} /> : <div>Loading...</div>;
+    return workbook ? <Editor workBook={workbook} workbookId={workbookId} /> : <div>Loading...</div>;
   } else if (next === "QuestionsSolve") {
     return workbook ? (
-      <QuestionsSolve workbook={workbook} />
+      <QuestionsSolve workbook={workbook} workbookId={workbookId} />
     ) : (
       <div>Loading...</div>
     );

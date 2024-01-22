@@ -6,7 +6,7 @@ import Result from "./Result";
 import Watch from "./Watch";
 import UserHeader from "../UserHeader";
 
-export default function QuestionsSolve({ workbook }) {
+export default function QuestionsSolve({ workbook,workbookId }) {
   // JSONはroot が先頭であることを保証しないとする。
   const info = workbook.info;
   const questionTree = workbook.questions;
@@ -79,6 +79,7 @@ export default function QuestionsSolve({ workbook }) {
       {isResultOpen ? (
         <Result
           answers={answers}
+          workbookId={workbookId}
           questionTree={questionTree}
           questionIds={questionIds}
         />

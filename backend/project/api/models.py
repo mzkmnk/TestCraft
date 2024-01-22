@@ -91,6 +91,15 @@ class Problem(models.Model):
     def __str__(self):
         return self.workbook_id.workbook_name
 
+class UserAnswer(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    workbook = models.ForeignKey(Workbook, on_delete=models.CASCADE)
+    answer_json = JSONField()
+    created_at = models.DateField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.problem.workbook_id.workbook_name}"
+
 class Category(models.Model):
     category_id = models.AutoField(primary_key=True, unique=True)
     category_name = models.CharField(max_length=25)

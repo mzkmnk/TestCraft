@@ -92,6 +92,10 @@ class likeDeleteSchema(Schema):
 class CsvUploadSchema(Schema):
     csv_data:str
     
+class SaveAnswerSchema(Schema):
+    workbook_id:int
+    answers:str
+    
 # API
 # ユーザー登録するAPI
 @api.post("/signup")
@@ -397,6 +401,31 @@ def add_like(request,workbookId:int):
             {
                 "success":False,
                 "csv_data":None,
+                "error":str(e),
+            },
+            status = 400,
+        )
+
+#ユーザが解答した情報を保存するAPI
+@api.post("/save_answer")
+def save_answer(request,payload:SaveAnswerSchema):
+    try:
+        workbook_id = payload.workbook_id
+        base_answers = payload.answers
+        answers = json.loads(base_answers)
+        UserAnswer.objects.create(
+        )
+        JsonResponse(
+            {
+                "success":True,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
                 "error":str(e),
             },
             status = 400,
