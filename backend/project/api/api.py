@@ -169,7 +169,13 @@ def user_change(request,payload: UserChangeSchema):
         user.set_password(payload.password)
         user.save()
         django_login(request,user)
-        return JsonResponse({"success":True, "id" : user.id },status = 200)
+        return JsonResponse({
+            "success":True,
+            "id" : user.id,
+            "username":user.username,
+            },
+                status = 200
+        )
     except Exception as e:
         return JsonResponse({"success":False, "message" : str(e) },status = 400)
         

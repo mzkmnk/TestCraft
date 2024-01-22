@@ -39,6 +39,7 @@ function UserChange() {
         });
         const data = await response.json();
         if (response.ok) {
+            localStorage.setItem('username', data.username);
             navigate('/mypage');
         } else {
             console.error('Change failed',data.message);
