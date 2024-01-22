@@ -1,14 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import {
-    Card,
-    CardActionArea,
-    CardContent,
-    CardMedia,
-    Typography,
-    Grid
-} from '@mui/material';
-import Pagination from '@mui/material/Pagination';
+import { DataGrid } from '@mui/x-data-grid';
 import UserHeader from './UserHeader';
 
 function AllCompanyUsers() {
@@ -48,50 +40,26 @@ function AllCompanyUsers() {
         });
     }, [navigate]);
 
-    const cardStyle = {
-        maxWidth: 400,
-        margin: 'auto',
-        borderRadius: '10px',
-        border: '2px solid #1876D1',
-    };
 
-    const mediaStyle = {
-        height: 140,
-    };
+    const columns = [
+        { field: 'name', headerName: 'Name', width: 350 },
+        { field: 'created_at', headerName: 'Date Created', width: 150 },
+        //今後解く必要がある問題数を表示できたらいいな
+    ];
 
-    const styles = {
-        styleheader: {
-            marginBottom: '20px',
-        },
-    }
     return (
         <>
-            <div style={styles.styleheader}>
+            <div style={{ marginBottom: '20px' }}>
                 <UserHeader />
             </div>
-            <Grid container spacing={0}>
-                {users.map(user => (
-                    <Grid item xs={12} sm={6} md={4} key={user.id}>
-                        <Card style={cardStyle}>
-                            <CardActionArea>
-                                <CardMedia
-                                    style={mediaStyle}
-                                    // image="sumple.jpg"
-                                    // title="user image"
-                                    //　ここで画像表示できるけど迷い中
-                                />
-                                <CardContent>
-                                    <Typography gutterBottom variant="h5" component="h2">
-                                        {user.name}
-                                    </Typography>
-                                    <Typography variant="body2" color="textSecondary" component="p">
-                                    </Typography>
-                                </CardContent>
-                            </CardActionArea>
-                        </Card>
-                    </Grid>
-                ))}
-            </Grid>
+            <div style={{ height: '100% ', width: '100%' }}>
+                <DataGrid
+                    rows={users}
+                    columns={columns}
+                    pageSize={5}
+                    checkboxSelection
+                />
+            </div>
         </>
     );
 }
