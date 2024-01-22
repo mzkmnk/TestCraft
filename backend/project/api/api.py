@@ -432,3 +432,65 @@ def save_answer(request,payload:SaveAnswerSchema):
             },
             status = 400,
         )
+
+#ユーザが解答した問題を取得するAPI
+@api.get("/solve_workbook")
+def solve_workbook(request):
+    try:
+        user_answers = UserAnswer.objects.filter(user = request.user).values(
+            'workbook__id',
+            'workbook__workbook_name',
+            'workbook__description',
+            'workbook__create_id__username',
+            'workbook__created_at',
+            'workbook__updated_at',
+            'workbook__like_count',
+            'answer_json',
+        )
+        user_answers_with_categories = []
+        for user_answer in user_answers:
+            categories = WorkbookCategory.objects.filter(id=user_answer['workbook__id']).values_list('category__category_name', flat=True)
+            user_answers_with_categories.append({
+                **user_answer,
+                'categories': list(categories)
+            })
+        print(user_answers_with_categories)
+        return JsonResponse(
+            {
+                'success' : True,
+                'workbook' : user_answers_with_categories,
+            },
+            status = 200
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                'success' : False,
+                'workbook' : None
+            },
+            status = 400
+            )
+#ユーザが解いた問題の情報を取得するAPI
+@api.get("/solve_detail/{workbookId}")
+def solve_detail(request,workbookId:int):
+    try:
+        workbook = Workbook.objects.get(id = workbookId)
+        user_answer = UserAnswer.objects.get(user = request.user, workbook = workbook)
+        problem = Problem.objects.get(workbook_id = workbookId).problem_json
+        return JsonResponse(
+            {
+                "success":True,
+                "workbook":problem,
+                "user_answer":user_answer.answer_json,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "error":str(e),
+            },
+            status = 400,
+        )

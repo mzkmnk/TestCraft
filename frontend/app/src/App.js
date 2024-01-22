@@ -7,6 +7,7 @@ import Signup from "./Signup";
 import QuestionsAll from "./QuestionsAll";
 import Mycreate from "./Mycreate";
 import Editor from "./Editor.tsx";
+import Solved from "./Solved.js";
 import Mysolve from "./Mysolve";
 import Message from "./Message.js";
 import AddUser from "./add_user";
@@ -33,6 +34,7 @@ function App() {
           path="/solve/:workbookId"
           element={<ReadWorkbook next={"QuestionsSolve"} />}
         />
+        <Route path="/solved/:workbookId" element={<Solved />} />
       </Routes>
     </Router>
   );
