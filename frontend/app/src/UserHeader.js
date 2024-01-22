@@ -19,6 +19,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import AddIcon from '@mui/icons-material/Add';
 import SendIcon from '@mui/icons-material/Send';
 import GroupIcon from '@mui/icons-material/Group';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 
 const UserHeader = ({ position = "static" }) => {
   const navigate = useNavigate();
@@ -146,6 +147,7 @@ const UserHeader = ({ position = "static" }) => {
                   to="/user_change"
                   onClick={handleMenuClose}
                 >
+                  <ManageAccountsIcon style={styles.icon} />
                   登録情報変更
                 </MenuItem>
                 <MenuItem
