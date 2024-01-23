@@ -9,6 +9,18 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Fade from "@mui/material/Fade";
 
+// アイコンimport
+import BorderColorIcon from '@mui/icons-material/BorderColor';
+import BookIcon from '@mui/icons-material/Book';
+import EqualizerIcon from '@mui/icons-material/Equalizer';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+import HistoryIcon from '@mui/icons-material/History';
+import LogoutIcon from '@mui/icons-material/Logout';
+import AddIcon from '@mui/icons-material/Add';
+import SendIcon from '@mui/icons-material/Send';
+import GroupIcon from '@mui/icons-material/Group';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+
 const UserHeader = ({ position = "static" }) => {
   const navigate = useNavigate();
   const username = localStorage.getItem("username");
@@ -88,6 +100,14 @@ const UserHeader = ({ position = "static" }) => {
                   onClick={handleMenuClose}
                 >
                   マイステータス
+                </MenuItem>
+                <MenuItem
+                  component={Link}
+                  to="/user_change"
+                  onClick={handleMenuClose}
+                >
+                  <ManageAccountsIcon style={styles.icon} />
+                  登録情報変更
                 </MenuItem>
                 <MenuItem
                   component={Link}

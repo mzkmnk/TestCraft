@@ -157,6 +157,22 @@ function MyPage() {
           <p>グラフデータがありません or ロード中</p>
         )}
       </div>
+      {openSnackbar && (
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={4000}
+          onClose={handleCloseSnackbar}
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        >
+          <Alert
+            onClose={handleCloseSnackbar}
+            severity={location.state.severity}
+            sx={{ width: '100%' }}
+          >
+            {location.state.message}
+          </Alert>
+        </Snackbar>
+      )}
     </>
   );
 }

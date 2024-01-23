@@ -22,7 +22,7 @@ class User(AbstractUser):
     company_user_id = models.CharField(max_length = 255, null = True, blank = True) # いる？
     is_company_user = models.BooleanField(default = False)
     is_own_company = models.BooleanField(default = False)
-    
+    created_at = models.DateField(auto_now_add = True)
     problem_create_cnt = models.IntegerField(default = 0)
     problem_slv_cnt = models.IntegerField(default = 0)
     
@@ -70,7 +70,7 @@ class Workbook(models.Model):
     is_public = models.BooleanField(default=True)
     like_count = models.IntegerField(default=0)
     categories = models.ManyToManyField('Category', through='WorkbookCategory')
-    
+    is_edit = models.BooleanField(default=False)
     def __str__(self):
         return str(self.id)
 

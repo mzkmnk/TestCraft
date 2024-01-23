@@ -92,6 +92,10 @@ class likeDeleteSchema(Schema):
 class CsvUploadSchema(Schema):
     csv_data:str
     
+class UserChangeSchema(Schema):
+    username : str
+    password : str
+    
 # API
 # ユーザー登録するAPI
 @api.post("/signup")
@@ -153,6 +157,28 @@ def logout_user(request):
         status=200
     )
 
+#登録情報を変更するAPI
+@api.post("/user_change")
+def user_change(request,payload: UserChangeSchema):
+    try:
+        user = User.objects.get(
+            pk=request.user.id,
+        )
+        print("*"*20)
+        user.username = payload.username
+        user.set_password(payload.password)
+        user.save()
+        django_login(request,user)
+        return JsonResponse({
+            "success":True,
+            "id" : user.id,
+            "username":user.username,
+            },
+                status = 200
+        )
+    except Exception as e:
+        return JsonResponse({"success":False, "message" : str(e) },status = 400)
+        
 # 会社登録するAPI
 @api.post("/company_signup")
 def company_signup(request,payload: CompanySignUpSchema):
@@ -161,9 +187,11 @@ def company_signup(request,payload: CompanySignUpSchema):
             name = payload.name,
             )
         company.save()
+        
         return JsonResponse({"success":True, "id" : company.company_id },status = 200)
     except Exception as e:
         return JsonResponse({"success":False, "message" : str(e) },status = 400)
+
 
 # 問題を取得するAPI
 @api.get("/questionsall")
@@ -252,11 +280,11 @@ def add_user(request ,payload:CsvUploadSchema):
             
             user = User.objects.create_user(
                 username=user_name,
-                password=request.user.password, 
                 email=request.user.email,
                 company=request.user.company,
                 is_company_user=True,
             )
+            user.password = request.user.password
             user.save()
             
             df.at[index, 'ユーザー名'] = user_name
@@ -304,6 +332,7 @@ def save_data(request,data:JsonFormat):
         workbook = Workbook.objects.create(
             workbook_name = data.info['title'],
             create_id = request.user,
+            is_edit = True,
         )
         Problem.objects.create(
             workbook_id = Workbook.objects.get(id = workbook.id),
@@ -397,6 +426,165 @@ def add_like(request,workbookId:int):
             {
                 "success":False,
                 "csv_data":None,
+                "error":str(e),
+            },
+            status = 400,
+        )
+
+@api.get("/message")
+def message(request):
+    try:
+        message_all = [
+            {"id":i,
+             "message":data.message,
+             "timestamp":data.timestamp,
+             "is_company_send":data.is_company_send,
+             "workbooks":data.is_slv_workbooks,
+            }
+            for i,data in enumerate(Message.objects.filter(receiver = request.user).order_by('-timestamp'))
+        ]
+        print(f"{request.user.is_company_user = }")
+        return JsonResponse(
+            {
+                "success":True,
+                "message": message_all,
+                "is_company_user":request.user.is_company_user,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "message":None,
+                "error":str(e),
+            },
+            status = 400,
+        )
+
+@api.get("/get_company_user")
+def get_company_user(request):
+    try:
+        company = request.user.company
+        company_user = [
+            {
+                "id":user.id,
+                "username":user.username,
+            }
+            for _i,user in enumerate(User.objects.filter(company = company))
+        ]
+        workbooks = [
+            {
+                "id":workbook.id,
+                "name":workbook.workbook_name,
+            }
+            for _i,workbook in enumerate(Workbook.objects.filter(create_id = request.user))
+        ]
+        print(workbooks)
+        print(company_user)
+        return JsonResponse(
+            {
+                "success":True,
+                "data":company_user,
+                "workbooks":workbooks,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "data":None,
+                "workbooks":None,
+                "error":str(e),
+            },
+            status = 400,
+        )
+    
+@api.post("/send_message")
+def send_messsage(request,payload:MessageSchema):
+    try:
+        message = payload.message
+        users = payload.to.split(',')
+        workbooks = payload.workbooks.split(',')
+        workbook_dict = {}
+        for workbook in workbooks:
+            workbook_id,workbook_name = workbook.split(':')
+            workbook_dict[workbook_id] = workbook_name
+        print(workbook_dict)
+        for user in users:
+            user_id,_username = user.split(':')
+            Message.objects.create(
+                sender = request.user,
+                receiver = User.objects.get(id = user_id),
+                message = message,
+                is_company_send = True,
+                is_slv_workbooks = workbook_dict,
+            )
+        return JsonResponse(
+            {
+                "success":True,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "error":str(e),
+            },
+            status = 400,
+        )
+
+@api.get("is_company_user")
+def is_company_user(request):
+    try:
+        return JsonResponse(
+            {
+                "success":True,
+                "is_own_company":request.user.is_own_company,
+                "is_company_user":request.user.is_company_user,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "error":str(e),
+            },
+            status = 400,
+        )
+
+@api.get("/all_company_users")
+def all_users(request):
+    try:
+        data = [
+            {
+                "id":user.id,
+                "name":user.username, 
+                "created_at":user.created_at,
+            }
+            for user in User.objects.filter(company=request.user.company)
+        ]
+        print(data)
+        return JsonResponse(
+            {
+                "success":True,
+                "data":data,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "data":None,
                 "error":str(e),
             },
             status = 400,
