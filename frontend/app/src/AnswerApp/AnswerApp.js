@@ -1,11 +1,11 @@
 import { useState } from "react";
-import SettingsModal from "./Pages/SettingsModal";
-import useTimer from "./hooks/useTimer";
+import { useParams } from "react-router-dom";
+import SettingsModal from "./components/SettingsModal";
+import useTimer from "../hooks/useTimer";
 import InputAnswer from "./Pages/InputAnswer";
 import Result from "./Pages/Result";
 import Watch from "./components/Watch";
 import UserHeader from "../UserHeader";
-import { useParams } from "react-router-dom";
 
 /**
  * 問題を解くアプリ。
@@ -16,7 +16,7 @@ import { useParams } from "react-router-dom";
  * @param {object} workbook
  *
  */
-export default function AnswersApp({ workbook,workbookId }) {
+export default function AnswersApp({ workbook, workbookId }) {
   // JSONはroot が先頭であることを保証しないとする。
   const info = workbook.info;
   const questionTree = workbook.questions;

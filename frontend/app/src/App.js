@@ -24,7 +24,7 @@ function App() {
         <Route path="/editor" element={<Editor />} />
         <Route
           path="/editor/:workbookId"
-          element={<ReadWorkbook next={"Editor"} />}
+          element={<ReadWorkbook nextAppName={"Editor"} />}
         />
         <Route path="/mypage/mycreate" element={<Mycreate />} />
         <Route path="/add_user" element={<AddUser />} />
@@ -32,7 +32,7 @@ function App() {
         <Route path="/mypage/message" element={<Message />} />
         <Route
           path="/solve/:workbookId"
-          element={<ReadWorkbook nextApp={"AnswerApp"} />}
+          element={<ReadWorkbook nextAppName={"AnswerApp"} />}
         />
         <Route path="/solved/:workbookId" element={<Solved />} />
       </Routes>

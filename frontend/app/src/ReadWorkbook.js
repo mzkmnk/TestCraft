@@ -1,65 +1,36 @@
 import React from "react";
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import useAPI from "./hooks/useAPI";
 import Editor from "./Editor.tsx";
 import AnswerApp from "./AnswerApp/AnswerApp.js";
+import Error from "./Error.js";
+import Loading from "./Loading";
 
 /**
  * APIにアクセスし、workbookが取得できたら、次のアプリに遷移する。
  * @param {string} nextApp "Editor" or "AnswerApp"
  */
-export default function ReadWorkbook({ nextApp }) {
-  let [workbook, setWorkbook] = useState(undefined);
-
+export default function ReadWorkbook({ nextAppName }) {
   const { workbookId } = useParams();
 
-  const navigate = useNavigate();
-  // APIにアクセスし、workbookを取得する。
-  useEffect(() => {
-    fetch("http://localhost:8000/api/check_auth", {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.authenticated === false) {
-          navigate("/login");
-        } else {
-          fetch(`http://localhost:8000/api/edit_workbook/${workbookId}`, {
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              if (data.success === true) {
-                setWorkbook(data.data);
-              }
-            })
-            .catch((error) => {
-              console.error("Error:", error);
-            });
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-  }, [navigate, workbookId]);
+  const url = `http://localhost:8000/api/edit_workbook/${workbookId}`;
+  const { data, isLoading, isSuccess } = useAPI({ url });
 
-  if (nextApp === "Editor") {
-    return workbook ? (
-      <Editor workBook={workbook} workbookId={workbookId} />
-    ) : (
-      <div>Loading...</div>
-    );
-  } else if (nextApp === "AnswerApp") {
-    return workbook ? (
-      <AnswerApp workbook={workbook} workbookId={workbookId} />
-    ) : (
-      <div>Loading...</div>
-    );
+  // ロード
+  if (isLoading) {
+    return <Loading />;
+  } else {
+    // APIに接続失敗 or データ取得失敗（DBにworkbookが存在しないなど。）
+    if (isSuccess === false || data.success === false) {
+      return <Error />;
+    }
   }
+
+  let nextApp = <></>;
+  if (nextAppName === "Editor") {
+    nextApp = <Editor workBook={data.data} workbookId={workbookId} />;
+  } else if (nextAppName === "AnswerApp") {
+    nextApp = <AnswerApp workbook={data.data} workbookId={workbookId} />;
+  }
+  return <>{nextApp}</>;
 }
