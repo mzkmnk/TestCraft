@@ -70,7 +70,7 @@ class Workbook(models.Model):
     is_public = models.BooleanField(default=True)
     like_count = models.IntegerField(default=0)
     categories = models.ManyToManyField('Category', through='WorkbookCategory')
-    
+    is_edit = models.BooleanField(default=False)
     def __str__(self):
         return str(self.id)
 

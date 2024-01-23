@@ -285,11 +285,11 @@ def add_user(request ,payload:CsvUploadSchema):
             
             user = User.objects.create_user(
                 username=user_name,
-                password=request.user.password, 
                 email=request.user.email,
                 company=request.user.company,
                 is_company_user=True,
             )
+            user.password = request.user.password
             user.save()
             
             df.at[index, 'ユーザー名'] = user_name
@@ -337,6 +337,7 @@ def save_data(request,data:JsonFormat):
         workbook = Workbook.objects.create(
             workbook_name = data.info['title'],
             create_id = request.user,
+            is_edit = True,
         )
         Problem.objects.create(
             workbook_id = Workbook.objects.get(id = workbook.id),
