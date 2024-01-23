@@ -49,11 +49,15 @@ export default function ReadWorkbook({ nextApp }) {
       });
   }, [navigate, workbookId]);
 
-  if (next === "Editor") {
-    return workbook ? <Editor workBook={workbook} workbookId={workbookId} /> : <div>Loading...</div>;
-  } else if (next === "QuestionsSolve") {
+  if (nextApp === "Editor") {
     return workbook ? (
-      <QuestionsSolve workbook={workbook} workbookId={workbookId} />
+      <Editor workBook={workbook} workbookId={workbookId} />
+    ) : (
+      <div>Loading...</div>
+    );
+  } else if (nextApp === "AnswerApp") {
+    return workbook ? (
+      <AnswerApp workbook={workbook} workbookId={workbookId} />
     ) : (
       <div>Loading...</div>
     );
