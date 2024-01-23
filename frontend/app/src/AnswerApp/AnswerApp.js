@@ -1,12 +1,21 @@
 import { useState } from "react";
-import SettingsModal from "./SettingsModal";
+import SettingsModal from "./Pages/SettingsModal";
 import useTimer from "./hooks/useTimer";
-import InputAnswer from "./InputAnswer";
-import Result from "./Result";
-import Watch from "./Watch";
+import InputAnswer from "./Pages/InputAnswer";
+import Result from "./Pages/Result";
+import Watch from "./components/Watch";
 import UserHeader from "../UserHeader";
 
-export default function QuestionsSolve({ workbook }) {
+/**
+ * 問題を解くアプリ。
+ * 問題データを受け取り、設定画面を開く。@see SettingsModal
+ * 設定を終えると、問題を解く画面を表示する。
+ * 問題を解き終えると、結果画面を表示する。
+ *
+ * @param {object} workbook
+ *
+ */
+export default function AnswersApp({ workbook }) {
   // JSONはroot が先頭であることを保証しないとする。
   const info = workbook.info;
   const questionTree = workbook.questions;
