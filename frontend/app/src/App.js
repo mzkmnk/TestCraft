@@ -27,12 +27,12 @@ function App() {
           element={<ReadWorkbook next={"Editor"} />}
         />
         <Route path="/mypage/mycreate" element={<Mycreate />} />
-        <Route path="/add_user" element = {<AddUser />} />
+        <Route path="/add_user" element={<AddUser />} />
         <Route path="/mypage/mysolve" element={<Mysolve />} />
         <Route path="/mypage/message" element={<Message />} />
         <Route
           path="/solve/:workbookId"
-          element={<ReadWorkbook next={"QuestionsSolve"} />}
+          element={<ReadWorkbook nextApp={"AnswerApp"} />}
         />
         <Route path="/solved/:workbookId" element={<Solved />} />
       </Routes>
