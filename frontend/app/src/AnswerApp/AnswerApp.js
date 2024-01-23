@@ -5,6 +5,7 @@ import InputAnswer from "./Pages/InputAnswer";
 import Result from "./Pages/Result";
 import Watch from "./components/Watch";
 import UserHeader from "../UserHeader";
+import { useParams } from "react-router-dom";
 
 /**
  * 問題を解くアプリ。
@@ -15,10 +16,11 @@ import UserHeader from "../UserHeader";
  * @param {object} workbook
  *
  */
-export default function AnswersApp({ workbook }) {
+export default function AnswersApp({ workbook,workbookId }) {
   // JSONはroot が先頭であることを保証しないとする。
   const info = workbook.info;
   const questionTree = workbook.questions;
+  const wrokookId = useParams();
   const rootId = Object.keys(questionTree).find(
     (key) => questionTree[key].questionType === "root"
   );
@@ -88,6 +90,7 @@ export default function AnswersApp({ workbook }) {
       {isResultOpen ? (
         <Result
           answers={answers}
+          workbookId={workbookId}
           questionTree={questionTree}
           questionIds={questionIds}
         />
