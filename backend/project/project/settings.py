@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-+@0dftz3kip5&+%a3_8*so8vsgf&k+imn6trt-@xc%yksp-v4c
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['72.44.49.32']
 
 
 # Application definition
@@ -84,10 +84,21 @@ CORS_ALLOW_CREDENTIALS = True
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'database-1',
+        'USER': 'admin',
+        'PASSWORD': 'mizuki9270',
+        'HOST': 'database-1.cyy6ppytlbtu.us-east-1.rds.amazonaws.com',
+        'PORT': '3306',
     }
 }
 
