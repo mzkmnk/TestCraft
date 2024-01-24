@@ -26,7 +26,7 @@ export default function useAPI({ url, isLoginRequired = true }) {
       }
     }
 
-    const fetchData = (async () => {
+    (async () => {
       setIsLoading(true);
       try {
         // ログイン認証
