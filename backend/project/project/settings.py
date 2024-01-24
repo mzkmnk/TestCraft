@@ -96,7 +96,7 @@ CORS_ALLOW_CREDENTIALS = True
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'database-1',
+        'NAME': 'djangodb',
         'USER': 'admin',
         'PASSWORD': 'mizuki9270',
         'HOST': 'database-1.ctmumisu2j7u.ap-northeast-1.rds.amazonaws.com',
