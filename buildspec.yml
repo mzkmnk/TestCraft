@@ -13,8 +13,10 @@ phases:
       - npm run build
 
 artifacts:
+  type: s3
   files:
-    - "**/*"
+    - '**/*'
   base-directory: frontend/app/build
   discard-paths: yes
-  bucket: testcraft
+  name: build-output
+  location: testcraft
