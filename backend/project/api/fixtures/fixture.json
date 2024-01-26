@@ -12,7 +12,8 @@
             "username": "murakami0001",
             "user_public_name": "murakami0001",
             "email": "murakami@murakami.com",
-            "password":"pbkdf2_sha256$720000$GsQw14alQhN4D3Ci8RtyCu$GfuLl9LiENyeOcX176jP/18DrZ246PhFVzjv0Pv933k="
+            "password":"pbkdf2_sha256$720000$GsQw14alQhN4D3Ci8RtyCu$GfuLl9LiENyeOcX176jP/18DrZ246PhFVzjv0Pv933k=",
+            "created_at":"2024-01-01"
         }
     },
     {
@@ -24,7 +25,8 @@
             "email": "company@company.com", 
             "password": "pbkdf2_sha256$720000$E2bY6le4KUgRNnLz9XbBvm$BARpTsheUHuPoFTDVpQ5mAMqGQTj3MBwZ24YVLlkE1s=",
             "is_company_user": false,
-            "is_own_company": true
+            "is_own_company": true,
+            "created_at":"2024-01-01"
         }
     },
     {
@@ -33,9 +35,24 @@
             "username":"MurakamiCompany_user_0001",
             "user_public_name":"MurakamiCompany_user_0001",
             "email":"company@company.com",
+            "company":1,
             "password": "pbkdf2_sha256$720000$E2bY6le4KUgRNnLz9XbBvm$BARpTsheUHuPoFTDVpQ5mAMqGQTj3MBwZ24YVLlkE1s=",
             "is_company_user":true,
-            "is_own_company": false
+            "is_own_company": false,
+            "created_at":"2024-01-01"
+        }
+    },
+    {
+        "model":"api.user",
+        "fields": {
+            "username":"MurakamiCompany_user_0002",
+            "user_public_name":"MurakamiCompany_user_0002",
+            "email":"company@company.com",
+            "company":1,
+            "password":"pbkdf2_sha256$720000$E2bY6le4KUgRNnLz9XbBvm$BARpTsheUHuPoFTDVpQ5mAMqGQTj3MBwZ24YVLlkE1s=",
+            "is_company_user":true,
+            "is_own_company": false,
+            "created_at":"2024-01-01"
         }
     },
     {
@@ -46,7 +63,8 @@
             "create_id": 1,
             "created_at":"2024-01-01",
             "updated_at":"2024-01-01",
-            "is_public":true
+            "is_public":true,
+            "is_edit":true
         }
     },
     {
@@ -57,7 +75,8 @@
             "create_id": 3,
             "created_at":"2024-01-12",
             "updated_at":"2024-01-12",
-            "is_public":false
+            "is_public":false,
+            "is_edit":true
         }
     },
     {
@@ -68,7 +87,8 @@
             "create_id":3,
             "created_at":"2024-01-01",
             "updated_at":"2024-01-01",
-            "is_public":true
+            "is_public":true,
+            "is_edit":true
         }
     },
     {
@@ -79,7 +99,8 @@
             "create_id": 1,
             "created_at":"2024-01-09",
             "updated_at":"2024-01-09",
-            "is_public":true
+            "is_public":true,
+            "is_edit":true
         }
     },
     {

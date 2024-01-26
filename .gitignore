@@ -7,3 +7,5 @@ db.sqlite3
 /backend/project/api/migrations/*
 
 desktop.ini
+
+mac_env.sh

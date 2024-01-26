@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -9,16 +9,46 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Fade from "@mui/material/Fade";
 
+// アイコンimport
+import BorderColorIcon from '@mui/icons-material/BorderColor';
+import BookIcon from '@mui/icons-material/Book';
+import EqualizerIcon from '@mui/icons-material/Equalizer';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+import HistoryIcon from '@mui/icons-material/History';
+import LogoutIcon from '@mui/icons-material/Logout';
+import AddIcon from '@mui/icons-material/Add';
+import SendIcon from '@mui/icons-material/Send';
+import GroupIcon from '@mui/icons-material/Group';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+
 const UserHeader = ({ position = "static" }) => {
   const navigate = useNavigate();
   const username = localStorage.getItem("username");
   const isLoggedIn = !!username;
-  const isOwnCompany = localStorage.getItem("is_own_company") === "true";
-
+  // const isOwnCompany = localStorage.getItem("is_own_company") === "true";
+  const [isOwnCompanyUser, setIsOwnCompanyUser] = React.useState(false);
+  const [isCompanyUser, setIsCompanyUser] = React.useState(false);
   const [userMenuAnchorEl, setUserMenuAnchorEl] = React.useState(null);
-  const [questionsMenuAnchorEl, setQuestionsMenuAnchorEl] =
-    React.useState(null);
+  const [questionsMenuAnchorEl, setQuestionsMenuAnchorEl] = React.useState(null);
+  const [companyMenuAnchorEl, setCompanyMenuAnchorEl] = React.useState(null);
 
+  useEffect(() => {
+    fetch("http://localhost:8000/api/is_company_user",{
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      if(data.success){
+        setIsOwnCompanyUser(data.is_own_company);
+        setIsCompanyUser(data.is_company_user);
+      }else{
+        console.error("Error:", data.error);
+      }
+    })
+  },[navigate]);
   const handleUserMenuClick = (event) => {
     setUserMenuAnchorEl(event.currentTarget);
   };
@@ -27,9 +57,14 @@ const UserHeader = ({ position = "static" }) => {
     setQuestionsMenuAnchorEl(event.currentTarget);
   };
 
+  const handleCompanyMenuClick = (event) => {
+    setCompanyMenuAnchorEl(event.currentTarget);
+  };
+
   const handleMenuClose = () => {
     setUserMenuAnchorEl(null);
     setQuestionsMenuAnchorEl(null);
+    setCompanyMenuAnchorEl(null);
   };
 
   const handleLogout = async () => {
@@ -54,6 +89,13 @@ const UserHeader = ({ position = "static" }) => {
       console.error("Error during logout:", error);
     }
   };
+
+  const styles = {
+    icon : {
+      marginRight: '10px',
+      color:'#1876D2',
+    }
+  }
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -87,20 +129,41 @@ const UserHeader = ({ position = "static" }) => {
                   to="/mypage"
                   onClick={handleMenuClose}
                 >
-                  マイステータス
+                  <EqualizerIcon style={styles.icon} />
+                  アクティビティ
+                </MenuItem>
+                {(isOwnCompanyUser || isCompanyUser) && (
+                  <MenuItem
+                    component={Link}
+                    to="/mypage/company_message"
+                    onClick={handleMenuClose}
+                  >
+                    <NotificationsActiveIcon style={styles.icon} />
+                    企業からのお知らせ
+                  </MenuItem>
+                )}
+                <MenuItem
+                  component={Link}
+                  to="/user_change"
+                  onClick={handleMenuClose}
+                >
+                  <ManageAccountsIcon style={styles.icon} />
+                  登録情報変更
                 </MenuItem>
                 <MenuItem
                   component={Link}
                   to="/mypage/message"
                   onClick={handleMenuClose}
                 >
-                  メッセージ
+                  <NotificationsActiveIcon style={styles.icon} />
+                  お知らせ
                 </MenuItem>
                 <MenuItem
                   component={Link}
                   to="/mypage/mycreate"
                   onClick={handleMenuClose}
                 >
+                  <HistoryIcon style={styles.icon} />
                   作成履歴
                 </MenuItem>
                 <MenuItem
@@ -108,9 +171,15 @@ const UserHeader = ({ position = "static" }) => {
                   to="/mypage/mysolve"
                   onClick={handleMenuClose}
                 >
+                  <HistoryIcon style={styles.icon} />
                   解答履歴
                 </MenuItem>
-                <MenuItem onClick={handleLogout}>ログアウト</MenuItem>
+                <MenuItem 
+                  onClick={handleLogout}
+                >
+                  <LogoutIcon style={styles.icon} />
+                  ログアウト
+                </MenuItem>
               </Menu>
               <Button
                 color="inherit"
@@ -135,6 +204,7 @@ const UserHeader = ({ position = "static" }) => {
                   to="/questionsAll"
                   onClick={handleMenuClose}
                 >
+                  <BorderColorIcon style={styles.icon} />
                   問題一覧
                 </MenuItem>
                 <MenuItem
@@ -142,18 +212,59 @@ const UserHeader = ({ position = "static" }) => {
                   to="/editor"
                   onClick={handleMenuClose}
                 >
+                  <BookIcon style={styles.icon} />
                   問題作成
                 </MenuItem>
-                {isOwnCompany && (
-                  <MenuItem
-                    component={Link}
-                    to="/add_user"
-                    onClick={handleMenuClose}
-                  >
-                    ユーザー追加
-                  </MenuItem>
-                )}
               </Menu>
+              {isOwnCompanyUser && (
+                <>
+                  <Button
+                    color="inherit"
+                    aria-controls="company-menu-appbar"
+                    aria-haspopup="true"
+                    onClick={handleCompanyMenuClick}
+                    style={{ cursor: "pointer" }}
+                  >
+                    企業用
+                  </Button> 
+                  <Menu
+                    id="company-menu-appbar"
+                    anchorEl={companyMenuAnchorEl}
+                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                    transformOrigin={{ vertical: "top", horizontal: "right" }}
+                    open={Boolean(companyMenuAnchorEl)}
+                    onClose={handleMenuClose}
+                    TransitionComponent={Fade}
+                  >
+                    <MenuItem
+                      component={Link}
+                      to="/add_user"
+                      onClick={handleMenuClose}
+                    >
+                      <AddIcon style={styles.icon} />
+                      ユーザ追加
+                    </MenuItem>
+                    {isOwnCompanyUser && (
+                      <MenuItem
+                        component={Link}
+                        to="/all_company_users"
+                        onclick={handleMenuClose}
+                      >
+                        <GroupIcon style={styles.icon} />
+                        社員一覧
+                      </MenuItem>
+                    )}
+                    <MenuItem
+                      component={Link}
+                      to="/send_message"
+                      onClick={handleMenuClose}
+                    >
+                      <SendIcon style={styles.icon} />
+                      お知らせ送信
+                    </MenuItem>
+                  </Menu>
+                </>
+              )}
             </>
           ) : (
             <>

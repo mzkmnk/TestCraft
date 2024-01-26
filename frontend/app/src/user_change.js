@@ -4,77 +4,59 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import Alert from "@mui/material/Alert";
 
 import UserHeader from './UserHeader';
 
 const theme = createTheme();
 
-function LoginForm() {
-  const navigate = useNavigate();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+function UserChange() {
+    const navigate = useNavigate();
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
 
-  useEffect(() => {
-    fetch('http://localhost:8000/api/check_auth', { credentials: 'include' })
-      .then(response => {
-        if (response.ok) {
-          navigate('/mypage',
-          {
-            state:{
-              message:'ログインしています。',
-              severity:'success'
-            }
-          });
-        }
-      })
-      .catch(error => {
-        console.error('Session check failed:', error);
-      });
-  }, [navigate]);
 
-  const handleLogin = async () => {
-    setError('');
+    const handleChange = async () => {
     try {
-        const response = await fetch('http://localhost:8000/api/login', {
+        const response = await fetch('http://localhost:8000/api/user_change', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+            'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify({ username, password }),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        console.log('Login succeeded');
-        localStorage.setItem('username', data.username);
-        localStorage.setItem('is_own_company',data.is_own_company);
-        navigate('/mypage',
-        {
-          state:{
-            message:'ログインに成功しました。',
-            severity:'success'
-          }
+        body: JSON.stringify(
+            {
+                "username":username,
+                "password":password,
+            }
+        ),
         });
-      } else {
-        setError("ログイン失敗しました。ユーザネームかパスワードが違います。");
-        console.error('Login failed');
-      }
+        const data = await response.json();
+        if (response.ok) {
+            localStorage.setItem('username', data.username);
+            navigate('/mypage',{
+                state: {
+                    message: `ユーザ情報を変更しました`,
+                    severity: 'success',
+                }
+            });
+        } else {
+            console.error('Change failed',data.message);
+        }
     } catch (error) {
-      setError("ログイン失敗しました。ユーザネームかパスワードが違います。"); 
-      console.error('Error during login:', error);
+        console.error('Error during change:', error);
     }
-  };
+    };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    handleLogin();
+    handleChange();
   };
 
   return (
@@ -95,7 +77,7 @@ function LoginForm() {
                 <LockOutlinedIcon />
                 </Avatar>
                 <Typography component="h1" variant="h5">
-                Sign in
+                ユーザ変更画面
                 </Typography>
                 <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
                 <TextField
@@ -122,26 +104,25 @@ function LoginForm() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
-                {error && (
-                  <Alert severity="error" sx={{ width: '100%'}}>
-                    {error}
-                  </Alert>
-                )}
+                {/* <FormControlLabel
+                    control={<Checkbox value="remember" color="primary" />}
+                    label="Remember me"
+                /> */}
                 <Button
                     type="submit"
                     fullWidth
                     variant="contained"
                     sx={{ mt: 3, mb: 2 }}
                 >
-                    Sign In
+                    登録情報を変更する
                 </Button>
                 </Box>
             </Box>
             </Container>
         </ThemeProvider>
     </>
-  );
+    );
 }
 
-export default LoginForm;
+export default UserChange;
 
