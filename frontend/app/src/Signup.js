@@ -72,7 +72,7 @@ function Signup() {
     } else if (loginAPI.isSuccess === false) {
       navigate("/error");
     }
-  }, [loginAPI.data, loginAPI.isSuccess, navigate]);
+  }, [is_own_company, loginAPI.isSuccess, navigate, username]);
 
   const handleSignup = async () => {
     signupAPI.sendAPI({
