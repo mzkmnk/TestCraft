@@ -92,6 +92,10 @@ class likeDeleteSchema(Schema):
 class CsvUploadSchema(Schema):
     csv_data:str
     
+class SaveAnswerSchema(Schema):
+    workbook_id:int
+    answers:str
+    
 class MessageSchema(Schema):
     message:str
     to:str
@@ -435,6 +439,95 @@ def add_like(request,workbookId:int):
             {
                 "success":False,
                 "csv_data":None,
+                "error":str(e),
+            },
+            status = 400,
+        )
+
+#ユーザが解答した情報を保存するAPI
+@api.post("/save_answer")
+def save_answer(request,payload:SaveAnswerSchema):
+    try:
+        workbook_id = payload.workbook_id
+        answers = json.loads(payload.answers)
+        UserAnswer.objects.create(
+            user = request.user,
+            workbook = Workbook.objects.get(id = workbook_id),
+            answer_json = answers,
+        )
+        JsonResponse(
+            {
+                "success":True,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "error":str(e),
+            },
+            status = 400,
+        )
+
+#ユーザが解答した問題を取得するAPI
+@api.get("/solve_workbook")
+def solve_workbook(request):
+    try:
+        user_answers = UserAnswer.objects.filter(user = request.user).values(
+            'workbook__id',
+            'workbook__workbook_name',
+            'workbook__description',
+            'workbook__create_id__username',
+            'workbook__created_at',
+            'workbook__updated_at',
+            'workbook__like_count',
+            'answer_json',
+        )
+        user_answers_with_categories = []
+        for user_answer in user_answers:
+            categories = WorkbookCategory.objects.filter(id=user_answer['workbook__id']).values_list('category__category_name', flat=True)
+            user_answers_with_categories.append({
+                **user_answer,
+                'categories': list(categories)
+            })
+        print(user_answers_with_categories)
+        return JsonResponse(
+            {
+                'success' : True,
+                'workbook' : user_answers_with_categories,
+            },
+            status = 200
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                'success' : False,
+                'workbook' : None
+            },
+            status = 400
+            )
+#ユーザが解いた問題の情報を取得するAPI
+@api.get("/solve_detail/{workbookId}")
+def solve_detail(request,workbookId:int):
+    try:
+        workbook = Workbook.objects.get(id = workbookId)
+        user_answer = UserAnswer.objects.get(user = request.user, workbook = workbook)
+        problem = Problem.objects.get(workbook_id = workbookId).problem_json
+        return JsonResponse(
+            {
+                "success":True,
+                "workbook":problem,
+                "user_answer":user_answer.answer_json,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
                 "error":str(e),
             },
             status = 400,

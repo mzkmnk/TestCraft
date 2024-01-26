@@ -16,15 +16,24 @@ export default function InputAnswer({
 }) {
   // questionIdsのindex
   const [displayQuestionIndex, setDisplayQuestionIndex] = useState(0);
+  const [islastQuestion, setIsLastQuestion] = useState(false);
 
   // 問題遷移
   const handlePrevQuestion = () => {
     if (displayQuestionIndex === 0) return;
     setDisplayQuestionIndex(displayQuestionIndex - 1);
+    if (islastQuestion) setIsLastQuestion(false);
   };
   const handleNextQuestion = () => {
-    if (displayQuestionIndex === questionIds.length - 1) return;
+    // 最後の問題で誤って次へが表示された場合、次へを終了に変更
+    if (displayQuestionIndex === questionIds.length - 1) {
+      setIsLastQuestion(true);
+      return;
+    }
     setDisplayQuestionIndex(displayQuestionIndex + 1);
+    if (displayQuestionIndex === questionIds.length - 2) {
+      setIsLastQuestion(true);
+    }
   };
 
   return (
@@ -63,10 +72,11 @@ export default function InputAnswer({
           <Button onClick={handlePrevQuestion}>前へ</Button>
         </Box>
         <Box sx={{ padding: 1, margin: 1 }}>
-          <Button onClick={() => finishAnswer()}>終了</Button>
-        </Box>
-        <Box sx={{ padding: 1, margin: 1 }}>
-          <Button onClick={handleNextQuestion}>次へ</Button>
+          {islastQuestion ? (
+            <Button onClick={finishAnswer}>終了</Button>
+          ) : (
+            <Button onClick={handleNextQuestion}>次へ</Button>
+          )}
         </Box>
       </Box>
     </Box>

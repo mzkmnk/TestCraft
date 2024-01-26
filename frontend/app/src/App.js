@@ -7,6 +7,7 @@ import Signup from "./Signup.js";
 import QuestionsAll from "./QuestionsAll.js";
 import Mycreate from "./Mycreate.js";
 import Editor from "./Editor.tsx";
+import Solved from "./Solved.js";
 import Mysolve from "./Mysolve.js";
 import Message from "./Message.js";
 import AllCompanyUsers from "./AllCompanyUsers.js";
@@ -32,7 +33,7 @@ function App() {
           element={<ReadWorkbook next={"Editor"} />}
         />
         <Route path="/mypage/mycreate" element={<Mycreate />} />
-        <Route path="/add_user" element = {<AddUser />} />
+        <Route path="/add_user" element={<AddUser />} />
         <Route path="/send_message" element={<SendMessage />} />
         <Route path="/all_company_users" element={<AllCompanyUsers />} />
         <Route path="/mypage/mysolve" element={<Mysolve />} />
@@ -40,8 +41,9 @@ function App() {
         <Route path="/mypage/company_message" element={<CompanyMessage />} />
         <Route
           path="/solve/:workbookId"
-          element={<ReadWorkbook next={"QuestionsSolve"} />}
+          element={<ReadWorkbook nextApp={"AnswerApp"} />}
         />
+        <Route path="/solved/:workbookId" element={<Solved />} />
       </Routes>
     </Router>
   );
