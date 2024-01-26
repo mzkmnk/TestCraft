@@ -5,8 +5,9 @@ const urlBase = "http://localhost:8000/api";
 const APIs = {
   singup: `${urlBase}/signup`,
   login: `${urlBase}/login`,
-  checkAuth: `${urlBase}/check_auth`,
+  check_auth: `${urlBase}/check_auth`,
   logout: `${urlBase}/logout`,
+  user_change: `${urlBase}/user_change`,
   company_signup: `${urlBase}/company_signup`,
   questionsall: `${urlBase}/questionsall`,
   create_user_workbook: `${urlBase}/create_user_workbook`,
@@ -25,6 +26,7 @@ const APIs = {
  * urlを受け取り、APIからデータを取得する。
  * ログイン認証に失敗した場合は、ログインページにリダイレクトする。
  * 一つのuseAPIでは、一つのAPIしか叩けず、初回読み込み時にAPINameを指定する必要がある。
+ * isLoginRequiredも、初期化時のみしか変更できない。
  * （再送信も初期化時もAPINameを省略可能にすると、APINameがnullの状態で実行される可能性がでる。）
  * 初回読み込み時にAPIを叩くかどうかは、loadOnStartで指定する。
  * sendAPIを使う場合、useEffectの中で使う必要がある。（無限ループになる）
@@ -41,14 +43,18 @@ export function useAPI({
   isLoginRequired = false,
   loadOnStart = false,
 }) {
-  const [data, setData] = useState(null);
+  // dataの初期値がnullだと、data.~~でエラーが出る。
+  const [data, setData] = useState({});
   const [isLoading, setIsLoading] = useState(loadOnStart ? true : null);
+  const [isSuccess, setIsSuccess] = useState(null);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const stateInit = () => {
+    setData({});
     setIsLoading(true);
     setError(undefined);
+    setIsSuccess(undefined);
   };
 
   // useEffectでも、外部からも呼び出せるようにするには、useCallbackを使う必要がある。
@@ -56,7 +62,7 @@ export function useAPI({
   // これは、useEffectの無限ループを引き起こす。
   // これを防ぐため、関数をメモ化して、保存する。
   const sendAPI = useCallback(
-    async ({ params = null, body = null, isLoginRequired = false }) => {
+    async ({ params = null, body = null }) => {
       // ログイン認証失敗Error
       class NotAuthenticatedError extends Error {
         constructor(message) {
@@ -68,7 +74,7 @@ export function useAPI({
       try {
         // ログイン認証
         if (isLoginRequired) {
-          const response = await fetch(APIs.checkAuth, {
+          const response = await fetch(APIs.check_auth, {
             headers: {
               "Content-Type": "application/json",
             },
@@ -87,6 +93,7 @@ export function useAPI({
         }
         // JSON Bodyがある場合は、POSTリクエストを送る。
         const url = typeof API === "function" ? API(params) : API;
+        console.log("url", url);
         const reqData = body
           ? {
               headers: {
@@ -102,13 +109,16 @@ export function useAPI({
               },
               credentials: "include",
             };
-
+        console.log("reqData", reqData);
         const response = await fetch(url, reqData);
         if (!response.ok) {
           throw new Error(`${response.status} ${response.statusText}`);
         }
+
         const data = await response.json();
         setData(data);
+
+        setIsSuccess(true);
       } catch (error) {
         // ログイン認証失敗の場合、ログインページにリダイレクトする。
         if (error instanceof NotAuthenticatedError) {
@@ -117,6 +127,7 @@ export function useAPI({
           setError(error);
         }
         console.log(error);
+        setIsSuccess(false);
       } finally {
         setIsLoading();
       }
@@ -129,10 +140,9 @@ export function useAPI({
       sendAPI({
         params,
         body,
-        isLoginRequired,
       });
     }
   }, [body, isLoginRequired, loadOnStart, params, sendAPI]);
 
-  return { sendAPI, data, isLoading, error };
+  return { sendAPI, data, isLoading, isSuccess, error };
 }

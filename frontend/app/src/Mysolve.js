@@ -1,45 +1,26 @@
 import React, { useEffect, useState } from "react";
 import UserHeader from "./UserHeader";
 import { useNavigate } from "react-router-dom";
+import { useAPI } from "./hooks/useAPI";
 
+// Exportしなくても使えてる？
 function Mysolve() {
-  const [questions, setQuestions] = useState([]);
+  const [workbooks, setWorkbooks] = useState([]);
   const navigate = useNavigate();
 
+  const API = useAPI({
+    APIName: "solve_workbook",
+    isLoginRequired: true,
+    loadOnStart: true,
+  });
+
   useEffect(() => {
-    fetch("http://localhost:8000/api/check_auth", {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.authenticated === false) {
-          navigate("/login");
-        } else {
-          fetch("http://localhost:8000/api/solve_workbook", {
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              if (data.success === true) {
-                console.log(data);
-                setQuestions(data.workbook);
-              }
-            })
-            .catch((error) => {
-              console.error("Error:", error);
-            });
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-  }, [navigate]);
+    if (API.isSuccess === false) {
+      navigate("/error");
+    } else if (API.isSuccess === true && API.data.success === true) {
+      setWorkbooks(API.data.workbook);
+    }
+  }, [API.data.success, API.data.workbook, API.isSuccess, navigate]);
 
   //ここ変更
   const handleQuestionClick = (workbookId) => {
@@ -89,23 +70,23 @@ function Mysolve() {
     <>
       <UserHeader />
       <div style={styles.questionsContainer}>
-        {questions.map((question) => (
+        {workbooks.map((workbook) => (
           <div
             style={styles.question}
-            key={question.workbook__id}
-            onClick={() => handleQuestionClick(question.workbook__id)}
+            key={workbook.workbook__id}
+            onClick={() => handleQuestionClick(workbook.workbook__id)}
           >
             <div style={styles.questionHeader}>
-              <h3>{question.workbook__workbook_name}</h3>
+              <h3>{workbook.workbook__workbook_name}</h3>
               <span style={styles.createdBy}>
-                created by {question.workbook_create_id__username} ({question.workbook__created_at}
-                )
+                created by {workbook.workbook_create_id__username} (
+                {workbook.workbook__created_at})
               </span>
             </div>
-            <p>{question.workbook__description}</p>
+            <p>{workbook.workbook__description}</p>
             <div style={likeStyle}>
               <span style={likeIconStyle}>♥</span>
-              <span>{question.workbook__like_count}</span>
+              <span>{workbook.workbook__like_count}</span>
             </div>
           </div>
         ))}

@@ -15,14 +15,15 @@ function QuestionsAll() {
   });
 
   useEffect(() => {
-    if (!API.data) return;
-    setWorkbooks(
-      API.data.workbooks.map((workbooks) => ({
-        ...workbooks,
-        liked: workbooks.liked_by_user,
-      }))
-    );
-  }, [API.data]);
+    if (API.isSuccess) {
+      setWorkbooks(
+        API.data.workbooks.map((workbooks) => ({
+          ...workbooks,
+          liked: workbooks.liked_by_user,
+        }))
+      );
+    }
+  }, [API.data.workbooks, API.isSuccess]);
 
   if (API.isLoading === true || workbooks === null) {
     return <Loading />;
