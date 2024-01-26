@@ -7,6 +7,7 @@ const APIs = {
   login: `${urlBase}/login`,
   check_auth: `${urlBase}/check_auth`,
   logout: `${urlBase}/logout`,
+  user_change: `${urlBase}/user_change`,
   company_signup: `${urlBase}/company_signup`,
   questionsall: `${urlBase}/questionsall`,
   create_user_workbook: `${urlBase}/create_user_workbook`,
