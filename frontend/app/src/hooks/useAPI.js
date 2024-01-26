@@ -25,6 +25,7 @@ const APIs = {
  * urlを受け取り、APIからデータを取得する。
  * ログイン認証に失敗した場合は、ログインページにリダイレクトする。
  * 一つのuseAPIでは、一つのAPIしか叩けず、初回読み込み時にAPINameを指定する必要がある。
+ * isLoginRequiredも、初期化時のみしか変更できない。
  * （再送信も初期化時もAPINameを省略可能にすると、APINameがnullの状態で実行される可能性がでる。）
  * 初回読み込み時にAPIを叩くかどうかは、loadOnStartで指定する。
  * sendAPIを使う場合、useEffectの中で使う必要がある。（無限ループになる）
@@ -60,7 +61,7 @@ export function useAPI({
   // これは、useEffectの無限ループを引き起こす。
   // これを防ぐため、関数をメモ化して、保存する。
   const sendAPI = useCallback(
-    async ({ params = null, body = null, isLoginRequired = false }) => {
+    async ({ params = null, body = null }) => {
       // ログイン認証失敗Error
       class NotAuthenticatedError extends Error {
         constructor(message) {
@@ -138,7 +139,6 @@ export function useAPI({
       sendAPI({
         params,
         body,
-        isLoginRequired,
       });
     }
   }, [body, isLoginRequired, loadOnStart, params, sendAPI]);
