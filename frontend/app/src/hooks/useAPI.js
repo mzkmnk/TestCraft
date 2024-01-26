@@ -41,13 +41,15 @@ export function useAPI({
   isLoginRequired = false,
   loadOnStart = false,
 }) {
-  const [data, setData] = useState(null);
+  // dataの初期値がnullだと、data.~~でエラーが出る。
+  const [data, setData] = useState({});
   const [isLoading, setIsLoading] = useState(loadOnStart ? true : null);
   const [isSuccess, setIsSuccess] = useState(null);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const stateInit = () => {
+    setData({});
     setIsLoading(true);
     setError(undefined);
     setIsSuccess(undefined);
