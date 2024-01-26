@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
-const urlBase = "http://localhost:8000/api";
+const urlBase = "http://54.150.14.102:8000/api";
 const APIs = {
   singup: `${urlBase}/signup`,
   login: `${urlBase}/login`,
