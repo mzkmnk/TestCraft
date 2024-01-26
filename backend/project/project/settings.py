@@ -42,7 +42,13 @@ INSTALLED_APPS = [
     'api',
     'ninja',
     'corsheaders',
+    'sslserver', #httpsに必要らしい
 ]
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = False
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 NINJA_DOCS_VIEW = 'redoc'
 
