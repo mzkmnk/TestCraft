@@ -16,6 +16,7 @@ import SendMessage from "./SendMessage.js";
 import AddUser from "./add_user.js";
 import UserChange from "./user_change.js";
 import ReadWorkbook from "./ReadWorkbook.js";
+import Error from "./Error.js";
 
 function App() {
   return (
@@ -27,7 +28,7 @@ function App() {
         <Route path="/questionsAll" element={<QuestionsAll />} />
         <Route path="/user_change" element={<UserChange />} />
         <Route path="/editor" element={<Editor />} />
-        
+
         <Route
           path="/editor/:workbookId"
           element={<ReadWorkbook nextAppName={"Editor"} />}
@@ -44,6 +45,7 @@ function App() {
           element={<ReadWorkbook nextAppName={"AnswerApp"} />}
         />
         <Route path="/solved/:workbookId" element={<Solved />} />
+        <Route path="/error" element={<Error />} />
       </Routes>
     </Router>
   );

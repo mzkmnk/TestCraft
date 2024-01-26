@@ -70,7 +70,7 @@ export function useAPI({
       try {
         // ログイン認証
         if (isLoginRequired) {
-          const response = await fetch(APIs.checkAuth, {
+          const response = await fetch(APIs.check_auth, {
             headers: {
               "Content-Type": "application/json",
             },
@@ -89,6 +89,7 @@ export function useAPI({
         }
         // JSON Bodyがある場合は、POSTリクエストを送る。
         const url = typeof API === "function" ? API(params) : API;
+        console.log("url", url);
         const reqData = body
           ? {
               headers: {
@@ -109,6 +110,7 @@ export function useAPI({
         if (!response.ok) {
           throw new Error(`${response.status} ${response.statusText}`);
         }
+
         const data = await response.json();
         setData(data);
 
