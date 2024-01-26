@@ -58,6 +58,7 @@ function Signup() {
     }
   }, [loginAPI, navigate, password, signupAPI.isSuccess, username]);
 
+  // loginAPIの終了に反応するuseEffect。
   useEffect(() => {
     if (loginAPI.isSuccess === true) {
       localStorage.setItem("username", username);
