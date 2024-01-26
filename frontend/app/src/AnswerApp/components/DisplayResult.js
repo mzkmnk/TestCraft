@@ -6,79 +6,15 @@ import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import TextField from "@mui/material/TextField";
+import { useAnswers } from "../context/AnswersContext";
 
-// ほぼInputAnswer.jsと同じ
-export default function ResultQuestion({
-  questionIds,
-  questionTree,
-  correctIds,
-  answers,
-  questionCount,
-}) {
-  // questionIdsのindex
-  const [displayQuestionIndex, setDisplayQuestionIndex] = useState(0);
-
-  // 問題遷移
-  const handlePrevQuestion = () => {
-    if (displayQuestionIndex === 0) return;
-    setDisplayQuestionIndex(displayQuestionIndex - 1);
-  };
-  const handleNextQuestion = () => {
-    if (displayQuestionIndex === questionIds.length - 1) return;
-    setDisplayQuestionIndex(displayQuestionIndex + 1);
-  };
-
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-        width: "100%",
-      }}
-      position={"fixed"}
-    >
-      <Box
-        sx={{
-          padding: 1,
-          margin: 1,
-        }}
-      >
-        <DisplayQuestion
-          questionId={questionIds[displayQuestionIndex]}
-          questionTree={questionTree}
-          correctIds={correctIds}
-          answers={answers}
-          questionCount={questionCount}
-        />
-      </Box>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          width: "80%",
-        }}
-      >
-        <Box sx={{ padding: 1, margin: 1 }}>
-          <Button onClick={handlePrevQuestion}>前へ</Button>
-        </Box>
-        <Box sx={{ padding: 1, margin: 1 }}>
-          <Button onClick={handleNextQuestion}>次へ</Button>
-        </Box>
-      </Box>
-    </Box>
-  );
-}
-
-function DisplayQuestion({
+export function DisplayResult({
   questionTree,
   questionId,
   correctIds,
-  answers,
   questionCount,
 }) {
+  const { answers } = useAnswers();
   const question = questionTree[questionId];
   let color;
   const isCorrect = correctIds.includes(questionId);
@@ -102,7 +38,7 @@ function DisplayQuestion({
       <>
         <Typography>{question.question}</Typography>
         {question.childIds.map((childId) => (
-          <DisplayQuestion
+          <DisplayResult
             key={childId}
             questionId={childId}
             questionTree={questionTree}
@@ -119,7 +55,7 @@ function DisplayQuestion({
         <Typography color={color + ".main"}>
           {isCorrect ? "正解" : "不正解"}
         </Typography>
-        <RadioGroup name={questionId} value={answers[questionId] || ""}>
+        <RadioGroup name={questionId} value={answers[questionId] || "未回答"}>
           {question.options.map((option) => (
             <FormControlLabel
               key={option.id}
@@ -139,8 +75,8 @@ function DisplayQuestion({
           {isCorrect ? "正解" : "不正解"}
         </Typography>
         <TextField
-          inputProps={{ maxLength: question.maxlength, readOnly: true }}
-          defaultValue={answers[questionId] || ""}
+          inputProps={{ readOnly: true }}
+          defaultValue={answers[questionId] || "未回答"}
           color={color}
           focused
         />
