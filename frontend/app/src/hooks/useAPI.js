@@ -5,7 +5,7 @@ const urlBase = "http://localhost:8000/api";
 const APIs = {
   singup: `${urlBase}/signup`,
   login: `${urlBase}/login`,
-  checkAuth: `${urlBase}/check_auth`,
+  check_auth: `${urlBase}/check_auth`,
   logout: `${urlBase}/logout`,
   company_signup: `${urlBase}/company_signup`,
   questionsall: `${urlBase}/questionsall`,
@@ -43,12 +43,14 @@ export function useAPI({
 }) {
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(loadOnStart ? true : null);
+  const [isSuccess, setIsSuccess] = useState(null);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const stateInit = () => {
     setIsLoading(true);
     setError(undefined);
+    setIsSuccess(undefined);
   };
 
   // useEffectでも、外部からも呼び出せるようにするには、useCallbackを使う必要がある。
@@ -102,13 +104,15 @@ export function useAPI({
               },
               credentials: "include",
             };
-
+        console.log("reqData", reqData);
         const response = await fetch(url, reqData);
         if (!response.ok) {
           throw new Error(`${response.status} ${response.statusText}`);
         }
         const data = await response.json();
         setData(data);
+
+        setIsSuccess(true);
       } catch (error) {
         // ログイン認証失敗の場合、ログインページにリダイレクトする。
         if (error instanceof NotAuthenticatedError) {
@@ -117,6 +121,7 @@ export function useAPI({
           setError(error);
         }
         console.log(error);
+        setIsSuccess(false);
       } finally {
         setIsLoading();
       }
@@ -134,5 +139,5 @@ export function useAPI({
     }
   }, [body, isLoginRequired, loadOnStart, params, sendAPI]);
 
-  return { sendAPI, data, isLoading, error };
+  return { sendAPI, data, isLoading, isSuccess, error };
 }
