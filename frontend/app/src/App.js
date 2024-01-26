@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
+import TopPage from "./TopPage.js";
 import LoginForm from "./LoginForm.js";
 import MyPage from "./Mypage.js";
 import Signup from "./Signup.js";
@@ -21,6 +22,7 @@ function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/" element={<TopPage />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/signup" element={<Signup />} />
