@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
@@ -15,38 +16,39 @@ const style = {
   boxShadow: 24,
 };
 
-export default function SettingsModal({
-  isSettingsOpen,
-  setIsSettingsOpen,
-  answerSettings,
-  setAnswerSettings,
-  startAnswer,
-}) {
-  // ウィンドウ外をクリックしたときにモーダルを閉じないようにする
-  const handleClose = (event, reason) => {
-    if (reason === "backdropClick") return;
-    setIsSettingsOpen(false);
-  };
+export function SettingsModal({ exitFunc, answerSettings, setAnswerSettings }) {
+  const [time_min, setTime_min] = useState(
+    Math.floor(answerSettings.time / 60)
+  );
+  const [time_sec, setTime_sec] = useState(answerSettings.time % 60);
 
   // textfieldの値を取得する
   const handleMinChange = (event) => {
     if (event.target.value === "") {
-      setAnswerSettings({ ...answerSettings, time_min: 0 });
+      setTime_min(0);
     } else {
-      setAnswerSettings({ ...answerSettings, time_min: event.target.value });
+      setTime_min(event.target.value);
     }
   };
+
   const handleSecChange = (event) => {
     if (event.target.value === "") {
-      setAnswerSettings({ ...answerSettings, time_sec: 0 });
+      setTime_sec(0);
     } else {
-      setAnswerSettings({ ...answerSettings, time_sec: event.target.value });
+      setTime_sec(event.target.value);
     }
+  };
+
+  // 閉じるときにまとめて設定を反映する
+  const finishSetting = () => {
+    const time = time_min * 60 + time_sec;
+    setAnswerSettings({ ...answerSettings, time });
+    exitFunc();
   };
 
   return (
     <>
-      <Modal open={isSettingsOpen} onClose={handleClose}>
+      <Modal open={true}>
         <Box sx={style}>
           <Typography>時間：</Typography>
           <Box sx={{ display: "flex" }}>
@@ -54,18 +56,18 @@ export default function SettingsModal({
               label="分"
               type="number"
               inputProps={{ min: 0 }}
-              defaultValue={answerSettings.time_min}
+              defaultValue={time_min}
               onChange={(event) => handleMinChange(event)}
             />
             <TextField
               label="秒"
               type="number"
               inputProps={{ min: 1, max: 59 }}
-              defaultValue={answerSettings.time_sec}
+              defaultValue={time_sec}
               onChange={(event) => handleSecChange(event)}
             />
           </Box>
-          <Button onClick={startAnswer}>開始</Button>
+          <Button onClick={finishSetting}>開始</Button>
         </Box>
       </Modal>
     </>
