@@ -644,6 +644,17 @@ def send_messsage(request,payload:MessageSchema):
 @api.get("is_company_user")
 def is_company_user(request):
     try:
+        if(request.user.is_anonymous):
+            return JsonResponse(
+                {
+                    "success":True,
+                    "is_own_company":False,
+                    "is_company_user":False,
+                    "error":None,
+                    
+                },
+                status = 201,
+            )
         return JsonResponse(
             {
                 "success":True,
