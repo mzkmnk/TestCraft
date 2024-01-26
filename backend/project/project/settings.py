@@ -41,14 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'api',
     'ninja',
-    'corsheaders',
-    'sslserver', #httpsに必要らしい
+    'corsheaders'
 ]
-
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SECURE_SSL_REDIRECT = False
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
 
 NINJA_DOCS_VIEW = 'redoc'
 
@@ -154,7 +148,7 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# http <s> のための設定
+# httpsのための設定
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
