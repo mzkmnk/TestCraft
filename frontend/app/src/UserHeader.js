@@ -10,16 +10,16 @@ import MenuItem from "@mui/material/MenuItem";
 import Fade from "@mui/material/Fade";
 
 // アイコンimport
-import BorderColorIcon from '@mui/icons-material/BorderColor';
-import BookIcon from '@mui/icons-material/Book';
-import EqualizerIcon from '@mui/icons-material/Equalizer';
-import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
-import HistoryIcon from '@mui/icons-material/History';
-import LogoutIcon from '@mui/icons-material/Logout';
-import AddIcon from '@mui/icons-material/Add';
-import SendIcon from '@mui/icons-material/Send';
-import GroupIcon from '@mui/icons-material/Group';
-import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import BorderColorIcon from "@mui/icons-material/BorderColor";
+import BookIcon from "@mui/icons-material/Book";
+import EqualizerIcon from "@mui/icons-material/Equalizer";
+import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
+import HistoryIcon from "@mui/icons-material/History";
+import LogoutIcon from "@mui/icons-material/Logout";
+import AddIcon from "@mui/icons-material/Add";
+import SendIcon from "@mui/icons-material/Send";
+import GroupIcon from "@mui/icons-material/Group";
+import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 
 const UserHeader = ({ position = "static" }) => {
   const navigate = useNavigate();
@@ -29,26 +29,27 @@ const UserHeader = ({ position = "static" }) => {
   const [isOwnCompanyUser, setIsOwnCompanyUser] = React.useState(false);
   const [isCompanyUser, setIsCompanyUser] = React.useState(false);
   const [userMenuAnchorEl, setUserMenuAnchorEl] = React.useState(null);
-  const [questionsMenuAnchorEl, setQuestionsMenuAnchorEl] = React.useState(null);
+  const [questionsMenuAnchorEl, setQuestionsMenuAnchorEl] =
+    React.useState(null);
   const [companyMenuAnchorEl, setCompanyMenuAnchorEl] = React.useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/is_company_user",{
+    fetch("http://localhost:8000/api/is_company_user", {
       headers: {
         "Content-Type": "application/json",
       },
       credentials: "include",
     })
-    .then((response) => response.json())
-    .then((data) => {
-      if(data.success){
-        setIsOwnCompanyUser(data.is_own_company);
-        setIsCompanyUser(data.is_company_user);
-      }else{
-        console.error("Error:", data.error);
-      }
-    })
-  },[navigate]);
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          setIsOwnCompanyUser(data.is_own_company);
+          setIsCompanyUser(data.is_company_user);
+        } else {
+          console.error("Error:", data.error);
+        }
+      });
+  }, [navigate]);
   const handleUserMenuClick = (event) => {
     setUserMenuAnchorEl(event.currentTarget);
   };
@@ -91,11 +92,11 @@ const UserHeader = ({ position = "static" }) => {
   };
 
   const styles = {
-    icon : {
-      marginRight: '10px',
-      color:'#1876D2',
-    }
-  }
+    icon: {
+      marginRight: "10px",
+      color: "#1876D2",
+    },
+  };
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -174,9 +175,7 @@ const UserHeader = ({ position = "static" }) => {
                   <HistoryIcon style={styles.icon} />
                   解答履歴
                 </MenuItem>
-                <MenuItem 
-                  onClick={handleLogout}
-                >
+                <MenuItem onClick={handleLogout}>
                   <LogoutIcon style={styles.icon} />
                   ログアウト
                 </MenuItem>
@@ -226,7 +225,7 @@ const UserHeader = ({ position = "static" }) => {
                     style={{ cursor: "pointer" }}
                   >
                     企業用
-                  </Button> 
+                  </Button>
                   <Menu
                     id="company-menu-appbar"
                     anchorEl={companyMenuAnchorEl}
@@ -248,7 +247,7 @@ const UserHeader = ({ position = "static" }) => {
                       <MenuItem
                         component={Link}
                         to="/all_company_users"
-                        onclick={handleMenuClose}
+                        onClick={handleMenuClose}
                       >
                         <GroupIcon style={styles.icon} />
                         社員一覧
