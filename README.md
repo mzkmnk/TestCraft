@@ -14,6 +14,14 @@ npx serve -s build -l 3000
 ### 個人的メモ
 gunicornの起動方法
 `gunicorn --workers 3 <project名>wsgi:application`
+サービス開始
+サービス停止
+サービス状態確認
+```
+sudo systemctl start gunicorn.service
+sudo systemctl stop gunicorn.service
+sudo systemctl status gunicorn.service
+```
 
 ssl証明書の発行方法
 ```
