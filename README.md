@@ -20,3 +20,12 @@ ssl証明書の発行方法
 sudo yum update
 sudo certbot --apache -d <ドメイン名>
 ```
+
+Apacheファイルの格納場所
+```
+/etc/httpd/conf/httpd.conf
+```
+アパッチ再起動
+```
+sudo systemctl restart httpd
+```
