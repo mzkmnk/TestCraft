@@ -84,7 +84,6 @@ export function useAPI({
             headers: {
               "Content-Type": "application/json",
             },
-            mode: 'no-cors',
             credentials: "include",
           });
           const data = await response.json();
@@ -106,9 +105,6 @@ export function useAPI({
               headers: {
                 "Content-Type": "application/json",
               },
-
-              mode: 'no-cors',
-
               credentials: "include",
               method: "POST",
               body: body,
@@ -117,9 +113,6 @@ export function useAPI({
               headers: {
                 "Content-Type": "application/json",
               },
-
-              mode: 'no-cors',
-
               credentials: "include",
             };
         console.log("reqData", reqData);
