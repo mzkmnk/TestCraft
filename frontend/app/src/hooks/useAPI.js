@@ -84,7 +84,7 @@ export function useAPI({
             headers: {
               "Content-Type": "application/json",
             },
-            mode: 'cors',
+            mode: 'no-cors',
             credentials: "include",
           });
           const data = await response.json();
@@ -107,7 +107,7 @@ export function useAPI({
                 "Content-Type": "application/json",
               },
 
-              mode: 'cors',
+              mode: 'no-cors',
 
               credentials: "include",
               method: "POST",
@@ -118,7 +118,7 @@ export function useAPI({
                 "Content-Type": "application/json",
               },
 
-              mode: 'cors',
+              mode: 'no-cors',
 
               credentials: "include",
             };
