@@ -21,6 +21,11 @@ const APIs = {
   save_answer: `${urlBase}/save_answer`,
   solve_workbook: `${urlBase}/solve_workbook`,
   solve_detail: (workbookId) => `${urlBase}/solve_detail/${workbookId}`,
+  message: `${urlBase}/message`,
+  get_company_user: `${urlBase}/get_company_user`,
+  send_message: `${urlBase}/send_message`,
+  is_company_user: `${urlBase}/is_company_user`,
+  all_company_users: `${urlBase}/all_company_users`,
 };
 
 /**
@@ -28,12 +33,12 @@ const APIs = {
  * ログイン認証に失敗した場合は、ログインページにリダイレクトする。
  * 一つのuseAPIでは、一つのAPIしか叩けず、初回読み込み時にAPINameを指定する必要がある。
  * isLoginRequiredも、初期化時のみしか変更できない。
- * （再送信も初期化時もAPINameを省略可能にすると、APINameがnullの状態で実行される可能性がでる。）
  * 初回読み込み時にAPIを叩くかどうかは、loadOnStartで指定する。
- * sendAPIを使う場合、useEffectの中で使う必要がある。（無限ループになる）
+ * sendAPIを使う場合、useEffectの中、非同期のイベント関数の中などで使う必要がある。（無限ループになる）
+ * bodyがあるかないかでGetとPostを判別するため、bodyのないPostは、空のオブジェクトをbodyに渡す必要がある。（出来が悪いインタフェースでごめん）
  *
  * @param {object} {APIName:string, params:string, body:string isLoginRequired:bool, loadOnStart:bool}
- * @returns {object} {data, error, isLoading}
+ * @returns {object} {sendAPI, data, isLoading, isSuccess, error }
  */
 
 // この関数が生きている限りは引数が使える？

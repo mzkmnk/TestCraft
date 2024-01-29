@@ -10,16 +10,17 @@ import MenuItem from "@mui/material/MenuItem";
 import Fade from "@mui/material/Fade";
 
 // アイコンimport
-import BorderColorIcon from '@mui/icons-material/BorderColor';
-import BookIcon from '@mui/icons-material/Book';
-import EqualizerIcon from '@mui/icons-material/Equalizer';
-import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
-import HistoryIcon from '@mui/icons-material/History';
-import LogoutIcon from '@mui/icons-material/Logout';
-import AddIcon from '@mui/icons-material/Add';
-import SendIcon from '@mui/icons-material/Send';
-import GroupIcon from '@mui/icons-material/Group';
-import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import BorderColorIcon from "@mui/icons-material/BorderColor";
+import BookIcon from "@mui/icons-material/Book";
+import EqualizerIcon from "@mui/icons-material/Equalizer";
+import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
+import HistoryIcon from "@mui/icons-material/History";
+import LogoutIcon from "@mui/icons-material/Logout";
+import AddIcon from "@mui/icons-material/Add";
+import SendIcon from "@mui/icons-material/Send";
+import GroupIcon from "@mui/icons-material/Group";
+import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import { useAPI } from "./hooks/useAPI";
 
 const UserHeader = ({ position = "static" }) => {
   const navigate = useNavigate();
@@ -29,26 +30,45 @@ const UserHeader = ({ position = "static" }) => {
   const [isOwnCompanyUser, setIsOwnCompanyUser] = React.useState(false);
   const [isCompanyUser, setIsCompanyUser] = React.useState(false);
   const [userMenuAnchorEl, setUserMenuAnchorEl] = React.useState(null);
-  const [questionsMenuAnchorEl, setQuestionsMenuAnchorEl] = React.useState(null);
+  const [questionsMenuAnchorEl, setQuestionsMenuAnchorEl] =
+    React.useState(null);
   const [companyMenuAnchorEl, setCompanyMenuAnchorEl] = React.useState(null);
 
+  const isCompanyUserAPI = useAPI({
+    APIName: "is_company_user",
+    loadOnStart: true,
+  });
+
+  const logoutAPI = useAPI({
+    APIName: "logout",
+  });
+
   useEffect(() => {
-    fetch("http://localhost:8000/api/is_company_user",{
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-    })
-    .then((response) => response.json())
-    .then((data) => {
-      if(data.success){
-        setIsOwnCompanyUser(data.is_own_company);
-        setIsCompanyUser(data.is_company_user);
-      }else{
-        console.error("Error:", data.error);
-      }
-    })
-  },[navigate]);
+    if (isCompanyUserAPI.isSuccess === false) {
+      navigate("/error");
+    } else if (
+      isCompanyUserAPI.isSuccess === true &&
+      isCompanyUserAPI.data.success === true
+    ) {
+      const data = isCompanyUserAPI.data;
+      setIsOwnCompanyUser(data.is_own_company);
+      setIsCompanyUser(data.is_company_user);
+    }
+  }, [isCompanyUserAPI.data, isCompanyUserAPI.isSuccess, navigate]);
+
+  useEffect(() => {
+    if (logoutAPI.isSuccess === false) {
+      navigate("/error");
+    } else if (
+      logoutAPI.isSuccess === true &&
+      logoutAPI.data.success === true
+    ) {
+      localStorage.removeItem("username");
+      localStorage.removeItem("is_own_company");
+      navigate("/login");
+    }
+  }, [logoutAPI.data.success, logoutAPI.isSuccess, navigate]);
+
   const handleUserMenuClick = (event) => {
     setUserMenuAnchorEl(event.currentTarget);
   };
@@ -68,34 +88,15 @@ const UserHeader = ({ position = "static" }) => {
   };
 
   const handleLogout = async () => {
-    try {
-      const response = await fetch("http://localhost:8000/api/logout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      });
-
-      if (response.ok) {
-        console.log("Logout succeeded");
-        localStorage.removeItem("username");
-        localStorage.removeItem("is_own_company");
-        navigate("/login");
-      } else {
-        console.error("Logout failed");
-      }
-    } catch (error) {
-      console.error("Error during logout:", error);
-    }
+    logoutAPI.sendAPI({ body: {} });
   };
 
   const styles = {
-    icon : {
-      marginRight: '10px',
-      color:'#1876D2',
-    }
-  }
+    icon: {
+      marginRight: "10px",
+      color: "#1876D2",
+    },
+  };
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -174,9 +175,7 @@ const UserHeader = ({ position = "static" }) => {
                   <HistoryIcon style={styles.icon} />
                   解答履歴
                 </MenuItem>
-                <MenuItem 
-                  onClick={handleLogout}
-                >
+                <MenuItem onClick={handleLogout}>
                   <LogoutIcon style={styles.icon} />
                   ログアウト
                 </MenuItem>
@@ -226,7 +225,7 @@ const UserHeader = ({ position = "static" }) => {
                     style={{ cursor: "pointer" }}
                   >
                     企業用
-                  </Button> 
+                  </Button>
                   <Menu
                     id="company-menu-appbar"
                     anchorEl={companyMenuAnchorEl}
@@ -248,7 +247,7 @@ const UserHeader = ({ position = "static" }) => {
                       <MenuItem
                         component={Link}
                         to="/all_company_users"
-                        onclick={handleMenuClose}
+                        onClick={handleMenuClose}
                       >
                         <GroupIcon style={styles.icon} />
                         社員一覧
