@@ -20,6 +20,11 @@ const APIs = {
   save_answer: `${urlBase}/save_answer`,
   solve_workbook: `${urlBase}/solve_workbook`,
   solve_detail: (workbookId) => `${urlBase}/solve_detail/${workbookId}`,
+  message: `${urlBase}/message`,
+  get_company_user: `${urlBase}/get_company_use`,
+  send_message: `${urlBase}/send_message`,
+  is_company_user: `${urlBase}/is_company_user`,
+  all_company_users: `${urlBase}/all_company_users`,
 };
 
 /**
