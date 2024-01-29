@@ -14,3 +14,9 @@ npx serve -s build -l 3000
 ### 個人的メモ
 gunicornの起動方法
 `gunicorn --workers 3 <project名>wsgi:application`
+
+ssl証明書の発行方法
+```
+sudo yum update
+sudo certbot --apache -d <ドメイン名>
+```
