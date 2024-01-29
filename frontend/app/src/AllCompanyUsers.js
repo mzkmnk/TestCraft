@@ -10,7 +10,7 @@ function AllCompanyUsers() {
 
   const API = useAPI({
     APIName: "all_company_users",
-    isLoginRequired: "true",
+    isLoginRequired: true,
     loadOnStart: true,
   });
 
