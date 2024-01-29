@@ -155,4 +155,5 @@ CSRF_COOKIE_SECURE = True
 CORS_ALLOWED_ORIGINS = [
     "https://www.testcrafts.net",
     "https://testcrafts.net",
+    "https://api.testcrafts.net",
 ]
