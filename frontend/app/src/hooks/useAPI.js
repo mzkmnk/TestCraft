@@ -21,7 +21,7 @@ const APIs = {
   solve_workbook: `${urlBase}/solve_workbook`,
   solve_detail: (workbookId) => `${urlBase}/solve_detail/${workbookId}`,
   message: `${urlBase}/message`,
-  get_company_user: `${urlBase}/get_company_use`,
+  get_company_user: `${urlBase}/get_company_user`,
   send_message: `${urlBase}/send_message`,
   is_company_user: `${urlBase}/is_company_user`,
   all_company_users: `${urlBase}/all_company_users`,
@@ -37,7 +37,7 @@ const APIs = {
  * sendAPIを使う場合、useEffectの中で使う必要がある。（無限ループになる）
  *
  * @param {object} {APIName:string, params:string, body:string isLoginRequired:bool, loadOnStart:bool}
- * @returns {object} {data, error, isLoading}
+ * @returns {object} {sendAPI, data, isLoading, isSuccess, error }
  */
 
 // この関数が生きている限りは引数が使える？
