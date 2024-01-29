@@ -6,5 +6,11 @@
 
 ### 解決策
 
-`npm run build`
-`npx serve -s build -l 3000`
+```
+npm run build
+npx serve -s build -l 3000
+```
+
+### 個人的メモ
+gunicornの起動方法
+`gunicorn --workers 3 <project名>wsgi:application`
