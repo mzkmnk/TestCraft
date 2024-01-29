@@ -20,6 +20,7 @@ import AddIcon from "@mui/icons-material/Add";
 import SendIcon from "@mui/icons-material/Send";
 import GroupIcon from "@mui/icons-material/Group";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import { useAPI } from "./hooks/useAPI";
 
 const UserHeader = ({ position = "static" }) => {
   const navigate = useNavigate();
@@ -33,23 +34,41 @@ const UserHeader = ({ position = "static" }) => {
     React.useState(null);
   const [companyMenuAnchorEl, setCompanyMenuAnchorEl] = React.useState(null);
 
+  const isCompanyUserAPI = useAPI({
+    APIName: "is_company_user",
+    loadOnStart: true,
+  });
+
+  const logoutAPI = useAPI({
+    APIName: "logout",
+  });
+
   useEffect(() => {
-    fetch("http://localhost:8000/api/is_company_user", {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          setIsOwnCompanyUser(data.is_own_company);
-          setIsCompanyUser(data.is_company_user);
-        } else {
-          console.error("Error:", data.error);
-        }
-      });
-  }, [navigate]);
+    if (isCompanyUserAPI.isSuccess === false) {
+      navigate("/error");
+    } else if (
+      isCompanyUserAPI.isSuccess === true &&
+      isCompanyUserAPI.data.success === true
+    ) {
+      const data = isCompanyUserAPI.data;
+      setIsOwnCompanyUser(data.is_own_company);
+      setIsCompanyUser(data.is_company_user);
+    }
+  }, [isCompanyUserAPI.data, isCompanyUserAPI.isSuccess, navigate]);
+
+  useEffect(() => {
+    if (logoutAPI.isSuccess === false) {
+      navigate("/error");
+    } else if (
+      logoutAPI.isSuccess === true &&
+      logoutAPI.data.success === true
+    ) {
+      localStorage.removeItem("username");
+      localStorage.removeItem("is_own_company");
+      navigate("/login");
+    }
+  }, [logoutAPI.data.success, logoutAPI.isSuccess, navigate]);
+
   const handleUserMenuClick = (event) => {
     setUserMenuAnchorEl(event.currentTarget);
   };
@@ -69,26 +88,7 @@ const UserHeader = ({ position = "static" }) => {
   };
 
   const handleLogout = async () => {
-    try {
-      const response = await fetch("http://localhost:8000/api/logout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      });
-
-      if (response.ok) {
-        console.log("Logout succeeded");
-        localStorage.removeItem("username");
-        localStorage.removeItem("is_own_company");
-        navigate("/login");
-      } else {
-        console.error("Logout failed");
-      }
-    } catch (error) {
-      console.error("Error during logout:", error);
-    }
+    logoutAPI.sendAPI({ body: {} });
   };
 
   const styles = {
