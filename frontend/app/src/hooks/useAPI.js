@@ -1,6 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
+
+// 追加
+function getCsrfToken(){
+  return document.cookie.split('; ').find(row=>row.startsWith('csrftoken')).split('=')[1];
+}
+
 const urlBase = "https://api.testcrafts.net/api";
 // const urlBase = "http://localhost:8000/api";
 const APIs = {
@@ -99,11 +105,17 @@ export function useAPI({
         }
         // JSON Bodyがある場合は、POSTリクエストを送る。
         const url = typeof API === "function" ? API(params) : API;
-        console.log("url", url);
+        console.log("url", url);  
+
+        // 追加
+        const csrfToken = getCsrfToken();
+
         const reqData = body
           ? {
               headers: {
                 "Content-Type": "application/json",
+
+                "X-CSRFToken": csrfToken,
               },
               credentials: "include",
               method: "POST",
@@ -112,6 +124,8 @@ export function useAPI({
           : {
               headers: {
                 "Content-Type": "application/json",
+
+                "X-CSRFToken": csrfToken,
               },
               credentials: "include",
             };
