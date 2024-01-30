@@ -18,7 +18,8 @@ from django.urls import path,include
 
 # 変更
 
-from api.api import *
+# from api.api import *
+import api
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', api.urls),
