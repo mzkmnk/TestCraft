@@ -4,7 +4,10 @@ import { useNavigate } from "react-router-dom";
 
 // 追加
 function getCsrfToken(){
-  return document.cookie.split('; ').find(row=>row.startsWith('csrftoken')).split('=')[1];
+  return document.cookie
+    .split('; ')
+    .find(row=>row.startsWith('csrftoken'))
+    ?.split('=')[1];
 }
 
 const urlBase = "https://api.testcrafts.net/api";
