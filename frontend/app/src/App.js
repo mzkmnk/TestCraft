@@ -7,7 +7,7 @@ import MyPage from "./Mypage.js";
 import Signup from "./Signup.js";
 import QuestionsAll from "./QuestionsAll.js";
 import Mycreate from "./Mycreate.js";
-import Editor from "./Editor.tsx";
+import Editor from "./EditorApp/EditorApp.tsx";
 import Solved from "./Solved.js";
 import Mysolve from "./Mysolve.js";
 import Message from "./Message.js";
