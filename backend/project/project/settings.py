@@ -61,7 +61,9 @@ MIDDLEWARE = [
 # httpsのための設定
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+
 CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'project.urls'
 
@@ -84,8 +86,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'project.wsgi.application'
 
 AUTH_USER_MODEL = 'api.User'
-
-CORS_ALLOW_CREDENTIALS = True
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
