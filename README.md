@@ -51,5 +51,5 @@ sudo systemctl restart httpd
 
 apiコール確認コマンド
 ```
-url -X POST https://api.testcrafts.net/api/login -H "Content-Type: application/json" -d '{"username":"username","password":"password"}'
+curl -X POST https://api.testcrafts.net/api/login -H "Content-Type: application/json" -d '{"username":"username","password":"password"}'
 ```
