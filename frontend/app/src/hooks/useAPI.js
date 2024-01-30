@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 function getCsrfToken(){
   return document.cookie
     .split('; ')
-    .find(row=>row.startsWith('csrftoken'))
+    .find(row => row.startsWith('csrftoken='))
     ?.split('=')[1];
 }
 
