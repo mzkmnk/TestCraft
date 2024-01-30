@@ -157,8 +157,3 @@ CORS_ALLOWED_ORIGINS = [
     "https://www.testcrafts.net",
     "https://api.testcrafts.net",
 ]
-
-CSRF_TRUSTED_ORIGINS = [
-    "https://www.testcrafts.net",
-    "https://api.testcrafts.net",
-]

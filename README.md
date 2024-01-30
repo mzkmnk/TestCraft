@@ -49,6 +49,13 @@ Apacheファイルの格納場所
 sudo systemctl restart httpd
 ```
 
+status log file
+error log file 
+```
+/var/log/httpd/access_log
+/var/log/httpd/error_log
+```
+
 apiコール確認コマンド
 ```
 curl -X POST https://api.testcrafts.net/api/login -H "Content-Type: application/json" -d '{"username":"username","password":"password"}'
