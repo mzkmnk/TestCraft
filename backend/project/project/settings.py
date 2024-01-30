@@ -26,12 +26,17 @@ SECRET_KEY = 'django-insecure-+@0dftz3kip5&+%a3_8*so8vsgf&k+imn6trt-@xc%yksp-v4c
 DEBUG = False
 
 ALLOWED_HOSTS = [
-    'localhost',
-    '54.150.14.102',
     'testcrafts.net',
     'api.testcrafts.net',
 ]
 
+# httpsのための設定
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+CORS_ALLOWED_ORIGINS = [
+    "https://www.testcrafts.net",
+    "https://api.testcrafts.net",
+]
 
 # Application definition
 
@@ -148,12 +153,3 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# httpsのための設定
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-# CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOWED_ORIGINS = [
-    "https://www.testcrafts.net",
-    "https://api.testcrafts.net",
-]
