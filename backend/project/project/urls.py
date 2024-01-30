@@ -17,11 +17,11 @@ from django.contrib import admin
 from django.urls import path
 
 # 変更
-from django.urls import include
+# from django.urls import include
 
 from api.api import *
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('api/', api.urls),
-    path('api/',include('api.api')),
+    path('api/', api.urls),
+    # path('api/',include('api.api')),
 ]
