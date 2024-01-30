@@ -48,9 +48,9 @@ NINJA_DOCS_VIEW = 'redoc'
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -60,15 +60,7 @@ MIDDLEWARE = [
 # httpsのための設定
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
-CORS_ORIGIN_ALLOW_ALL = True
-CORS_ORIGIN_WHITELIST = [
-    'https://testcrafts.net',
-    'https://api.testcrafts.net',
-]
-# CORS_ALLOWED_ORIGINS = [
-#     "https://www.testcrafts.net",
-#     "https://api.testcrafts.net",
-# ]
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'project.urls'
 
