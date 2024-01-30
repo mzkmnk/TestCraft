@@ -101,10 +101,6 @@ export function useAPI({
         // JSON Bodyがある場合は、POSTリクエストを送る。
         const url = typeof API === "function" ? API(params) : API;
         console.log("url", url);  
-
-        // 追加
-        const csrfToken = getCsrfToken();
-
         const reqData = body
           ? {
               headers: {
