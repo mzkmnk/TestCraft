@@ -30,14 +30,6 @@ ALLOWED_HOSTS = [
     'api.testcrafts.net',
 ]
 
-# httpsのための設定
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-CORS_ALLOWED_ORIGINS = [
-    "https://www.testcrafts.net",
-    "https://api.testcrafts.net",
-]
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -63,6 +55,34 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+# httpsのための設定
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+CORS_ALLOWED_ORIGINS = [
+    "https://www.testcrafts.net",
+    "https://api.testcrafts.net",
+]
+
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
 ]
 
 ROOT_URLCONF = 'project.urls'

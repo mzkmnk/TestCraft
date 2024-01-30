@@ -104,7 +104,6 @@ class MessageSchema(Schema):
 class UserChangeSchema(Schema):
     username : str
     password : str
-    
 # API
 # ユーザー登録するAPI
 @api.post("/signup")
