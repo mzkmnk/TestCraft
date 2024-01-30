@@ -12,8 +12,19 @@ npx serve -s build -l 3000
 ```
 
 ### 個人的メモ
+gunicornのsystemdのサービスファイルの保管場所
+```/etc/systemd/system/gunicorn.service```
+
 gunicornの起動方法
 `gunicorn --workers 3 <project名>wsgi:application`
+
+gunicorn本番環境設定
+```
+sudo systemctl daemon-reload
+sudo systemctl start gunicorn.service
+sudo systemctl enable gunicorn.service
+```
+
 サービス開始
 サービス停止
 サービス状態確認
@@ -36,4 +47,9 @@ Apacheファイルの格納場所
 アパッチ再起動
 ```
 sudo systemctl restart httpd
+```
+
+apiコール確認コマンド
+```
+url -X POST https://api.testcrafts.net/api/login -H "Content-Type: application/json" -d '{"username":"username","password":"password"}'
 ```
