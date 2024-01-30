@@ -59,4 +59,5 @@ error log file
 apiコール確認コマンド
 ```
 curl -X POST https://api.testcrafts.net/api/login -H "Content-Type: application/json" -d '{"username":"username","password":"password"}'
+curl -X POST https://api.testcrafts.net/api/signup -H "Content-Type: application/json" -d '{"username": "testuser", "email": "test@example.com", "password": "password", "is_company_user": false, "is_own_company": false}'
 ```
