@@ -12,15 +12,28 @@ npx serve -s build -l 3000
 ```
 
 ### 個人的メモ
-mysqlの接続コマンド
+
+#### mysqlの接続コマンド
+dbにアクセスするコマンド
 ```
 mysql -h エンドポイント -P 3306 -u ユーザー名 -p データベース名
+```
+##### mysql内でのコマンド
+確認したいデータベース `use <database名>;`
+
+##### データベース内でのコマンド
+テーブル一覧表示 `show tables;`
+テーブル一括削除方法
+```
+SET FOREIGN_KEY_CHECKS = 0;
+SELECT Concat('DROP TABLE ', table_name, ';') FROM information_schema.tables WHERE table_schema = 'djangodb';
+SET FOREIGN_KEY_CHECKS = 1;
 ```
 
 gunicornのsystemdのサービスファイルの保管場所
 ```/etc/systemd/system/gunicorn.service```
 
-gunicornの起動方法
+#### gunicornの起動方法
 `gunicorn --workers 3 <project名>wsgi:application`
 
 gunicorn本番環境設定
@@ -41,42 +54,27 @@ sudo systemctl stop gunicorn.service
 sudo systemctl status gunicorn.service
 ```
 
-ssl証明書の発行方法
+#### ssl証明書の発行方法
 ```
 sudo yum update
 sudo certbot --apache -d <ドメイン名>
 ```
 
-Apacheファイルの格納場所
-```
-/etc/httpd/conf/httpd.conf
-```
-アパッチ再起動
-```
-sudo systemctl restart httpd
-```
-
-status log file
-error log file 
-```
-/var/log/httpd/access_log
-/var/log/httpd/error_log
-```
-
-apiコール確認コマンド
+#### apiコール確認コマンド
 ```
 curl -X POST https://api.testcrafts.net/api/login -H "Content-Type: application/json" -d '{"username":"username","password":"password"}'
 curl -X POST https://api.testcrafts.net/api/signup -H "Content-Type: application/json" -d '{"username": "testuser", "email": "test@example.com", "password": "password", "is_company_user": false, "is_own_company": false}'
 ```
 
-nginxの設定
+#### nginxの設定
 
 ```
 sudo systemctl reload nginx.service
 sudo systemctl status nginx.service
 ```
 
-log
+log一覧
 ```
 /var/log/nginx/access.log
+/var/log/nginx/error_log
 ```
