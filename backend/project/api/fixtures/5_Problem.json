@@ -3,7 +3,7 @@
     "model": "api.problem",
     "fields": {
       "workbook_id_id": 1,
-      "problem_json": "{\"info\":{\"title\":\"生物について\"},\"questions\":{\"1hlfgamob0.oeo4nssvumg\":{\"questionType\":\"root\",\"title\":\"新規ドキュメント\",\"childIds\":[\"1hlfgapb10.9ng21jtc5\"]},\"1hlfgapb10.9ng21jtc5\":{\"parentId\":\"1hlfgamob0.oeo4nssvumg\",\"question\":\"生物とは生物である。\",\"questionType\":\"radio\",\"options\":[{\"id\":\"1hlfgb31f0.vd6dbfdtgro\",\"value\":\"O\"},{\"id\":\"1hlfgb6te0.en2tnbjq14g\",\"value\":\"X\"}],\"canMultiple\":false,\"answers\":[]}}}"
+      "problem_json": "{\"info\":{\"title\":\"生物について\"},\"questions\":{\"1hlflvdts0.06aelbmgo4g\":{\"questionType\":\"root\",\"title\":\"新規ドキュメント\",\"childIds\":[\"1hlflvkiq0.smu5g8bk5e\"]},\"1hlflvkiq0.smu5g8bk5e\":{\"parentId\":\"1hlflvdts0.06aelbmgo4g\",\"question\":\"生物は生物であるか\",\"questionType\":\"radio\",\"options\":[{\"id\":\"1hlflvr9v0.5vnopekk06g\",\"value\":\"O\"},{\"id\":\"1hlflvsu10.veevh64o1g8\",\"value\":\"X\"}],\"canMultiple\":false,\"answers\":[{\"id\":\"1hlflvv160.nqs5f57bqb8\",\"value\":\"O\"}]}}}"
     }
   }
 ]
