@@ -27,11 +27,9 @@ function EmailVerification() {
             // 取得したデータに基づいて条件分岐
             if (responseData.success) {
                 if (responseData.status === "1") {
-                    // 認証成功
                     setVerificationStatus("認証が成功しました");
                     navigate('/mypage')
                 } else if (responseData.status === "2") {
-                    // 既に認証済み
                     setVerificationStatus("既に認証済みです");
                     navigate('/mypage')
                 } else {

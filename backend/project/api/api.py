@@ -153,7 +153,6 @@ def login(request, payload: LoginSchema):
 # ログインしているかどうかを確認するAPI
 @api.get("/check_auth")
 def check_auth(request):
-    
     if request.user.is_authenticated & request.user.is_email_certification == True:
         return JsonResponse({"authenticated": True}, status=200)
     else:
@@ -203,8 +202,6 @@ def email_verification(request):
                     pk=request.user.id,
                 )
                 user.is_email_certification = True
-                
-                print(user.id)
                 user.save()
                 status="1"
             else:
