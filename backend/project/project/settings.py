@@ -66,7 +66,7 @@ CSRF_COOKIE_SECURE = True
 CORS_ORIGIN_WHITELIST = [
     "https://www.testcrafts.net",
 ]
-# CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'project.urls'
 
