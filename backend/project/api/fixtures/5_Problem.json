@@ -1,0 +1,9 @@
+[
+  {
+    "model": "api.problem",
+    "fields": {
+      "workbook_id_id": 1,
+      "problem_json": "{\"info\":{\"title\":\"生物について\"},\"questions\":{\"1hlfgamob0.oeo4nssvumg\":{\"questionType\":\"root\",\"title\":\"新規ドキュメント\",\"childIds\":[\"1hlfgapb10.9ng21jtc5\"]},\"1hlfgapb10.9ng21jtc5\":{\"parentId\":\"1hlfgamob0.oeo4nssvumg\",\"question\":\"生物とは生物である。\",\"questionType\":\"radio\",\"options\":[{\"id\":\"1hlfgb31f0.vd6dbfdtgro\",\"value\":\"O\"},{\"id\":\"1hlfgb6te0.en2tnbjq14g\",\"value\":\"X\"}],\"canMultiple\":false,\"answers\":[]}}}"
+    }
+  }
+]
