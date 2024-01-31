@@ -12,8 +12,22 @@ export function AnswerForms({
   resultMode = false,
   correctIds = null,
   questionCount = null,
+  info = null,
+  questionTree = null,
+  rootId = null,
+  answers = null,
 }) {
-  const { info, questionTree, rootId } = useQuestions();
+  const QuestionsContext = useQuestions();
+
+  if (info === null) {
+    info = QuestionsContext.info;
+  }
+  if (questionTree === null) {
+    questionTree = QuestionsContext.questionTree;
+  }
+  if (rootId === null) {
+    rootId = QuestionsContext.rootId;
+  }
 
   // 入れ子の問題は一ページにまとめる。
   const pages = [rootId, ...questionTree[rootId].childIds];
@@ -78,6 +92,7 @@ export function AnswerForms({
               questionId={pages[displayPageIndex]}
               correctIds={correctIds}
               questionCount={questionCount}
+              answers={answers}
             />
           )}
         </Box>

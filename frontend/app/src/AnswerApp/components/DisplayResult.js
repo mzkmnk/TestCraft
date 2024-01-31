@@ -13,8 +13,13 @@ export function DisplayResult({
   questionId,
   correctIds,
   questionCount,
+  answers = null,
 }) {
-  const { answers } = useAnswers();
+  const answersContext = useAnswers();
+  if (answers === null) {
+    answers = answersContext.answers;
+  }
+
   const question = questionTree[questionId];
   let color;
   const isCorrect = correctIds.includes(questionId);

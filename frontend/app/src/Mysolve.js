@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import UserHeader from "./UserHeader";
 import { useNavigate } from "react-router-dom";
 import { useAPI } from "./hooks/useAPI";
+import { Typography } from "@mui/material";
 
 // Exportしなくても使えてる？
 function Mysolve() {
@@ -66,30 +67,40 @@ function Mysolve() {
     marginRight: "5px",
   };
 
+  const workbookLists = (
+    <>
+      {workbooks.map((workbook) => (
+        <div
+          style={styles.question}
+          key={workbook.workbook__id}
+          onClick={() => handleQuestionClick(workbook.workbook__id)}
+        >
+          <div style={styles.questionHeader}>
+            <h3>{workbook.workbook__workbook_name}</h3>
+            <span style={styles.createdBy}>
+              created by {workbook.workbook_create_id__username} (
+              {workbook.workbook__created_at})
+            </span>
+          </div>
+          <p>{workbook.workbook__description}</p>
+          <div style={likeStyle}>
+            <span style={likeIconStyle}>♥</span>
+            <span>{workbook.workbook__like_count}</span>
+          </div>
+        </div>
+      ))}
+    </>
+  );
+
   return (
     <>
       <UserHeader />
       <div style={styles.questionsContainer}>
-        {workbooks.map((workbook) => (
-          <div
-            style={styles.question}
-            key={workbook.workbook__id}
-            onClick={() => handleQuestionClick(workbook.workbook__id)}
-          >
-            <div style={styles.questionHeader}>
-              <h3>{workbook.workbook__workbook_name}</h3>
-              <span style={styles.createdBy}>
-                created by {workbook.workbook_create_id__username} (
-                {workbook.workbook__created_at})
-              </span>
-            </div>
-            <p>{workbook.workbook__description}</p>
-            <div style={likeStyle}>
-              <span style={likeIconStyle}>♥</span>
-              <span>{workbook.workbook__like_count}</span>
-            </div>
-          </div>
-        ))}
+        {workbooks.length !== 0 ? (
+          workbookLists
+        ) : (
+          <Typography>まだ解答履歴はありません。</Typography>
+        )}
       </div>
     </>
   );
