@@ -12,6 +12,11 @@ npx serve -s build -l 3000
 ```
 
 ### 個人的メモ
+mysqlの接続コマンド
+```
+mysql -h エンドポイント -P 3306 -u ユーザー名 -p データベース名
+```
+
 gunicornのsystemdのサービスファイルの保管場所
 ```/etc/systemd/system/gunicorn.service```
 
