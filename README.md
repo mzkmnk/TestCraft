@@ -30,6 +30,8 @@ sudo systemctl start gunicorn.service
 sudo systemctl enable gunicorn.service
 ```
 
+なぜかgunicornの設定ファイルを変更しても動かないため、仮想環境に入り`TestCraft/backend/project`で`/home/ec2-user/TestCraft/.venv/bin/gunicorn --access-logfile - --workers 3 --bind 127.0.0.1:8000 project.wsgi:application`をするとうまく行く。（はず）
+
 サービス開始
 サービス停止
 サービス状態確認
@@ -65,4 +67,16 @@ apiコール確認コマンド
 ```
 curl -X POST https://api.testcrafts.net/api/login -H "Content-Type: application/json" -d '{"username":"username","password":"password"}'
 curl -X POST https://api.testcrafts.net/api/signup -H "Content-Type: application/json" -d '{"username": "testuser", "email": "test@example.com", "password": "password", "is_company_user": false, "is_own_company": false}'
+```
+
+nginxの設定
+
+```
+sudo systemctl reload nginx.service
+sudo systemctl status nginx.service
+```
+
+log
+```
+/var/log/nginx/access.log
 ```

@@ -63,7 +63,9 @@ MIDDLEWARE = [
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ORIGIN_WHITELIST = [
+    "https://www.testcrafts.net",
+]
 # CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'project.urls'
