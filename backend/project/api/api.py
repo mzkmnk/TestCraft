@@ -14,7 +14,7 @@ from .models import *
 
 from django.http import JsonResponse
 
-from pydantic import BaseModel,ValidationError
+from pydantic import BaseModel,ValidationError,HttpUrl
 from typing import Dict,List,Optional,Union
 
 from datetime import date
@@ -27,6 +27,10 @@ import pandas as pd
 from io import StringIO
 
 import numpy as np
+
+from django.core.mail import send_mail
+
+
 
 api = NinjaAPI()
 
@@ -101,6 +105,9 @@ class UserChangeSchema(Schema):
     username : str
     password : str
     
+
+class VerificationSchema(Schema):
+    url:str
 # API
 # ユーザー登録するAPI
 @api.post("/signup")
@@ -146,7 +153,8 @@ def login(request, payload: LoginSchema):
 # ログインしているかどうかを確認するAPI
 @api.get("/check_auth")
 def check_auth(request):
-    if request.user.is_authenticated:
+    
+    if request.user.is_authenticated & request.user.is_email_certification == True:
         return JsonResponse({"authenticated": True}, status=200)
     else:
         return JsonResponse({"authenticated": False}, status=401)
@@ -161,7 +169,59 @@ def logout_user(request):
         },
         status=200
     )
+    
+#メール送信をするAPI
+@api.post("/send_email")
+def send_email(request,payload:VerificationSchema):
+    verification_url = payload.url
+    print(verification_url)
+    try:
+        subject = "メールアドレス認証"
+        message = f"このメールは問題作成アプリ新規登録用です。\n新規登録をお済でない場合下記のURLをクリックしてメールアドレスを認証してください。\nこのメールに心当たりがない場合メールの削除をお願いいたします。\n{verification_url}"
+        from_email = "djangoserver@gmail.com"
+        send_mail(
+            subject,
+            message,
+            from_email,
+            [
+                request.user.email,
+            ],
+            fail_silently=False
+        )
+    except Exception as e:
+        print(e)
+        return JsonResponse({"success":False, "message" : str(e) },status = 400)
 
+#メールアドレス認証を完了するAPI
+@api.post("/email_verification")
+def email_verification(request):
+    try :
+        status=""
+        if request.user.username:
+            if request.user.is_email_certification == False:
+                user=User.objects.get(
+                    pk=request.user.id,
+                )
+                user.is_email_certification = True
+                
+                print(user.id)
+                user.save()
+                status="1"
+            else:
+                status="2"
+        else :
+                status="3"
+
+        return JsonResponse(
+            {
+                "success":True,
+                "status":status,
+                "error":None,
+            }
+        )
+    except Exception as e:
+        return JsonResponse({"success":False, "message" : str(e) },status = 400)
+        
 #登録情報を変更するAPI
 @api.post("/user_change")
 def user_change(request,payload: UserChangeSchema):
@@ -169,7 +229,6 @@ def user_change(request,payload: UserChangeSchema):
         user = User.objects.get(
             pk=request.user.id,
         )
-        print("*"*20)
         user.username = payload.username
         user.set_password(payload.password)
         user.save()

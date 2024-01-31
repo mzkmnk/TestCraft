@@ -25,6 +25,7 @@ class User(AbstractUser):
     created_at = models.DateField(auto_now_add = True)
     problem_create_cnt = models.IntegerField(default = 0)
     problem_slv_cnt = models.IntegerField(default = 0)
+    is_email_certification= models.BooleanField(default = False)
     
     USERNAME_FIELD = 'username'
     

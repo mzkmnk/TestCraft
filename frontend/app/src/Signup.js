@@ -24,6 +24,7 @@ function Signup() {
   const [is_company_user,setIsCompanyUser] = useState(false);
   const [is_own_company, setIsOwnCompany] = useState(false);
   const [error, setError] = useState('');
+  const [url, setUrl] = useState('');
 
   useEffect(() => {
     fetch('http://localhost:8000/api/check_auth', {
@@ -47,6 +48,7 @@ function Signup() {
         console.error('Error:', error);
       });
   }, [navigate]);
+  
 
   const handleSignup = async () => {
     try {
@@ -67,6 +69,10 @@ function Signup() {
       }
       );
       if (response.ok) {
+        localStorage.setItem('user_email', user_email)
+
+        
+
         localStorage.setItem('username', username);
         const is_login_response = await fetch('http://localhost:8000/api/login', {
           method: 'POST',
@@ -88,7 +94,26 @@ function Signup() {
               message:'ユーザー登録に成功しました。',
               severity:'success',
             }
+            
           });
+
+          const url = 'http://localhost:3000/email_verification';
+          setUrl(url);
+          const send_email_response = await fetch('http://localhost:8000/api/send_email',{
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },  
+          body: JSON.stringify(
+              {
+              'url' : url ,
+              }
+          ),
+          credentials: 'include',
+        });
+        if(send_email_response.ok){
+          console.log('メール送信成功')
+        }
         }
         else{
           console.error('Login failed');
