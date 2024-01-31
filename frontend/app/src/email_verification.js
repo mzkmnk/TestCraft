@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {  useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Button from "@mui/material/Button";
@@ -6,24 +6,6 @@ import Button from "@mui/material/Button";
 function EmailVerification() {
     const navigate = useNavigate();
     const [verificationStatus, setVerificationStatus] = useState(null);
-
-    // useEffect(() => {
-    //     fetch('http://localhost:8000/api/check_auth', {
-    //         headers: {
-    //             'Content-Type': 'application/json',
-    //         },
-    //         credentials: 'include',
-    //     })
-    //         .then(response => response.json())
-    //         .then(data => {
-    //             if (data.authenticated === false) {
-    //                 navigate('/login');
-    //             }
-    //         })
-    //         .catch(error => {
-    //             console.error('Error:', error);
-    //         });
-    // }, [navigate]);
 
     const push_button = async () => {
         const certification = "true";
