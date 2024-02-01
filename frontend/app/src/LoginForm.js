@@ -43,7 +43,7 @@ function LoginForm() {
       localStorage.setItem("is_own_company", loginAPI.data.is_own_company);
       navigate("/mypage", {
         state: {
-          message: "ユーザー登録に成功しました。",
+          message: "ログインに成功しました。",
           severity: "success",
         },
       });
