@@ -315,7 +315,8 @@ def add_user(request ,payload:CsvUploadSchema):
             },
             status = 400,
         )
-        
+
+#グラフを修正するAPI(beta)       
 @api.get("/get_graph_data")
 def get_graph_data(request):
     try:
@@ -332,7 +333,8 @@ def get_graph_data(request):
         return JsonResponse({'success':True,'data': data},status = 200)
     except Exception as e:
         return JsonResponse({'success':False,'data': None},status = 400)
-    
+
+#問題を保存するAPI
 @api.post("/save_data")
 def save_data(request,data:JsonFormat):
     try:
@@ -362,6 +364,16 @@ def save_data(request,data:JsonFormat):
             workbook_id = Workbook.objects.get(id = workbook.id),
             problem_json = data.json(),
         )
+        if(UserActivity.objects.filter(user_id = request.user.id, date = date.today()).exists()):
+            activity = UserActivity.objects.get(user_id = request.user.id, date = date.today())
+            activity.problems_created_count += 1
+            activity.save()
+        else:
+            UserActivity.objects.create(
+                user_id = request.user.id,
+                date = date.today(),
+                problems_created_count = 1,
+            )
         return JsonResponse(
             {
                 'success':True,
@@ -476,8 +488,17 @@ def save_answer(request,payload:SaveAnswerSchema):
                 workbook = Workbook.objects.get(id = workbook_id),
                 count = 1,
             )
-        print("Ok")
         user_count_answer.save()
+        if(UserActivity.objects.filter(user_id = request.user.id, date = date.today()).exists()):
+            activity = UserActivity.objects.get(user_id = request.user.id, date = date.today())
+            activity.problems_solved_count += 1
+            activity.save()
+        else:
+            UserActivity.objects.create(
+                user_id = request.user.id,
+                date = date.today(),
+                problems_solved_count = 1,
+            )
         answers = json.loads(payload.answers)
         UserAnswer.objects.create(
             user = request.user,

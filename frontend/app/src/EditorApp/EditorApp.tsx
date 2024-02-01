@@ -7,7 +7,7 @@ import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import UserHeader from "../UserHeader";
 import Paper from "@mui/material/Paper";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -91,7 +91,7 @@ export default function EditorApp({ workBook }) {
   const [title, setTitle] = useState(workBook.info.title);
   const navigate = useNavigate();
   const saveAPI = useAPI({ APIName: "save_data" });
-  console.log("workbook", JSON.stringify(workBook));
+  const {workbookId} = useParams();
 
   useEffect(() => {
     if (saveAPI.isSuccess === true) {
@@ -111,6 +111,7 @@ export default function EditorApp({ workBook }) {
     workBook = {
       info: {
         title: title,
+        workbook_id:workbookId,
       },
       questions: questionTree,
     };
