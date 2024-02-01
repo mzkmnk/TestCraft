@@ -1,0 +1,8 @@
+[
+  {
+    "model": "api.company",
+    "fields": {
+      "name": "MurakamiCompany"
+    }
+  }
+]

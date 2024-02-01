@@ -20,12 +20,13 @@ function Mysolve() {
       navigate("/error");
     } else if (API.isSuccess === true && API.data.success === true) {
       setWorkbooks(API.data.workbook);
+      console.log(API.data.workbook);
     }
   }, [API.data.success, API.data.workbook, API.isSuccess, navigate]);
 
   //ここ変更
-  const handleQuestionClick = (workbookId) => {
-    navigate(`/solved/${workbookId}`);
+  const handleQuestionClick = (workbookId,solved_count) => {
+    navigate(`/solved/${workbookId}/${solved_count}`);
   };
 
   const styles = {
@@ -72,8 +73,8 @@ function Mysolve() {
       {workbooks.map((workbook) => (
         <div
           style={styles.question}
-          key={workbook.workbook__id}
-          onClick={() => handleQuestionClick(workbook.workbook__id)}
+          key={workbook.solved_count}
+          onClick={() => handleQuestionClick(workbook.workbook__id,workbook.solved_count)}
         >
           <div style={styles.questionHeader}>
             <h3>{workbook.workbook__workbook_name}</h3>

@@ -46,7 +46,7 @@ function App() {
           path="/solve/:workbookId"
           element={<ReadWorkbook nextAppName={"AnswerApp"} />}
         />
-        <Route path="/solved/:workbookId" element={<Solved />} />
+        <Route path="/solved/:workbookId/:solved_count" element={<Solved />} />
         <Route path="/error" element={<Error />} />
       </Routes>
     </Router>
