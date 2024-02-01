@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import React from "react";
 import Box from "@mui/material/Box";
 import List from "@mui/material/List";
@@ -12,6 +12,9 @@ import UserHeader from "../UserHeader";
 import Paper from "@mui/material/Paper";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
+import { MathJax, MathJaxContext } from "better-react-mathjax";
+import { SwitchableTextField } from "./SwitchableTextField";
+import { useAPI } from "../hooks/useAPI";
 
 const theme = createTheme({
   palette: {
@@ -72,11 +75,11 @@ const createId = () =>
 export default function EditorApp({ workBook }) {
   if (!workBook) {
     workBook = {
-      info: {},
+      info: { title: "新規ドキュメント" },
       questions: {
         [createId()]: {
           questionType: "root",
-          title: "新規ドキュメント",
+
           childIds: [],
         },
       },
@@ -86,8 +89,23 @@ export default function EditorApp({ workBook }) {
   // questionTreeの値は、textareaの入力内容と常に同期する。
 
   const [questionTree, setQuestionTree] = useState(workBook.questions);
-  const [title, setTitle] = useState("初期タイトル");
+  const [title, setTitle] = useState(workBook.info.title);
   const navigate = useNavigate();
+  const saveAPI = useAPI({ APIName: "save_data" });
+
+  useEffect(() => {
+    if (saveAPI.isSuccess === true) {
+      navigate("/mypage/mycreate", {
+        state: {
+          message: `${title}を保存しました`,
+          severity: "success",
+        },
+      });
+    } else if (saveAPI.isSuccess === false) {
+      navigate("/error");
+    }
+  }, [navigate, saveAPI.isSuccess, title]);
+
   // 保存用関数
   function save() {
     workBook = {
@@ -96,30 +114,8 @@ export default function EditorApp({ workBook }) {
       },
       questions: questionTree,
     };
-    console.log(JSON.stringify(workBook));
     const data = JSON.stringify(workBook);
-    fetch("http://localhost:8000/api/save_data", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: data,
-      credentials: "include",
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          console.log("success");
-          navigate("/mypage/mycreate", {
-            state: {
-              message: `${title}を保存しました`,
-              severity: "success",
-            },
-          });
-        } else {
-          console.error("error", data.error);
-        }
-      });
+    saveAPI.sendAPI({ body: data });
   }
 
   // state更新関数群 React Reducerを使うべきではある（コードが分かりにくくなる && 面倒）
@@ -533,15 +529,11 @@ function QuestionEditor({
   const questionField = (
     <Box marginBottom={1}>
       <Typography>問題文</Typography>
-      <TextField
-        defaultValue={displayQuestion.question}
-        onChange={(event) => {
-          handleChangeText(event.target.value, questionId, "question");
-        }}
-        fullWidth
-        multiline
-        maxRows={6}
-      ></TextField>
+      <SwitchableTextField
+        value={displayQuestion.question}
+        setValue={handleChangeText}
+        args={[questionId, "question"]}
+      ></SwitchableTextField>
     </Box>
   );
 
@@ -560,6 +552,7 @@ function QuestionEditor({
           )
         }
         fullWidth
+        sx={{ marginLeft: 1 }}
       >
         {questionTypes.map((questionType, index) => (
           <MenuItem key={index} value={questionType}>
