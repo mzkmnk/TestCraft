@@ -12,7 +12,6 @@ import UserHeader from "../UserHeader";
 import Paper from "@mui/material/Paper";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import { MathJax, MathJaxContext } from "better-react-mathjax";
 import { SwitchableTextField } from "./SwitchableTextField";
 import { useAPI } from "../hooks/useAPI";
 
@@ -79,7 +78,7 @@ export default function EditorApp({ workBook }) {
       questions: {
         [createId()]: {
           questionType: "root",
-
+          title: "fake",
           childIds: [],
         },
       },
@@ -92,6 +91,7 @@ export default function EditorApp({ workBook }) {
   const [title, setTitle] = useState(workBook.info.title);
   const navigate = useNavigate();
   const saveAPI = useAPI({ APIName: "save_data" });
+  console.log("workbook", JSON.stringify(workBook));
 
   useEffect(() => {
     if (saveAPI.isSuccess === true) {
@@ -300,6 +300,7 @@ export default function EditorApp({ workBook }) {
         },
       });
     }
+    console.log(changedQuestion);
   }
 
   // QuestionTypeを変更たびにidも変えないと、muiからstateに登録していないものが変更されていると警告がでる。
@@ -618,7 +619,6 @@ function QuestionEditor({
                 );
               }}
               variant="outlined"
-              sx={{ flexGrow: 1, merginRight: 2 }}
             ></TextField>
             <Button
               onClick={() => handleRemoveAnswer(questionId, answers.id)}
@@ -684,6 +684,7 @@ function QuestionEditor({
           onChange={(event) => {
             handleChangeText(event.target.value, questionId, "maxlength");
           }}
+          sx={{ marginLeft: 1 }}
         ></TextField>
       </>
     );

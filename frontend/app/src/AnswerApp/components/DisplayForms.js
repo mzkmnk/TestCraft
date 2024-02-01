@@ -6,12 +6,18 @@ import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import TextField from "@mui/material/TextField";
 import { useAnswers } from "../context/AnswersContext";
+import { format } from "../../EditorApp/SwitchableTextField";
+import { useMemo } from "react";
 
 // 再帰的に問題を表示する関数
 export function DisplayForms({ info = {}, questionTree, questionId }) {
   const { answers, setAnswers } = useAnswers();
   // 今回表示する問題
   const question = questionTree[questionId];
+
+  const questionJsx = useMemo(() => {
+    return question.question !== undefined ? format(question.question) : null;
+  }, [question.question]);
 
   const handleSetAnswers = (event) => {
     setAnswers({ ...answers, [questionId]: event.target.value });
@@ -28,7 +34,7 @@ export function DisplayForms({ info = {}, questionTree, questionId }) {
   } else if (questionTree[questionId].questionType === "nested") {
     return (
       <>
-        <Typography>{question.question}</Typography>
+        {questionJsx}
         {question.childIds.map((childId) => (
           <DisplayForms
             key={childId}
@@ -43,7 +49,7 @@ export function DisplayForms({ info = {}, questionTree, questionId }) {
   } else if (questionTree[questionId].questionType === "radio") {
     return (
       <>
-        <Typography>{question.question}</Typography>
+        {questionJsx}
         <RadioGroup
           name={questionId}
           onChange={(event) => handleSetAnswers(event)}
@@ -63,9 +69,7 @@ export function DisplayForms({ info = {}, questionTree, questionId }) {
   } else if (questionTree[questionId].questionType === "textarea") {
     return (
       <>
-        {question.question === "" ? null : (
-          <Typography>{question.question}</Typography>
-        )}
+        {questionJsx}
         <TextField
           inputProps={{ maxLength: question.maxlength }}
           onChange={(event) => handleSetAnswers(event)}

@@ -3,8 +3,8 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { MathJax, MathJaxContext } from "better-react-mathjax";
 import Box from "@mui/material/Box";
-import hljs from "highlight.js/lib/common";
-import "highlight.js/styles/github.css";
+import SyntaxHighlighter from "react-syntax-highlighter";
+import hlStyle from "react-syntax-highlighter/dist/esm/styles/hljs/docco";
 
 // Typographyのラップ
 function Paragraph({ children }) {
@@ -35,18 +35,15 @@ function InsertCode(text) {
 
   while ((result = text.match(re))) {
     if (result !== null) {
-      console.log("text.slice(result.index)", text.slice(0, result.index));
       returnJSX = (
         <>
           {returnJSX}
           <Paragraph>{text.slice(0, result.index)}</Paragraph>
-          <pre>
-            <code className={result[1]}>{result[2]}</code>
-          </pre>
+          <SyntaxHighlighter language={result[1]} style={hlStyle}>
+            {result[2]}
+          </SyntaxHighlighter>
         </>
       );
-      console.log("result.index", result.index);
-      console.log();
       text = text.slice(result.index + result[0].length);
     } else {
       break;
@@ -62,7 +59,7 @@ function InsertCode(text) {
   return returnJSX;
 }
 
-function format(text) {
+export function format(text) {
   let returnJSX = InsertCode(text);
   returnJSX = InsertMathJax(text, returnJSX);
   return returnJSX;
@@ -82,12 +79,6 @@ export function SwitchableTextField({ value, setValue, args = [] }) {
 
   const [canInput, setCanInput] = useState(defaultState);
   const [displayValue, setDisplayValue] = useState(<>{defaultValue}</>);
-
-  useEffect(() => {
-    hljs.initHighlighting();
-    hljs.initHighlighting.called = false;
-    console.log("useE");
-  });
 
   const toggleState = () => {
     setCanInput(!canInput);
@@ -128,6 +119,7 @@ export function SwitchableTextField({ value, setValue, args = [] }) {
                 start + tab.length;
             }
           }}
+          sx={{ marginLeft: 1 }}
         />
       ) : (
         <Box

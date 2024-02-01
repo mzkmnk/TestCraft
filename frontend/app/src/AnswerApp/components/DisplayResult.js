@@ -7,6 +7,8 @@ import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import TextField from "@mui/material/TextField";
 import { useAnswers } from "../context/AnswersContext";
+import { format } from "../../EditorApp/SwitchableTextField";
+import { useMemo } from "react";
 
 export function DisplayResult({
   questionTree,
@@ -28,6 +30,9 @@ export function DisplayResult({
   } else {
     color = "error";
   }
+  const questionJsx = useMemo(() => {
+    return question.question !== undefined ? format(question.question) : null;
+  }, [question.question]);
 
   if (questionTree[questionId].questionType === "root") {
     return (
@@ -41,7 +46,7 @@ export function DisplayResult({
   } else if (questionTree[questionId].questionType === "nested") {
     return (
       <>
-        <Typography>{question.question}</Typography>
+        {questionJsx}
         {question.childIds.map((childId) => (
           <DisplayResult
             key={childId}
@@ -56,7 +61,7 @@ export function DisplayResult({
   } else if (questionTree[questionId].questionType === "radio") {
     return (
       <>
-        <Typography>{question.question}</Typography>
+        {questionJsx}
         <Typography color={color + ".main"}>
           {isCorrect ? "正解" : "不正解"}
         </Typography>
@@ -75,7 +80,7 @@ export function DisplayResult({
   } else if (questionTree[questionId].questionType === "textarea") {
     return (
       <>
-        <Typography>{question.question}</Typography>
+        {questionJsx}
         <Typography color={color + ".main"}>
           {isCorrect ? "正解" : "不正解"}
         </Typography>
