@@ -337,7 +337,23 @@ def get_graph_data(request):
 @api.post("/save_data")
 def save_data(request,data:JsonFormat):
     try:
-        question_dict = {k:v for k,v in data.questions.items()}
+        workbook_id = None
+        if(data.info.get('workbook_id') is not None):
+            workbook_id = data.info['workbook_id']
+        if(Workbook.objects.filter(id = workbook_id).exists()):
+            workbook = Workbook.objects.get(id = workbook_id)
+            workbook.workbook_name = data.info['title']
+            workbook.save()
+            problem = Problem.objects.get(workbook_id = workbook_id)
+            problem.problem_json = data.json()
+            problem.save()
+            return JsonResponse(
+                {
+                    'success':True,
+                    'error':None,
+                },
+                status = 200
+            )
         workbook = Workbook.objects.create(
             workbook_name = data.info['title'],
             create_id = request.user,

@@ -7,7 +7,7 @@ import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useParams } from "react-router-dom";
 import UserHeader from "./UserHeader";
 import Paper from "@mui/material/Paper";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -88,11 +88,14 @@ export default function Editor({ workBook }) {
   const [questionTree, setQuestionTree] = useState(workBook.questions);
   const [title, setTitle] = useState("初期タイトル");
   const navigate = useNavigate();
+  const {workbookId} = useParams();
+  console.log("workbook_id",workbookId);
   // 保存用関数
   function save() {
     workBook = {
       info: {
         title: title,
+        workbook_id: workbookId,
       },
       questions: questionTree,
     };
