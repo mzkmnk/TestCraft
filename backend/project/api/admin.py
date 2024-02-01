@@ -29,7 +29,7 @@ class CustomLike(admin.ModelAdmin):
 admin.site.register(Like,CustomLike)
 
 class CustomUserAnswer(admin.ModelAdmin):
-    list_display = ('user','workbook')
+    list_display = ('user','workbook','solved_count')
     search_fields=('id',)
 admin.site.register(UserAnswer,CustomUserAnswer)
 
@@ -37,3 +37,8 @@ class CustomMessage(admin.ModelAdmin):
     list_display = ('sender','receiver','timestamp')
     search_fields=('id',)
 admin.site.register(Message,CustomMessage)
+
+class CustomUserCountAnswer(admin.ModelAdmin):
+    list_display = ('user','workbook','count')
+    search_fields=('id',)
+admin.site.register(UserCountAnswer,CustomUserCountAnswer)

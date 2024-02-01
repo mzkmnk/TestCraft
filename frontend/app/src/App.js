@@ -7,7 +7,7 @@ import MyPage from "./Mypage.js";
 import Signup from "./Signup.js";
 import QuestionsAll from "./QuestionsAll.js";
 import Mycreate from "./Mycreate.js";
-import Editor from "./Editor.tsx";
+import Editor from "./EditorApp/EditorApp.tsx";
 import Solved from "./Solved.js";
 import Mysolve from "./Mysolve.js";
 import Message from "./Message.js";
@@ -46,7 +46,7 @@ function App() {
           path="/solve/:workbookId"
           element={<ReadWorkbook nextAppName={"AnswerApp"} />}
         />
-        <Route path="/solved/:workbookId" element={<Solved />} />
+        <Route path="/solved/:workbookId/:solved_count" element={<Solved />} />
         <Route path="/error" element={<Error />} />
       </Routes>
     </Router>

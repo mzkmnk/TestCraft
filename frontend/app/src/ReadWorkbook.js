@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useAPI } from "./hooks/useAPI";
-import Editor from "./Editor.tsx";
+import Editor from "./EditorApp/EditorApp.tsx";
 import AnswerApp from "./AnswerApp/AnswerApp.js";
 import Error from "./Error.js";
 import Loading from "./Loading";

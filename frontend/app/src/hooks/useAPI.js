@@ -21,7 +21,7 @@ const APIs = {
     `${urlBase}/questionsall/${workbookId}/like`,
   save_answer: `${urlBase}/save_answer`,
   solve_workbook: `${urlBase}/solve_workbook`,
-  solve_detail: (workbookId) => `${urlBase}/solve_detail/${workbookId}`,
+  solve_detail: (arr) => `${urlBase}/solve_detail/${arr[0]}/${arr[1]}`,
   message: `${urlBase}/message`,
   get_company_user: `${urlBase}/get_company_user`,
   send_message: `${urlBase}/send_message`,

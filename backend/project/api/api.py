@@ -464,11 +464,26 @@ def add_like(request,workbookId:int):
 def save_answer(request,payload:SaveAnswerSchema):
     try:
         workbook_id = payload.workbook_id
+        is_user_count_answer = UserCountAnswer.objects.filter(user = request.user, workbook = Workbook.objects.get(id = workbook_id))
+        solved_count = 0
+        if(is_user_count_answer):
+            user_count_answer = UserCountAnswer.objects.get(user = request.user, workbook = Workbook.objects.get(id = workbook_id))
+            solved_count = user_count_answer.count
+            user_count_answer.count += 1
+        else:
+            user_count_answer = UserCountAnswer.objects.create(
+                user = request.user,
+                workbook = Workbook.objects.get(id = workbook_id),
+                count = 1,
+            )
+        print("Ok")
+        user_count_answer.save()
         answers = json.loads(payload.answers)
         UserAnswer.objects.create(
             user = request.user,
             workbook = Workbook.objects.get(id = workbook_id),
             answer_json = answers,
+            solved_count = solved_count,
         )
         JsonResponse(
             {
@@ -499,6 +514,7 @@ def solve_workbook(request):
             'workbook__updated_at',
             'workbook__like_count',
             'answer_json',
+            'solved_count',
         )
         user_answers_with_categories = []
         for user_answer in user_answers:
@@ -524,11 +540,13 @@ def solve_workbook(request):
             status = 400
             )
 #ユーザが解いた問題の情報を取得するAPI
-@api.get("/solve_detail/{workbookId}")
-def solve_detail(request,workbookId:int):
+@api.get("/solve_detail/{workbookId}/{solved_count}")
+def solve_detail(request,workbookId:int,solved_count:int):
     try:
+        print(workbookId,solved_count)
         workbook = Workbook.objects.get(id = workbookId)
-        user_answer = UserAnswer.objects.get(user = request.user, workbook = workbook)
+        user_answer = UserAnswer.objects.get(user = request.user, workbook = workbook, solved_count = solved_count)
+        print("ok")
         problem = Problem.objects.get(workbook_id = workbookId).problem_json
         return JsonResponse(
             {

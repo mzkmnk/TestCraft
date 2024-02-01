@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useMemo } from "react";
 import UserHeader from "./UserHeader";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAPI } from "./hooks/useAPI";
@@ -11,10 +11,11 @@ function Solved() {
   const [workbook, setWorkbook] = useState(undefined);
   const [answers, setAnswers] = useState(undefined);
   const navigate = useNavigate();
-  const { workbookId } = useParams();
+  const { workbookId,solved_count } = useParams();
+  const params = useMemo(() => [workbookId, solved_count], [workbookId, solved_count]);
   const API = useAPI({
     APIName: "solve_detail",
-    params: workbookId,
+    params: params,
     isLoginRequired: true,
     loadOnStart: true,
   });

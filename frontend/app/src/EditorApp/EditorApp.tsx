@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import React from "react";
 import Box from "@mui/material/Box";
 import List from "@mui/material/List";
@@ -7,11 +7,13 @@ import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
-import { useNavigate,useParams } from "react-router-dom";
-import UserHeader from "./UserHeader";
+import { useNavigate } from "react-router-dom";
+import UserHeader from "../UserHeader";
 import Paper from "@mui/material/Paper";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
+import { SwitchableTextField } from "./SwitchableTextField";
+import { useAPI } from "../hooks/useAPI";
 
 const theme = createTheme({
   palette: {
@@ -69,14 +71,14 @@ type JsonFormat = {
 const createId = () =>
   new Date().getTime().toString(32) + Math.random().toString(32);
 
-export default function Editor({ workBook }) {
+export default function EditorApp({ workBook }) {
   if (!workBook) {
     workBook = {
-      info: {},
+      info: { title: "新規ドキュメント" },
       questions: {
         [createId()]: {
           questionType: "root",
-          title: "新規ドキュメント",
+          title: "fake",
           childIds: [],
         },
       },
@@ -86,43 +88,34 @@ export default function Editor({ workBook }) {
   // questionTreeの値は、textareaの入力内容と常に同期する。
 
   const [questionTree, setQuestionTree] = useState(workBook.questions);
-  const [title, setTitle] = useState("初期タイトル");
+  const [title, setTitle] = useState(workBook.info.title);
   const navigate = useNavigate();
-  const {workbookId} = useParams();
-  console.log("workbook_id",workbookId);
+  const saveAPI = useAPI({ APIName: "save_data" });
+  console.log("workbook", JSON.stringify(workBook));
+
+  useEffect(() => {
+    if (saveAPI.isSuccess === true) {
+      navigate("/mypage/mycreate", {
+        state: {
+          message: `${title}を保存しました`,
+          severity: "success",
+        },
+      });
+    } else if (saveAPI.isSuccess === false) {
+      navigate("/error");
+    }
+  }, [navigate, saveAPI.isSuccess, title]);
+
   // 保存用関数
   function save() {
     workBook = {
       info: {
         title: title,
-        workbook_id: workbookId,
       },
       questions: questionTree,
     };
-    console.log(JSON.stringify(workBook));
     const data = JSON.stringify(workBook);
-    fetch("http://localhost:8000/api/save_data", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: data,
-      credentials: "include",
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          console.log("success");
-          navigate("/mypage/mycreate", {
-            state: {
-              message: `${title}を保存しました`,
-              severity: "success",
-            },
-          });
-        } else {
-          console.error("error", data.error);
-        }
-      });
+    saveAPI.sendAPI({ body: data });
   }
 
   // state更新関数群 React Reducerを使うべきではある（コードが分かりにくくなる && 面倒）
@@ -307,6 +300,7 @@ export default function Editor({ workBook }) {
         },
       });
     }
+    console.log(changedQuestion);
   }
 
   // QuestionTypeを変更たびにidも変えないと、muiからstateに登録していないものが変更されていると警告がでる。
@@ -536,15 +530,11 @@ function QuestionEditor({
   const questionField = (
     <Box marginBottom={1}>
       <Typography>問題文</Typography>
-      <TextField
-        defaultValue={displayQuestion.question}
-        onChange={(event) => {
-          handleChangeText(event.target.value, questionId, "question");
-        }}
-        fullWidth
-        multiline
-        maxRows={6}
-      ></TextField>
+      <SwitchableTextField
+        value={displayQuestion.question}
+        setValue={handleChangeText}
+        args={[questionId, "question"]}
+      ></SwitchableTextField>
     </Box>
   );
 
@@ -563,6 +553,7 @@ function QuestionEditor({
           )
         }
         fullWidth
+        sx={{ marginLeft: 1 }}
       >
         {questionTypes.map((questionType, index) => (
           <MenuItem key={index} value={questionType}>
@@ -628,7 +619,6 @@ function QuestionEditor({
                 );
               }}
               variant="outlined"
-              sx={{ flexGrow: 1, merginRight: 2 }}
             ></TextField>
             <Button
               onClick={() => handleRemoveAnswer(questionId, answers.id)}
@@ -694,6 +684,7 @@ function QuestionEditor({
           onChange={(event) => {
             handleChangeText(event.target.value, questionId, "maxlength");
           }}
+          sx={{ marginLeft: 1 }}
         ></TextField>
       </>
     );
