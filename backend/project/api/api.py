@@ -547,6 +547,7 @@ def solve_detail(request,workbookId:int,solved_count:int):
         print(workbookId,solved_count)
         workbook = Workbook.objects.get(id = workbookId)
         user_answer = UserAnswer.objects.get(user = request.user, workbook = workbook, solved_count = solved_count)
+        print("ok")
         problem = Problem.objects.get(workbook_id = workbookId).problem_json
         return JsonResponse(
             {
