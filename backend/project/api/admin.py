@@ -8,7 +8,11 @@ class CustomUser(admin.ModelAdmin):
 admin.site.register(User,CustomUser)
 
 admin.site.register(Company)
-admin.site.register(UserActivity)
+
+class CustomUserActivity(admin.ModelAdmin):
+    list_display = ('user','date','problems_solved_count','problems_created_count')
+    search_fields=('id',)
+admin.site.register(UserActivity,CustomUserActivity)
 
 class CustomWorkbook(admin.ModelAdmin):
     list_display = ('workbook_name','id','create_id','is_public')
