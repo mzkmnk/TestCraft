@@ -71,7 +71,6 @@ class NestedQuestion(CommonQuestionFields):
 
 class Root(BaseModel):
     questionType: str = "root"
-    title: str
     childIds: List[str]
 
 Question = Union[Root, NestedQuestion, RadioQuestion, TextareaQuestion]
