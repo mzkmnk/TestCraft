@@ -91,9 +91,15 @@ class Problem(models.Model):
     def __str__(self):
         return self.workbook_id.workbook_name
 
+class UserCountAnswer(models.Model):
+    workbook = models.ForeignKey(Workbook, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    count = models.IntegerField(default=0)
+
 class UserAnswer(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     workbook = models.ForeignKey(Workbook, on_delete=models.CASCADE)
+    solved_count = models.IntegerField(default=0)
     answer_json = JSONField()
     created_at = models.DateField(auto_now_add=True)
     

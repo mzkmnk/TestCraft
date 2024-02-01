@@ -11,10 +11,10 @@ function Solved() {
   const [workbook, setWorkbook] = useState(undefined);
   const [answers, setAnswers] = useState(undefined);
   const navigate = useNavigate();
-  const { workbookId } = useParams();
+  const { workbookId,solved_count } = useParams();
   const API = useAPI({
     APIName: "solve_detail",
-    params: workbookId,
+    params: [workbookId,solved_count],
     isLoginRequired: true,
     loadOnStart: true,
   });
