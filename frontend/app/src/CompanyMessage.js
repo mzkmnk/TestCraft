@@ -99,7 +99,7 @@ function CompanyMessage() {
                       <li key={id}>
                         {`ワークブック名: ${workbookName}`}
                         <a
-                          href={`http://localhost:3000/solve/${id}`}
+                          href={`https://www.testcrafts.net/solve/${id}`}
                           target="_blank"
                           rel="noopener noreferrer"
                         >
