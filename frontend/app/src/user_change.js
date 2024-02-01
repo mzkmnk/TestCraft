@@ -15,6 +15,8 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import UserHeader from "./UserHeader";
 import { useAPI } from "./hooks/useAPI";
 
+import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+
 const theme = createTheme();
 //　名前を空にできてしまうのを直す必要がある。
 function UserChange() {
@@ -52,6 +54,13 @@ function UserChange() {
     handleChange();
   };
 
+  const styles = {
+    icon: {
+      marginRight: "5px",
+      color: "#1876D2",
+    },
+  };
+
   return (
     <>
       <UserHeader />
@@ -66,8 +75,8 @@ function UserChange() {
               alignItems: "center",
             }}
           >
-            <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-              <LockOutlinedIcon />
+            <Avatar sx={{ m: 1, bgcolor: "white" }}>
+              <ManageAccountsIcon style={styles.icon} fontSize="large"/>
             </Avatar>
             <Typography component="h1" variant="h5">
               ユーザ変更画面
