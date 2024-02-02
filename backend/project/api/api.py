@@ -94,6 +94,7 @@ class CsvUploadSchema(Schema):
     
 class SaveAnswerSchema(Schema):
     workbook_id:int
+    correctIds:List[str]
     answers:str
     
 class MessageSchema(Schema):
@@ -476,6 +477,7 @@ def add_like(request,workbookId:int):
 @api.post("/save_answer")
 def save_answer(request,payload:SaveAnswerSchema):
     try:
+        print(payload)
         workbook_id = payload.workbook_id
         is_user_count_answer = UserCountAnswer.objects.filter(user = request.user, workbook = Workbook.objects.get(id = workbook_id))
         solved_count = 0
@@ -501,9 +503,11 @@ def save_answer(request,payload:SaveAnswerSchema):
                 problems_solved_count = 1,
             )
         answers = json.loads(payload.answers)
+        
         UserAnswer.objects.create(
             user = request.user,
             workbook = Workbook.objects.get(id = workbook_id),
+            correctIds = payload.correctIds,
             answer_json = answers,
             solved_count = solved_count,
         )
@@ -574,6 +578,7 @@ def solve_detail(request,workbookId:int,solved_count:int):
             {
                 "success":True,
                 "workbook":problem,
+                "correctIds":user_answer.correctIds,
                 "user_answer":user_answer.answer_json,
                 "error":None,
             },
