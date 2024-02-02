@@ -46,3 +46,8 @@ class CustomUserCountAnswer(admin.ModelAdmin):
     list_display = ('user','workbook','count')
     search_fields=('id',)
 admin.site.register(UserCountAnswer,CustomUserCountAnswer)
+
+class CustomCertification(admin.ModelAdmin):
+    list_display = ('username','key')
+    search_fields = ('id',)
+admin.site.register(Certification,CustomCertification)
