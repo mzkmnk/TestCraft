@@ -11,50 +11,66 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Alert from "@mui/material/Alert";
 
+import { useAPI } from './hooks/useAPI';
+import { set } from 'date-fns';
+
 
 const theme = createTheme();
 
 function ChangePass() {
     const [username, setUsername] = useState('');
     const [error, setError] = useState('');
+    const navigate = useNavigate();
+    const is_check_API = useAPI({
+        APIName: 'email_verification',
+        isLoginRequired: false, 
+    });
 
+    useEffect(() => {
+        if (is_check_API.isSuccess === true && is_check_API.data.success === true) {
+            navigate('/mypage',{
+                state: {
+                    message: 'メールアドレス認証が完了しました。',
+                    severity: 'success',
+                },
+            });
+        }else if(is_check_API.isSuccess === false){
+            setError('変更に失敗しました。ユーザネームが違います。');
+        }
+    },[is_check_API.isSuccess, navigate]);
 
     const handleChangePassword = async () => {
-        setError('');
-        try {
-            const password ="0000";
-            const response = await fetch('http://localhost:8000/api/email_verification', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(
-                    {
-                        'username': username,
-                        'password': password,
-                    }
-                ),
-                credentials: 'include',
-
-            });
-            const data = await response.json();
-            if (response.ok) {
-                console.log('Send succeeded');
-                
-                
-            } else {
-                setError("変更に失敗しました。ユーザネームが違います。");
-                console.error('Send failed');
-            }
-        } catch (error) {
-            setError("変更に失敗しました。ユーザネームが違います。");
-            console.error('Error during login:', error);
-        }
+        is_check_API.sendAPI({
+            body: JSON.stringify({
+                'username': username,
+            }),
+        });
     };
+    // const handleChangePassword = async () => {
+    //     setError(' ');
+    //     is_check_API.sendAPI({
+    //         body: JSON.stringify({
+    //             'username': username,
+    //         }),
+    //     });
+    //     if (is_check_API.isSuccess) {
+    //         navigate('/mypage',{
+    //             state: {
+    //                 message: 'メールアドレス認証が完了しました。',
+    //                 severity: 'success',
+    //             },
+    //         });
+    //     } else {
+    //         setError('変更に失敗しました。ユーザネームが違います。');
+    //         console.error('Send failed');
+    //     }
+    // };
+
     const handleSubmit = (event) => {
         event.preventDefault();
         handleChangePassword();
     };
+    
     return (
         <>
             <ThemeProvider theme={theme}>

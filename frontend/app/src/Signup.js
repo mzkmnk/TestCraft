@@ -25,6 +25,8 @@ function Signup() {
   const [is_company_user, setIsCompanyUser] = useState(false);
   const [is_own_company, setIsOwnCompany] = useState(false);
   const [error, setError] = useState("");
+  const [send_email, setSendEmail] = useState('');
+  const url = 'http://localhost:3000/email_verification';//随時変更
 
   // はじめに、ログインしているかどうかの確認を行う。
   const checkAuthAPI = useAPI({ APIName: "check_auth", loadOnStart: true });
@@ -32,6 +34,8 @@ function Signup() {
   const signupAPI = useAPI({ APIName: "singup" });
   // signupAPIが成功したら、loginAPIを送信する。
   const loginAPI = useAPI({ APIName: "login" });
+  // signupAPIが成功したら、メールを送信する。
+  const sendEmailAPI = useAPI({APIName: "send_email",});
 
   // checkAuthAPIの終了に反応するuseEffect。
   useEffect(() => {
@@ -39,6 +43,7 @@ function Signup() {
       navigate("/mypage", {
         state: {
           message: "ログインしています。",
+          severity: "success",
         },
       });
     }
@@ -70,6 +75,15 @@ function Signup() {
           severity: "success",
         },
       });
+      sendEmailAPI.sendAPI({
+        body: JSON.stringify(
+          {
+          'username' : username,
+          'url' : url ,
+          'email' : user_email,
+          }
+        ),
+      })
     } else if (loginAPI.isSuccess === false) {
       navigate("/error");
     }

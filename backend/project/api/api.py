@@ -69,6 +69,7 @@ class TextareaQuestion(CommonQuestionFields):
     maxlength: str
     answers: List[Answer]
 
+
 class NestedQuestion(CommonQuestionFields):
     questionType: str = "nested"
     childIds: List[str]
@@ -106,10 +107,10 @@ class MessageSchema(Schema):
     workbooks:str
     
 class UserChangeSchema(Schema):
-    username : str
     password : str
     
-
+class EmailVerificationSchema(Schema):
+    username : str
     
 class PassChangeSchema(Schema):
     url:str
@@ -119,11 +120,7 @@ class PassChangeSchema(Schema):
 # ユーザー登録するAPI
 @api.post("/signup")
 def signup(request, payload: SignUpSchema):
-    try:
-        # rand_key = [random.choice(string.ascii_letters + string.digits) for i in range(10)]
-        # rand_key=str(rand_key)
-        # print(rand_key)
-        
+    try:  
         user = User.objects.create_user(
             username = payload.username,
             email = payload.email,
@@ -133,15 +130,6 @@ def signup(request, payload: SignUpSchema):
             )
         user.set_password(payload.password)
         user.save()
-        # print(rand_key)
-        
-        # certification = Certification.objects.create(
-        #     key = rand_key,
-        #     username = payload.username,
-        # )
-        # print(rand_key)
-        
-        # certification.save()
         
         if payload.is_own_company:
             company = Company.objects.create(
@@ -174,7 +162,7 @@ def login(request, payload: LoginSchema):
 # ログインしているかどうかを確認するAPI
 @api.get("/check_auth")
 def check_auth(request):
-    if request.user.is_authenticated & request.user.is_email_certification == True:
+    if(request.user.is_authenticated):
         return JsonResponse({"authenticated": True}, status=200)
     else:
         return JsonResponse({"authenticated": False})
@@ -196,7 +184,6 @@ def send_email(request,payload:PassChangeSchema):
     verification_url = payload.url
     send_email = payload.email
     try:
-        
         rand_key = [random.choice(string.ascii_letters + string.digits) for i in range(10)]
         rand_key=str(rand_key)
         print(rand_key)
@@ -206,7 +193,7 @@ def send_email(request,payload:PassChangeSchema):
         
         user_object.key=rand_key
         user_object.save()
-        # if(Certification.objects.get(username=payload.username))
+
         certification = Certification.objects.create(
             key = rand_key,
             username = payload.username,
@@ -231,7 +218,7 @@ def send_email(request,payload:PassChangeSchema):
 
 #メールアドレス認証を完了するAPI
 @api.post("/email_verification")
-def email_verification(request,payload:UserChangeSchema):
+def email_verification(request,payload:EmailVerificationSchema):
     try :
         status=""
         certification_instance = Certification.objects.get(username=payload.username)
@@ -242,7 +229,6 @@ def email_verification(request,payload:UserChangeSchema):
 
         if(certification_key == user_key):
             if user_object.is_email_certification == False :
-                
                 user_object.is_email_certification = True
                 user_object.save()
                 status="1"
@@ -256,7 +242,8 @@ def email_verification(request,payload:UserChangeSchema):
                 "success":True,
                 "status":status,
                 "error":None,
-            }
+            },
+            status = 200,
         )
     except Exception as e:
         return JsonResponse({"success":False, "message" : str(e) },status = 400)
@@ -321,7 +308,7 @@ def user_change(request,payload: UserChangeSchema):
         user = User.objects.get(
             pk=request.user.id,
         )
-        user.username = payload.username
+        # user.username = payload.username
         user.set_password(payload.password)
         user.save()
         django_login(request,user)
