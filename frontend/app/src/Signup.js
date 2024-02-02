@@ -52,7 +52,9 @@ function Signup() {
   
 
   const handleSignup = async () => {
+    
     try {
+      const random_pass = Math.random().toString(32).substring(2);
       const response = await fetch('http://localhost:8000/api/signup', {
         method: 'POST',
         headers: {
@@ -65,6 +67,7 @@ function Signup() {
             "password" : password,
             "is_company_user" : is_company_user,
             "is_own_company" : is_own_company,
+            
         }
         ),
       }
@@ -102,8 +105,11 @@ function Signup() {
             'Content-Type': 'application/json',
           },  
           body: JSON.stringify(
+            
               {
+              'username' : username,
               'url' : url ,
+              'email' : user_email,
               }
           ),
           credentials: 'include',

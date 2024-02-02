@@ -77,6 +77,10 @@ function LoginForm() {
     handleLogin();
   };
 
+  const handleChange = ()=>{
+    navigate('/change_pass_send')
+  }
+
   return (
     <>
         <UserHeader/>
@@ -136,6 +140,14 @@ function LoginForm() {
                     Sign In
                 </Button>
                 </Box>
+                <Button
+                type="submit"
+                variant="contained"
+                sx={{ mt: 3, mb: 2 ,width:'200px'}}
+                onClick={handleChange}
+                >
+                パスワードを忘れた場合はこちら
+                </Button>
             </Box>
             </Container>
         </ThemeProvider>

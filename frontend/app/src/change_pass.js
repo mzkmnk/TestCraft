@@ -16,14 +16,14 @@ const theme = createTheme();
 
 function ChangePass() {
     const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
     const [error, setError] = useState('');
 
 
     const handleChangePassword = async () => {
         setError('');
         try {
-            const password ="0000";
-            const response = await fetch('http://localhost:8000/api/email_verification', {
+            const response = await fetch('http://localhost:8000/api/change_pass', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -72,7 +72,7 @@ function ChangePass() {
                             <LockOutlinedIcon />
                         </Avatar>
                         <Typography component="h1" variant="h5">
-                            メールアドレス認証画面
+                            パスワード変更画面
                         </Typography>
                         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
                             <TextField
@@ -87,6 +87,18 @@ function ChangePass() {
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                             />
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                name="password"
+                                label="Password"
+                                type="password"
+                                id="password"
+                                autoComplete="current-password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                            />
                             {error && (
                                 <Alert severity="error" sx={{ width: '100%' }}>
                                     {error}
@@ -98,7 +110,7 @@ function ChangePass() {
                                 variant="contained"
                                 sx={{ mt: 3, mb: 2 }}
                             >
-                                メールアドレス認証を完了する
+                                パスワードを変更する
                             </Button>
                         </Box>
                     </Box>

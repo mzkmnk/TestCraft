@@ -11,19 +11,21 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Alert from "@mui/material/Alert";
 
+import UserHeader from './UserHeader';
 
 const theme = createTheme();
 
-function ChangePass() {
+function ChangePassSend() {
     const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [error, setError] = useState('');
 
 
-    const handleChangePassword = async () => {
+    const handleSendEmail = async () => {
         setError('');
         try {
-            const password ="0000";
-            const response = await fetch('http://localhost:8000/api/email_verification', {
+            const url = 'http://localhost:3000/change_pass';
+            const response = await fetch('http://localhost:8000/api/change_pass_send', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -31,7 +33,8 @@ function ChangePass() {
                 body: JSON.stringify(
                     {
                         'username': username,
-                        'password': password,
+                        'url': url,
+                        'email': email,
                     }
                 ),
                 credentials: 'include',
@@ -40,23 +43,23 @@ function ChangePass() {
             const data = await response.json();
             if (response.ok) {
                 console.log('Send succeeded');
-                
-                
+                    
             } else {
-                setError("変更に失敗しました。ユーザネームが違います。");
+                setError("ログイン失敗しました。ユーザネームかパスワードが違います。");
                 console.error('Send failed');
             }
         } catch (error) {
-            setError("変更に失敗しました。ユーザネームが違います。");
+            setError("ログイン失敗しました。ユーザネームかパスワードが違います。");
             console.error('Error during login:', error);
         }
     };
     const handleSubmit = (event) => {
         event.preventDefault();
-        handleChangePassword();
+        handleSendEmail();
     };
     return (
         <>
+            <UserHeader />
             <ThemeProvider theme={theme}>
                 <Container component="main" maxWidth="xs">
                     <CssBaseline />
@@ -72,7 +75,7 @@ function ChangePass() {
                             <LockOutlinedIcon />
                         </Avatar>
                         <Typography component="h1" variant="h5">
-                            メールアドレス認証画面
+                            change_pass_send
                         </Typography>
                         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
                             <TextField
@@ -87,6 +90,18 @@ function ChangePass() {
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                             />
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                name="email"
+                                label="Email"
+                                type="email"
+                                id="email"
+                                autoComplete="current-email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
                             {error && (
                                 <Alert severity="error" sx={{ width: '100%' }}>
                                     {error}
@@ -98,7 +113,7 @@ function ChangePass() {
                                 variant="contained"
                                 sx={{ mt: 3, mb: 2 }}
                             >
-                                メールアドレス認証を完了する
+                                メールアドレスを送信する
                             </Button>
                         </Box>
                     </Box>
@@ -108,5 +123,5 @@ function ChangePass() {
     );
 }
 
-export default ChangePass;
+export default ChangePassSend;
 

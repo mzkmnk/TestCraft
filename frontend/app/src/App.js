@@ -16,6 +16,9 @@ import AddUser from "./add_user.js";
 import UserChange from "./user_change.js";
 import ReadWorkbook from "./ReadWorkbook.js";
 import EmailVerification from "./email_verification";
+import ChangePassSend from "./change_pass_send";
+import ChangePass from "./change_pass";
+
 
 function App() {
   return (
@@ -28,7 +31,9 @@ function App() {
         <Route path="/user_change" element={<UserChange />} />
         <Route path="/editor" element={<Editor />} />
         <Route path="/email_verification" element={<EmailVerification />}/>
-        
+        <Route path='/change_pass_send' element={<ChangePassSend />}/>
+        <Route path='/change_pass' element={<ChangePass />}/>
+
         <Route
           path="/editor/:workbookId"
           element={<ReadWorkbook next={"Editor"} />}

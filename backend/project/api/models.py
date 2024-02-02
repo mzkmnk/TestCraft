@@ -6,7 +6,7 @@ from django.core.mail import send_mail
 from django.db import models
 from django.db.models import JSONField
 from django.utils.translation import gettext_lazy as _
-
+import random, string
 # Create your models here.
 
 class Company(models.Model):
@@ -26,6 +26,7 @@ class User(AbstractUser):
     problem_create_cnt = models.IntegerField(default = 0)
     problem_slv_cnt = models.IntegerField(default = 0)
     is_email_certification= models.BooleanField(default = False)
+    key = models.CharField(max_length = 48, null = True, blank = True)
     
     USERNAME_FIELD = 'username'
     
@@ -49,6 +50,11 @@ class User(AbstractUser):
     
     def __str__(self):
         return self.username
+
+class Certification(models.Model):
+    username=models.CharField(max_length = 48, primary_key=True, default='')
+    key=models.CharField(max_length = 48,default='')
+    
 
 class UserActivity(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

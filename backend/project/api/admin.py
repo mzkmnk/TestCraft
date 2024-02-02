@@ -32,3 +32,8 @@ class CustomMessage(admin.ModelAdmin):
     list_display = ('sender','receiver','timestamp')
     search_fields=('id',)
 admin.site.register(Message,CustomMessage)
+
+class CustomCertification(admin.ModelAdmin):
+    list_display = ('username','key')
+    search_fields = ('id',)
+admin.site.register(Certification,CustomCertification)
