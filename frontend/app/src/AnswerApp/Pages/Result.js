@@ -33,6 +33,7 @@ export default function Result({ exitFunc }) {
   return (
     <>
       <AnswerForms
+        exitFunc={exitFunc}
         resultMode={true}
         correctIds={correctIds}
         questionCount={questionCount}

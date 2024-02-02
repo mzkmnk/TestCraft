@@ -6,6 +6,7 @@ import { SettingsModal } from "./components/SettingsModal";
 import { QuestionsProvider } from "./context/QuestionsContext";
 import { AnswersProvider } from "./context/AnswersContext";
 import { InputAnswers } from "./Pages/InputAnswers";
+import { useNavigate } from "react-router-dom";
 
 const defaultAnswerSettings = {
   /**単位は秒 */
@@ -30,6 +31,7 @@ export default function AnswersApp({ workbook }) {
   const [isSettingsOpen, setIsSettingsOpen] = useState(true);
   const [isInputOpen, setIsInputOpen] = useState(false);
   const [isResultOpen, setIsResultOpen] = useState(false);
+  const navigate = useNavigate();
 
   const Timer = useTimer();
 
@@ -76,8 +78,7 @@ export default function AnswersApp({ workbook }) {
           {isResultOpen ? (
             <Result
               exitFunc={() => {
-                setIsResultOpen(false);
-                setIsSettingsOpen(true);
+                navigate("/mypage");
               }}
             />
           ) : null}
