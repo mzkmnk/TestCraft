@@ -27,6 +27,10 @@ const APIs = {
   send_message: `${urlBase}/send_message`,
   is_company_user: `${urlBase}/is_company_user`,
   all_company_users: `${urlBase}/all_company_users`,
+  send_email: `${urlBase}/send_email`,
+  email_verification: `${urlBase}/email_verification`,
+  change_pass_send: `${urlBase}/change_pass_send`,
+  change_pass: `${urlBase}/change_pass`,
 };
 
 /**

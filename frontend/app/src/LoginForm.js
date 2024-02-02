@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useLocation } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -11,6 +11,7 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Alert from "@mui/material/Alert";
 import { useAPI } from "./hooks/useAPI";
+import Snackbar from "@mui/material/Snackbar";
 
 import UserHeader from "./UserHeader";
 
@@ -18,8 +19,10 @@ const theme = createTheme();
 
 function LoginForm() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
   const [error, setError] = useState("");
 
   // はじめに、ログインしているかどうかの確認を行う。
@@ -65,6 +68,20 @@ function LoginForm() {
   const handleSubmit = (event) => {
     event.preventDefault();
     handleLogin();
+  };
+
+  const handleChange = ()=>{
+    navigate('/change_pass_send')
+  };
+
+  useEffect(() => {
+    if (location.state?.message) {
+      setOpenSnackbar(true);
+    }
+  }, [location]);
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
   };
 
   return (
@@ -131,9 +148,33 @@ function LoginForm() {
                 Sign In
               </Button>
             </Box>
+                <Button
+                type="submit"
+                variant="contained"
+                sx={{ mt: 3, mb: 2 ,width:'200px'}}
+                onClick={handleChange}
+                >
+                パスワードを忘れた場合はこちら
+                </Button>
           </Box>
         </Container>
       </ThemeProvider>
+      {openSnackbar && (
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={4000}
+          onClose={handleCloseSnackbar}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        >
+          <Alert
+            onClose={handleCloseSnackbar}
+            severity={location.state.severity}
+            sx={{ width: "100%" }}
+          >
+            {location.state.message}
+          </Alert>
+        </Snackbar>
+      )}
     </>
   );
 }

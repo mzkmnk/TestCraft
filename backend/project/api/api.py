@@ -14,7 +14,7 @@ from .models import *
 
 from django.http import JsonResponse
 
-from pydantic import BaseModel,ValidationError
+from pydantic import BaseModel,ValidationError,HttpUrl
 from typing import Dict,List,Optional,Union
 
 from datetime import date
@@ -27,6 +27,10 @@ import pandas as pd
 from io import StringIO
 
 import numpy as np
+
+from django.core.mail import send_mail
+
+from django.core.exceptions import ObjectDoesNotExist
 
 api = NinjaAPI()
 
@@ -65,6 +69,7 @@ class TextareaQuestion(CommonQuestionFields):
     maxlength: str
     answers: List[Answer]
 
+
 class NestedQuestion(CommonQuestionFields):
     questionType: str = "nested"
     childIds: List[str]
@@ -94,6 +99,7 @@ class CsvUploadSchema(Schema):
     
 class SaveAnswerSchema(Schema):
     workbook_id:int
+    correctIds:List[str]
     answers:str
     
 class MessageSchema(Schema):
@@ -102,13 +108,19 @@ class MessageSchema(Schema):
     workbooks:str
     
 class UserChangeSchema(Schema):
-    username : str
     password : str
+class EmailVerificationSchema(Schema):
+    username : str
+    
+class PassChangeSchema(Schema):
+    url:str
+    email:str
+    username:str
 # API
 # ユーザー登録するAPI
 @api.post("/signup")
 def signup(request, payload: SignUpSchema):
-    try:
+    try:  
         user = User.objects.create_user(
             username = payload.username,
             email = payload.email,
@@ -118,6 +130,7 @@ def signup(request, payload: SignUpSchema):
             )
         user.set_password(payload.password)
         user.save()
+        
         if payload.is_own_company:
             company = Company.objects.create(
                 name = payload.username,
@@ -149,7 +162,7 @@ def login(request, payload: LoginSchema):
 # ログインしているかどうかを確認するAPI
 @api.get("/check_auth")
 def check_auth(request):
-    if request.user.is_authenticated:
+    if(request.user.is_authenticated):
         return JsonResponse({"authenticated": True}, status=200)
     else:
         return JsonResponse({"authenticated": False})
@@ -164,6 +177,166 @@ def logout_user(request):
         },
         status=200
     )
+    
+#認証用メールを送信をするAPI
+@api.post("/send_email")
+def send_email(request,payload:PassChangeSchema):
+    verification_url = payload.url
+    send_email = payload.email
+    try:
+        rand_key = [random.choice(string.ascii_letters + string.digits) for i in range(10)]
+        rand_key=str(rand_key)
+        print(rand_key)
+        
+        user_object = User.objects.get(username=payload.username)
+        print(user_object)
+        
+        user_object.key=rand_key
+        user_object.save()
+
+        certification = Certification.objects.create(
+            key = rand_key,
+            username = payload.username,
+        )
+        certification.save()
+        
+        subject = "メールアドレス認証"
+        message = f"このメールは問題作成アプリ新規登録用です。\n新規登録をお済でない場合下記のURLをクリックしてメールアドレスを認証してください。\nこのメールに心当たりがない場合メールの削除をお願いいたします。\n{verification_url}"
+        from_email = "testcrarts.official@gmail.com"
+        send_mail(
+            subject,
+            message,
+            from_email,
+            [
+                send_email,
+            ],
+            fail_silently=False
+        )
+    except Exception as e:
+        print(e)
+        return JsonResponse({"success":False, "message" : str(e) },status = 400)
+
+#メールアドレス認証を完了するAPI
+@api.post("/email_verification")
+def email_verification(request,payload:EmailVerificationSchema):
+    try :
+        status=""
+        certification_instance = Certification.objects.get(username=payload.username)
+        certification_key = certification_instance.key
+        user_object = User.objects.get(username=payload.username)
+        
+        user_key = user_object.key
+
+        if(certification_key == user_key):
+            if user_object.is_email_certification == False :
+                user_object.is_email_certification = True
+                user_object.save()
+                status="1"
+            else:
+                status="2"
+        else :
+                status="3"
+        certification_instance.delete()
+        return JsonResponse(
+            {
+                "success":True,
+                "status":status,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse({"success":False, "message" : str(e) },status = 400)
+        
+#パスワード変更用メールを送信をするAPI
+@api.post("/change_pass_send")
+def change_pass_send(request,payload:PassChangeSchema):
+    send_email = payload.email
+    verification_url = payload.url
+    try:
+        rand_key = [random.choice(string.ascii_letters + string.digits) for i in range(10)]
+        rand_key=str(rand_key)
+        
+        user_object = User.objects.get(username=payload.username)
+        
+        user_object.key=rand_key
+        user_object.save()
+        if(Certification.objects.filter(username=payload.username).exists()):
+            certification_instance = Certification.objects.get(username=payload.username)
+            certification_instance.key = rand_key
+            certification_instance.save()
+        else:
+            certification = Certification.objects.create(
+                key = rand_key,
+                username = payload.username,
+            )
+            certification.save()
+        
+        subject = "パスワード変更画面"
+        message = f"このメールは問題作成アプリのパスワード変更用メールです。\nパスワードを忘れた場合下記のURLをクリックしてメールアドレスを認証してください。\nこのメールに心当たりがない場合メールの削除をお願いいたします。\n{verification_url}"
+        from_email = "testcrarts.official@gmail.com"
+        send_mail(
+            subject,
+            message,
+            from_email,
+            [
+                send_email,
+            ],
+            fail_silently=False
+        )
+        return JsonResponse(
+            {
+                "success":True,
+                "error":None,
+            }
+        )
+    except Exception as e:
+        print("Exception:",e)
+        return JsonResponse(
+            {
+                "success":False,
+                "error" : str(e)
+            },
+            status = 400
+        )
+
+#パスワードを変更するAPI
+@api.post("/change_pass")
+def change_pass(request,payload :LoginSchema):
+    try:
+        certification_instance = Certification.objects.get(username=payload.username)
+        certification_key = certification_instance.key
+        user_object = User.objects.get(username=payload.username)
+        user_key = user_object.key
+        if(certification_key == user_key):
+            user_object.set_password(payload.password)
+            user_object.save()
+        else:
+            return JsonResponse(
+                {
+                    "success":False,
+                    "error":None,
+                    "message" : "認証キーが一致しません。",
+                },
+                status = 400
+            )
+        certification_instance.delete()
+        return JsonResponse(
+            {
+                "success":True,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success": False,
+                "message": "ユーザーが見つかりませんでした。",
+                "error": str(e)
+            }, 
+            status=400
+        )
 
 #登録情報を変更するAPI
 @api.post("/user_change")
@@ -172,8 +345,7 @@ def user_change(request,payload: UserChangeSchema):
         user = User.objects.get(
             pk=request.user.id,
         )
-        print("*"*20)
-        user.username = payload.username
+        # user.username = payload.username
         user.set_password(payload.password)
         user.save()
         django_login(request,user)
@@ -475,6 +647,7 @@ def add_like(request,workbookId:int):
 @api.post("/save_answer")
 def save_answer(request,payload:SaveAnswerSchema):
     try:
+        print(payload)
         workbook_id = payload.workbook_id
         is_user_count_answer = UserCountAnswer.objects.filter(user = request.user, workbook = Workbook.objects.get(id = workbook_id))
         solved_count = 0
@@ -500,9 +673,11 @@ def save_answer(request,payload:SaveAnswerSchema):
                 problems_solved_count = 1,
             )
         answers = json.loads(payload.answers)
+        
         UserAnswer.objects.create(
             user = request.user,
             workbook = Workbook.objects.get(id = workbook_id),
+            correctIds = payload.correctIds,
             answer_json = answers,
             solved_count = solved_count,
         )
@@ -573,6 +748,7 @@ def solve_detail(request,workbookId:int,solved_count:int):
             {
                 "success":True,
                 "workbook":problem,
+                "correctIds":user_answer.correctIds,
                 "user_answer":user_answer.answer_json,
                 "error":None,
             },
