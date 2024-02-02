@@ -2,8 +2,8 @@
   {
     "model": "api.workbook",
     "fields": {
-      "workbook_name": "生物について",
-      "description": "生物について知ることができます。",
+      "workbook_name": "テストケース問題",
+      "description": "網羅的な問題",
       "create_id": 1,
       "created_at": "2024-01-02",
       "updated_at": "2024-01-02",
