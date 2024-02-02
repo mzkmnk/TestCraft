@@ -307,13 +307,20 @@ def change_pass(request,payload :LoginSchema):
         certification_instance = Certification.objects.get(username=payload.username)
         certification_key = certification_instance.key
         user_object = User.objects.get(username=payload.username)
-        
         user_key = user_object.key
         if(certification_key == user_key):
             user_object.set_password(payload.password)
             user_object.save()
+        else:
+            return JsonResponse(
+                {
+                    "success":False,
+                    "error":None,
+                    "message" : "認証キーが一致しません。",
+                },
+                status = 400
+            )
         certification_instance.delete()
-        print("Ok")
         return JsonResponse(
             {
                 "success":True,

@@ -20,6 +20,7 @@ function ChangePass() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const navigate = useNavigate();
     const changeAPI = useAPI({
         APIName: 'change_pass',
         isLoginRequired: false,
@@ -28,53 +29,29 @@ function ChangePass() {
     useEffect(() => {
         if(changeAPI.isSuccess && changeAPI.data.success){
             console.log('Send succeeded');
+            navigate('/login',{
+                state: {
+                    message: 'パスワードを変更しました。ログインしてください。',
+                    severity: 'success',
+                }
+            })
+            
         }else if(changeAPI.isSuccess === false){
-            setError("変更に失敗しました。ユーザネームが違います。");
+            setError(changeAPI.data.message);
             console.error('Send failed');
         }
-    });
+    },[changeAPI.isSuccess,navigate]);
 
     const handleChangePassword = async () => {
         changeAPI.sendAPI({
-            body:
+            body:JSON.stringify(
             {
             username: username,
             password: password,
             }
-        })
+        )
+        });
     };
-
-    // const handleChangePassword = async () => {
-    //     setError('');
-    //     try {
-    //         const response = await fetch('http://localhost:8000/api/change_pass', {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //             },
-    //             body: JSON.stringify(
-    //                 {
-    //                     'username': username,
-    //                     'password': password,
-    //                 }
-    //             ),
-    //             credentials: 'include',
-
-    //         });
-    //         const data = await response.json();
-    //         if (response.ok) {
-    //             console.log('Send succeeded');
-
-
-    //         } else {
-    //             setError("変更に失敗しました。ユーザネームが違います。");
-    //             console.error('Send failed');
-    //         }
-    //     } catch (error) {
-    //         setError("変更に失敗しました。ユーザネームが違います。");
-    //         console.error('Error during login:', error);
-    //     }
-    // };
 
     const handleSubmit = (event) => {
         event.preventDefault();
