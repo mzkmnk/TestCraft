@@ -64,6 +64,7 @@ class TextareaQuestion(CommonQuestionFields):
     questionType: str = "textarea"
     maxlength: str
     answers: List[Answer]
+    useAIScoring: bool
 
 class NestedQuestion(CommonQuestionFields):
     questionType: str = "nested"
