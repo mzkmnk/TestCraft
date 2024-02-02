@@ -27,7 +27,7 @@ function Signup() {
   const [error, setError] = useState("");
   const [send_email, setSendEmail] = useState('');
 
-  const url = 'http://localhost:3000/email_verification';//随時変更
+  const url = 'https://www.testcrafts.net/email_verification';//随時変更
 
   // はじめに、ログインしているかどうかの確認を行う。
   const checkAuthAPI = useAPI({ APIName: "check_auth", loadOnStart: true });

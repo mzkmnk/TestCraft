@@ -23,7 +23,7 @@ function ChangePassSend() {
 
     const navigate = useNavigate();
 
-    const url = 'http://localhost:3000/change_pass';//随時変更
+    const url = 'https://www.testcrafts.net/change_pass';//随時変更
 
     const sendEmailAPI = useAPI({
         APIName: 'change_pass_send',
