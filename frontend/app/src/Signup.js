@@ -26,6 +26,7 @@ function Signup() {
   const [is_own_company, setIsOwnCompany] = useState(false);
   const [error, setError] = useState("");
   const [send_email, setSendEmail] = useState('');
+
   const url = 'http://localhost:3000/email_verification';//随時変更
 
   // はじめに、ログインしているかどうかの確認を行う。
