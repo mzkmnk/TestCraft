@@ -5,6 +5,7 @@ import { useNavigate,useLocation } from 'react-router-dom';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from "@mui/material/Alert";
 import UserHeader from './UserHeader';
+import { useAPI } from "./hooks/useAPI";
 import 'chartjs-adapter-date-fns';
 import { 
   Chart as ChartJS,
@@ -33,86 +34,70 @@ function MyPage() {
   const location = useLocation();
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [chartData, setChartData] = useState({}); 
+  const API = useAPI({
+    APIName: "get_graph_data",
+    isLoginRequired: true,
+    loadOnStart: true,
+  });
+
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/check_auth', {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.authenticated === false) {
-          navigate('/login');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
+    if(API.isSuccess && API.data.success){
+      const graphdata = API.data.data;
+      console.log(graphdata);
+      let startDate;
+      if(graphdata.length === 0){
+        const today =new Date();
+        startDate = new Date(today.getFullYear(),today.getMonth(),today.getDate() - 7);
+      }else{
+        console.log(graphdata[0]);
+        startDate = new Date(graphdata[0].date);
+      }
+      const endDate = new Date();
+      const allDates = eachDayOfInterval({
+        start: startDate,
+        end: endDate
+      }).map(day => format(day, 'yyyy-MM-dd'));
+
+      const solveCounts = allDates.map(date => {
+        const data = graphdata.find(item => item.date === date);
+        return data ? data.solve_cnt : 0;
       });
 
-      fetch('http://localhost:8000/api/get_graph_data',{
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
+      const createCounts = allDates.map(date => {
+        const data = graphdata.find(item => item.date === date);
+        return data ? data.create_cnt : 0;
+      });
+      setChartData({
+        labels:allDates,
+        datasets: [
+          {
+            label:'問題回答数',
+            data: solveCounts,
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.2)',
+            ],
+            borderColor: [
+              'rgba(255, 99, 132, 1)',
+            ],
+          },
+          {
+            label:'問題作成数',
+            data:createCounts,
+            backgroundColor: [
+              'rgba(54, 162, 235, 0.2)',
+            ],
+            borderColor: [
+              'rgba(54, 162, 235, 1)',
+            ],
+          }
+        ]
       })
-      .then(response => response.json())
-      .then(userData => {
-        if (userData.success) {
-          const graphdata = userData.data;
-          let startDate;
-          if(graphdata.length === 0){
-            const today = new Date();
-            startDate = new Date(today.getFullYear(),today.getMonth(),today.getDate() - 7);
-          }else{
-            startDate = new Date(graphdata[0].date);
-          }
-          const endDate = new Date();
-          const allDates = eachDayOfInterval({
-            start: startDate,
-            end: endDate
-          }).map(day => format(day, 'yyyy-MM-dd'));
+    }else{
+      console.error("グラフデータの取得に失敗しました");
+    }
+  },[navigate,API.data,API.isSuccess]);
 
-          const solveCounts = allDates.map(date => {
-            const data = graphdata.find(item => item.date === date);
-            return data ? data.solve_cnt : 0;
-          });
-
-          const createCounts = allDates.map(date => {
-            const data = graphdata.find(item => item.date === date);
-            return data ? data.create_cnt : 0;
-          });
-          setChartData({
-            labels:allDates,
-            datasets: [
-              {
-                label:'問題回答数',
-                data: solveCounts,
-                backgroundColor: [
-                  'rgba(255, 99, 132, 0.2)',
-                ],
-                borderColor: [
-                  'rgba(255, 99, 132, 1)',
-                ],
-              },
-              {
-                label:'問題作成数',
-                data:createCounts,
-                backgroundColor: [
-                  'rgba(54, 162, 235, 0.2)',
-                ],
-                borderColor: [
-                  'rgba(54, 162, 235, 1)',
-                ],
-              }
-            ]
-          })
-          }else{
-            console.error("グラフデータの取得に失敗しました");
-          }
-        })
-  }, [navigate]);
 
   useEffect(() => {
     if (location.state?.message) {
