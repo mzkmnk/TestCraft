@@ -96,6 +96,10 @@ class likeDeleteSchema(Schema):
 class CsvUploadSchema(Schema):
     csv_data:str
     
+class SaveAnswerSchema(Schema):
+    workbook_id:int
+    answers:str
+    
 class MessageSchema(Schema):
     message:str
     to:str
@@ -173,7 +177,7 @@ def check_auth(request):
     if request.user.is_authenticated & request.user.is_email_certification == True:
         return JsonResponse({"authenticated": True}, status=200)
     else:
-        return JsonResponse({"authenticated": False}, status=401)
+        return JsonResponse({"authenticated": False})
     
 # ログアウトするAPI
 @api.post("/logout")
@@ -459,7 +463,8 @@ def add_user(request ,payload:CsvUploadSchema):
             },
             status = 400,
         )
-        
+
+#グラフを修正するAPI(beta)       
 @api.get("/get_graph_data")
 def get_graph_data(request):
     try:
@@ -476,11 +481,28 @@ def get_graph_data(request):
         return JsonResponse({'success':True,'data': data},status = 200)
     except Exception as e:
         return JsonResponse({'success':False,'data': None},status = 400)
-    
+
+#問題を保存するAPI
 @api.post("/save_data")
 def save_data(request,data:JsonFormat):
     try:
-        question_dict = {k:v for k,v in data.questions.items()}
+        workbook_id = None
+        if(data.info.get('workbook_id') is not None):
+            workbook_id = data.info['workbook_id']
+        if(Workbook.objects.filter(id = workbook_id).exists()):
+            workbook = Workbook.objects.get(id = workbook_id)
+            workbook.workbook_name = data.info['title']
+            workbook.save()
+            problem = Problem.objects.get(workbook_id = workbook_id)
+            problem.problem_json = data.json()
+            problem.save()
+            return JsonResponse(
+                {
+                    'success':True,
+                    'error':None,
+                },
+                status = 200
+            )
         workbook = Workbook.objects.create(
             workbook_name = data.info['title'],
             create_id = request.user,
@@ -490,6 +512,16 @@ def save_data(request,data:JsonFormat):
             workbook_id = Workbook.objects.get(id = workbook.id),
             problem_json = data.json(),
         )
+        if(UserActivity.objects.filter(user_id = request.user.id, date = date.today()).exists()):
+            activity = UserActivity.objects.get(user_id = request.user.id, date = date.today())
+            activity.problems_created_count += 1
+            activity.save()
+        else:
+            UserActivity.objects.create(
+                user_id = request.user.id,
+                date = date.today(),
+                problems_created_count = 1,
+            )
         return JsonResponse(
             {
                 'success':True,
@@ -582,6 +614,122 @@ def add_like(request,workbookId:int):
             {
                 "success":False,
                 "csv_data":None,
+                "error":str(e),
+            },
+            status = 400,
+        )
+
+#ユーザが解答した情報を保存するAPI
+@api.post("/save_answer")
+def save_answer(request,payload:SaveAnswerSchema):
+    try:
+        workbook_id = payload.workbook_id
+        is_user_count_answer = UserCountAnswer.objects.filter(user = request.user, workbook = Workbook.objects.get(id = workbook_id))
+        solved_count = 0
+        if(is_user_count_answer):
+            user_count_answer = UserCountAnswer.objects.get(user = request.user, workbook = Workbook.objects.get(id = workbook_id))
+            solved_count = user_count_answer.count
+            user_count_answer.count += 1
+        else:
+            user_count_answer = UserCountAnswer.objects.create(
+                user = request.user,
+                workbook = Workbook.objects.get(id = workbook_id),
+                count = 1,
+            )
+        user_count_answer.save()
+        if(UserActivity.objects.filter(user_id = request.user.id, date = date.today()).exists()):
+            activity = UserActivity.objects.get(user_id = request.user.id, date = date.today())
+            activity.problems_solved_count += 1
+            activity.save()
+        else:
+            UserActivity.objects.create(
+                user_id = request.user.id,
+                date = date.today(),
+                problems_solved_count = 1,
+            )
+        answers = json.loads(payload.answers)
+        UserAnswer.objects.create(
+            user = request.user,
+            workbook = Workbook.objects.get(id = workbook_id),
+            answer_json = answers,
+            solved_count = solved_count,
+        )
+        JsonResponse(
+            {
+                "success":True,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "error":str(e),
+            },
+            status = 400,
+        )
+
+#ユーザが解答した問題を取得するAPI
+@api.get("/solve_workbook")
+def solve_workbook(request):
+    try:
+        user_answers = UserAnswer.objects.filter(user = request.user).values(
+            'workbook__id',
+            'workbook__workbook_name',
+            'workbook__description',
+            'workbook__create_id__username',
+            'workbook__created_at',
+            'workbook__updated_at',
+            'workbook__like_count',
+            'answer_json',
+            'solved_count',
+        )
+        user_answers_with_categories = []
+        for user_answer in user_answers:
+            categories = WorkbookCategory.objects.filter(id=user_answer['workbook__id']).values_list('category__category_name', flat=True)
+            user_answers_with_categories.append({
+                **user_answer,
+                'categories': list(categories)
+            })
+        print(user_answers_with_categories)
+        return JsonResponse(
+            {
+                'success' : True,
+                'workbook' : user_answers_with_categories,
+            },
+            status = 200
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                'success' : False,
+                'workbook' : None
+            },
+            status = 400
+            )
+#ユーザが解いた問題の情報を取得するAPI
+@api.get("/solve_detail/{workbookId}/{solved_count}")
+def solve_detail(request,workbookId:int,solved_count:int):
+    try:
+        print(workbookId,solved_count)
+        workbook = Workbook.objects.get(id = workbookId)
+        user_answer = UserAnswer.objects.get(user = request.user, workbook = workbook, solved_count = solved_count)
+        print("ok")
+        problem = Problem.objects.get(workbook_id = workbookId).problem_json
+        return JsonResponse(
+            {
+                "success":True,
+                "workbook":problem,
+                "user_answer":user_answer.answer_json,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
                 "error":str(e),
             },
             status = 400,
@@ -698,6 +846,17 @@ def send_messsage(request,payload:MessageSchema):
 @api.get("is_company_user")
 def is_company_user(request):
     try:
+        if(request.user.is_anonymous):
+            return JsonResponse(
+                {
+                    "success":True,
+                    "is_own_company":False,
+                    "is_company_user":False,
+                    "error":None,
+                    
+                },
+                status = 201,
+            )
         return JsonResponse(
             {
                 "success":True,

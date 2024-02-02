@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import UserHeader from "./UserHeader";
-import { useNavigate,useLocation } from "react-router-dom";
-import Pagination from '@mui/material/Pagination';
-import Snackbar from '@mui/material/Snackbar';
+import { useNavigate, useLocation } from "react-router-dom";
+import Pagination from "@mui/material/Pagination";
+import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import { FaHeart } from "react-icons/fa";
+import { useAPI } from "./hooks/useAPI";
 
 function Mycreate() {
   const [questions, setQuestions] = useState([]);
@@ -12,7 +13,10 @@ function Mycreate() {
   const questionsPerPage = 6;
   const indexOfLastQuestions = currentPage * questionsPerPage;
   const indexOfFirstQuestions = indexOfLastQuestions - questionsPerPage;
-  const currentQuestions = questions.slice(indexOfFirstQuestions, indexOfLastQuestions);
+  const currentQuestions = questions.slice(
+    indexOfFirstQuestions,
+    indexOfLastQuestions
+  );
   const navigate = useNavigate();
   const location = useLocation();
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -21,46 +25,26 @@ function Mycreate() {
     setCurrentPage(value);
   };
 
+  const API = useAPI({
+    APIName: "create_user_workbook",
+    isLoginRequired: true,
+    loadOnStart: true,
+  });
+
   useEffect(() => {
-    fetch("http://localhost:8000/api/check_auth", {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.authenticated === false) {
-          navigate("/login");
-        } else {
-          fetch("http://localhost:8000/api/create_user_workbook", {
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              if (data.success === true) {
-                setQuestions(data.workbook);
-              }
-            })
-            .catch((error) => {
-              console.error("Error:", error);
-            });
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-  }, [navigate]);
+    if (API.isSuccess === false) {
+      navigate("/error");
+    } else if (API.isSuccess === true && API.data.success === true) {
+      setQuestions(API.data.workbook);
+    }
+  }, [API.data.success, API.data.workbook, API.isSuccess, navigate]);
 
   useEffect(() => {
     if (location.state?.message) {
       setOpenSnackbar(true);
     }
   }, [location]);
-  
+
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   };
@@ -133,19 +117,23 @@ function Mycreate() {
           </div>
         ))}
       </div>
-      <Pagination 
-          count={Math.ceil(questions.length / questionsPerPage)} 
-          page={currentPage} 
-          onChange={handleChangePage}
+      <Pagination
+        count={Math.ceil(questions.length / questionsPerPage)}
+        page={currentPage}
+        onChange={handleChangePage}
       />
       {openSnackbar && (
         <Snackbar
           open={openSnackbar}
           autoHideDuration={4000}
           onClose={handleCloseSnackbar}
-          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
         >
-          <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
+          <Alert
+            onClose={handleCloseSnackbar}
+            severity="success"
+            sx={{ width: "100%" }}
+          >
             {location.state.message}
           </Alert>
         </Snackbar>

@@ -1,15 +1,10 @@
-import ResultQuestion from "./ResultQuestion";
-
-export default function Result({ answers, questionTree, questionIds }) {
-  // すべての問題数。questionIdsの長さではnestedに対応できない。
+// 採点
+export function grade({ questionTree, questionIds, answers }) {
   let questionCount = 0;
-  const correctIds = [];
+  let correctIds = [];
 
-  // 正答判定
   const grade = (questionIds) => {
     for (const id of questionIds) {
-      if (questionTree[id].questionType === "root") continue;
-
       // nestedの場合は再帰
       if (questionTree[id].questionType === "nested") {
         grade(questionTree[id].childIds, id);
@@ -32,18 +27,7 @@ export default function Result({ answers, questionTree, questionIds }) {
       }
     }
   };
-
   grade(questionIds);
 
-  return (
-    <>
-      <ResultQuestion
-        questionIds={questionIds}
-        questionTree={questionTree}
-        correctIds={correctIds}
-        answers={answers}
-        questionCount={questionCount}
-      />
-    </>
-  );
+  return { correctIds, questionCount };
 }

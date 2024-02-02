@@ -8,7 +8,11 @@ class CustomUser(admin.ModelAdmin):
 admin.site.register(User,CustomUser)
 
 admin.site.register(Company)
-admin.site.register(UserActivity)
+
+class CustomUserActivity(admin.ModelAdmin):
+    list_display = ('user','date','problems_solved_count','problems_created_count')
+    search_fields=('id',)
+admin.site.register(UserActivity,CustomUserActivity)
 
 class CustomWorkbook(admin.ModelAdmin):
     list_display = ('workbook_name','id','create_id','is_public')
@@ -28,10 +32,20 @@ class CustomLike(admin.ModelAdmin):
     search_fields=('id',)
 admin.site.register(Like,CustomLike)
 
+class CustomUserAnswer(admin.ModelAdmin):
+    list_display = ('user','workbook','solved_count')
+    search_fields=('id',)
+admin.site.register(UserAnswer,CustomUserAnswer)
+
 class CustomMessage(admin.ModelAdmin):
     list_display = ('sender','receiver','timestamp')
     search_fields=('id',)
 admin.site.register(Message,CustomMessage)
+
+class CustomUserCountAnswer(admin.ModelAdmin):
+    list_display = ('user','workbook','count')
+    search_fields=('id',)
+admin.site.register(UserCountAnswer,CustomUserCountAnswer)
 
 class CustomCertification(admin.ModelAdmin):
     list_display = ('username','key')

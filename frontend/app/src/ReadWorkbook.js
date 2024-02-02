@@ -1,55 +1,34 @@
-import { useState, useEffect, React } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import Editor from "./Editor.tsx";
-import QuestionsSolve from "./QuestionsSolve/QuestionsSolve";
+import { useParams } from "react-router-dom";
+import { useAPI } from "./hooks/useAPI";
+import Editor from "./EditorApp/EditorApp.tsx";
+import AnswerApp from "./AnswerApp/AnswerApp.js";
+import Error from "./Error.js";
+import Loading from "./Loading";
 
-export default function ReadWorkbook({ next }) {
-  let [workbook, setWorkbook] = useState(undefined);
+/**
+ * APIにアクセスし、workbookが取得できたら、次のアプリに遷移する。
+ * @param {string} nextApp "Editor" or "AnswerApp"
+ */
+export default function ReadWorkbook({ nextAppName }) {
   const { workbookId } = useParams();
+  const API = useAPI({
+    APIName: "edit_workbook",
+    params: workbookId,
+    loadOnStart: true,
+  });
 
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    fetch("http://localhost:8000/api/check_auth", {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.authenticated === false) {
-          navigate("/login");
-        } else {
-          fetch(`http://localhost:8000/api/edit_workbook/${workbookId}`, {
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              if (data.success === true) {
-                setWorkbook(data.data);
-              }
-            })
-            .catch((error) => {
-              console.error("Error:", error);
-            });
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-  }, [navigate]);
-
-  if (next === "Editor") {
-    return workbook ? <Editor workBook={workbook} /> : <div>Loading...</div>;
-  } else if (next === "QuestionsSolve") {
-    return workbook ? (
-      <QuestionsSolve workbook={workbook} />
-    ) : (
-      <div>Loading...</div>
-    );
+  if (API.isLoading === true) {
+    return <Loading />;
   }
+  if (API.error || API.data.success === false) {
+    return <Error />;
+  }
+
+  let nextApp = <></>;
+  if (nextAppName === "Editor") {
+    nextApp = <Editor workBook={API.data.data} workbookId={workbookId} />;
+  } else if (nextAppName === "AnswerApp") {
+    nextApp = <AnswerApp workbook={API.data.data} workbookId={workbookId} />;
+  }
+  return <>{nextApp}</>;
 }

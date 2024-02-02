@@ -1,12 +1,14 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
+import TopPage from "./TopPage.js";
 import LoginForm from "./LoginForm.js";
 import MyPage from "./Mypage.js";
 import Signup from "./Signup.js";
 import QuestionsAll from "./QuestionsAll.js";
 import Mycreate from "./Mycreate.js";
-import Editor from "./Editor.tsx";
+import Editor from "./EditorApp/EditorApp.tsx";
+import Solved from "./Solved.js";
 import Mysolve from "./Mysolve.js";
 import Message from "./Message.js";
 import AllCompanyUsers from "./AllCompanyUsers.js";
@@ -19,11 +21,13 @@ import EmailVerification from "./email_verification";
 import ChangePassSend from "./change_pass_send";
 import ChangePass from "./change_pass";
 
+import Error from "./Error.js";
 
 function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/" element={<TopPage />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/signup" element={<Signup />} />
@@ -36,10 +40,10 @@ function App() {
 
         <Route
           path="/editor/:workbookId"
-          element={<ReadWorkbook next={"Editor"} />}
+          element={<ReadWorkbook nextAppName={"Editor"} />}
         />
         <Route path="/mypage/mycreate" element={<Mycreate />} />
-        <Route path="/add_user" element = {<AddUser />} />
+        <Route path="/add_user" element={<AddUser />} />
         <Route path="/send_message" element={<SendMessage />} />
         <Route path="/all_company_users" element={<AllCompanyUsers />} />
         <Route path="/mypage/mysolve" element={<Mysolve />} />
@@ -47,8 +51,10 @@ function App() {
         <Route path="/mypage/company_message" element={<CompanyMessage />} />
         <Route
           path="/solve/:workbookId"
-          element={<ReadWorkbook next={"QuestionsSolve"} />}
+          element={<ReadWorkbook nextAppName={"AnswerApp"} />}
         />
+        <Route path="/solved/:workbookId/:solved_count" element={<Solved />} />
+        <Route path="/error" element={<Error />} />
       </Routes>
     </Router>
   );
