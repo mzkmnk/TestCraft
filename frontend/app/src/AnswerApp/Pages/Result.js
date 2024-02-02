@@ -4,40 +4,47 @@ import { AnswerForms } from "../components/AnswerForms";
 import { useQuestions } from "../context/QuestionsContext";
 import { useAnswers } from "../context/AnswersContext";
 import { useAPI } from "../../hooks/useAPI";
-import { grade } from "../../grade";
+import { useGrade } from "../../hooks/useGrade";
 
 export default function Result({ exitFunc }) {
   const { questionTree, rootId } = useQuestions();
   const { answers } = useAnswers();
   const questionIds = questionTree[rootId].childIds;
-  // すべての問題数。questionIdsの長さではnestedに対応できない。
+  const saveAPI = useAPI({ APIName: "save_answer" });
 
   const { workbookId } = useParams();
-  const { correctIds, questionCount } = grade({
+  const { correctIds, questionCount, isFinished } = useGrade({
     questionTree,
     questionIds,
     answers,
   });
 
-  const reqData = {
-    workbook_id: Number(workbookId),
-    answers: JSON.stringify(answers),
-  };
+  useEffect(() => {
+    if (isFinished && saveAPI.isSuccess === null) {
+      const reqData = {
+        workbook_id: Number(workbookId),
+        answers: JSON.stringify(answers),
+        correctIds: correctIds,
+      };
+      saveAPI.sendAPI({
+        body: JSON.stringify(reqData),
+      });
+    }
+  }, [answers, correctIds, isFinished, saveAPI, workbookId]);
 
-  useAPI({
-    APIName: "save_answer",
-    body: JSON.stringify(reqData),
-    loadOnStart: true,
-  });
-
+  console.log("isSuccess", saveAPI.isSuccess ? "true" : "false");
   return (
     <>
-      <AnswerForms
-        exitFunc={exitFunc}
-        resultMode={true}
-        correctIds={correctIds}
-        questionCount={questionCount}
-      />
+      {saveAPI.isSuccess ? (
+        <AnswerForms
+          exitFunc={exitFunc}
+          resultMode={true}
+          correctIds={correctIds}
+          questionCount={questionCount}
+        />
+      ) : (
+        <div style={{ marginTop: 100, fontSize: 30 }}>採点中</div>
+      )}
     </>
   );
 }

@@ -141,7 +141,7 @@ export function useAPI({
         setIsLoading();
       }
     },
-    [APIName, navigate]
+    [APIName, isLoginRequired, navigate]
   );
 
   useEffect(() => {

@@ -1,18 +1,22 @@
-import React, { useEffect, useState,useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import UserHeader from "./UserHeader";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAPI } from "./hooks/useAPI";
 import Error from "./Error";
 import Loading from "./Loading";
 import { AnswerForms } from "./AnswerApp/components/AnswerForms";
-import { grade } from "./grade";
+import { useGrade } from "./hooks/useGrade";
 
 function Solved() {
   const [workbook, setWorkbook] = useState(undefined);
   const [answers, setAnswers] = useState(undefined);
+  const [correctIds, setCorrectIds] = useState([]);
   const navigate = useNavigate();
-  const { workbookId,solved_count } = useParams();
-  const params = useMemo(() => [workbookId, solved_count], [workbookId, solved_count]);
+  const { workbookId, solved_count } = useParams();
+  const params = useMemo(
+    () => [workbookId, solved_count],
+    [workbookId, solved_count]
+  );
   const API = useAPI({
     APIName: "solve_detail",
     params: params,
@@ -27,6 +31,8 @@ function Solved() {
       const data = API.data;
       setAnswers(data.user_answer);
       setWorkbook(JSON.parse(data.workbook));
+      setCorrectIds(data.correctIds);
+      console.log("data.correctIds", data.correctIds);
     }
   }, [API.data, API.isSuccess, navigate]);
 
@@ -40,25 +46,23 @@ function Solved() {
   const info = workbook.info;
   const questionTree = workbook.questions;
 
-  console.log(questionTree);
   const rootId = Object.keys(questionTree).find(
     (key) => questionTree[key].questionType === "root"
   );
-  const questionIds = questionTree[rootId].childIds;
 
-  const { correctIds, questionCount } = grade({
-    questionTree,
-    questionIds,
-    answers,
-  });
-
-  console.log(answers);
+  const questionCount = Object.keys(questionTree).filter(
+    (key) =>
+      questionTree[key].questionType !== "root" &&
+      questionTree[key].questionType !== "nested"
+  ).length;
 
   return (
     <>
       <UserHeader />
       <AnswerForms
-        exitFunc={() => {}}
+        exitFunc={() => {
+          navigate("/mypage");
+        }}
         resultMode={true}
         correctIds={correctIds}
         questionCount={questionCount}
