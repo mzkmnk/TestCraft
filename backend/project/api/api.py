@@ -153,7 +153,7 @@ def check_auth(request):
     if request.user.is_authenticated:
         return JsonResponse({"authenticated": True}, status=200)
     else:
-        return JsonResponse({"authenticated": False}, status=401)
+        return JsonResponse({"authenticated": False})
     
 # ログアウトするAPI
 @api.post("/logout")
