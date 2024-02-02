@@ -17,7 +17,8 @@ python .\backend\project\manage.py makemigrations &&^
 python .\backend\project\manage.py migrate
 
 echo "loading fixtures..."
-for %%f in (.\backend\project\api\fixture\*.json) do (
+for %%f in (.\backend\project\api\fixtures\*.json) do (
+    echo "loading %%f..."
     python .\backend\project\manage.py loaddata %%f
 )
 
