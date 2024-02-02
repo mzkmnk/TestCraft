@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { json, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -12,60 +12,76 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Alert from "@mui/material/Alert";
 
 import { useAPI } from './hooks/useAPI';
-import UserHeader from './UserHeader';
+
 
 const theme = createTheme();
 
-function ChangePassSend() {
+function ChangePass() {
     const [username, setUsername] = useState('');
-    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-
-    const navigate = useNavigate();
-
-    const url = 'http://localhost:3000/change_pass';//随時変更
-
-    const sendEmailAPI = useAPI({
-        APIName: 'change_pass_send',
-        isLoginRequired: false, 
+    const changeAPI = useAPI({
+        APIName: 'change_pass',
+        isLoginRequired: false,
     });
 
     useEffect(() => {
-        console.log(sendEmailAPI);
-        if(sendEmailAPI.isSuccess === true && sendEmailAPI.data.success === true){
+        if(changeAPI.isSuccess && changeAPI.data.success){
             console.log('Send succeeded');
-            console.log(sendEmailAPI.data);
-            console.log("hhhhhhh")
-            navigate('/login',{
-                state: {
-                    message: 'メールを送信しました。メールを確認してください。',
-                    severity: 'success',
-                }
-            });
-        }else if(sendEmailAPI.isSuccess === false){
-            setError("メール送信に失敗しました。ユーザ名かメールアドレスが違います。");
+        }else if(changeAPI.isSuccess === false){
+            setError("変更に失敗しました。ユーザネームが違います。");
             console.error('Send failed');
         }
-    },[sendEmailAPI.isSuccess,navigate]);
+    });
 
-    const handleSendEmail = async () => {
-        sendEmailAPI.sendAPI({
-            body: JSON.stringify({
-                'username': username,
-                'email': email,
-                'url': url,
-            }),
-        });
+    const handleChangePassword = async () => {
+        changeAPI.sendAPI({
+            body:
+            {
+            username: username,
+            password: password,
+            }
+        })
     };
+
+    // const handleChangePassword = async () => {
+    //     setError('');
+    //     try {
+    //         const response = await fetch('http://localhost:8000/api/change_pass', {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //             body: JSON.stringify(
+    //                 {
+    //                     'username': username,
+    //                     'password': password,
+    //                 }
+    //             ),
+    //             credentials: 'include',
+
+    //         });
+    //         const data = await response.json();
+    //         if (response.ok) {
+    //             console.log('Send succeeded');
+
+
+    //         } else {
+    //             setError("変更に失敗しました。ユーザネームが違います。");
+    //             console.error('Send failed');
+    //         }
+    //     } catch (error) {
+    //         setError("変更に失敗しました。ユーザネームが違います。");
+    //         console.error('Error during login:', error);
+    //     }
+    // };
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        handleSendEmail();
+        handleChangePassword();
     };
-
     return (
         <>
-            <UserHeader />
             <ThemeProvider theme={theme}>
                 <Container component="main" maxWidth="xs">
                     <CssBaseline />
@@ -81,7 +97,7 @@ function ChangePassSend() {
                             <LockOutlinedIcon />
                         </Avatar>
                         <Typography component="h1" variant="h5">
-                            パスワードを変更する
+                            パスワード変更画面
                         </Typography>
                         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
                             <TextField
@@ -100,13 +116,13 @@ function ChangePassSend() {
                                 margin="normal"
                                 required
                                 fullWidth
-                                name="email"
-                                label="Email"
-                                type="email"
-                                id="email"
-                                autoComplete="current-email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                name="password"
+                                label="Password"
+                                type="password"
+                                id="password"
+                                autoComplete="current-password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                             />
                             {error && (
                                 <Alert severity="error" sx={{ width: '100%' }}>
@@ -119,7 +135,7 @@ function ChangePassSend() {
                                 variant="contained"
                                 sx={{ mt: 3, mb: 2 }}
                             >
-                                メールアドレスを送信する
+                                パスワードを変更する
                             </Button>
                         </Box>
                     </Box>
@@ -129,5 +145,4 @@ function ChangePassSend() {
     );
 }
 
-export default ChangePassSend;
-
+export default ChangePass;

@@ -46,25 +46,6 @@ function ChangePass() {
             }),
         });
     };
-    // const handleChangePassword = async () => {
-    //     setError(' ');
-    //     is_check_API.sendAPI({
-    //         body: JSON.stringify({
-    //             'username': username,
-    //         }),
-    //     });
-    //     if (is_check_API.isSuccess) {
-    //         navigate('/mypage',{
-    //             state: {
-    //                 message: 'メールアドレス認証が完了しました。',
-    //                 severity: 'success',
-    //             },
-    //         });
-    //     } else {
-    //         setError('変更に失敗しました。ユーザネームが違います。');
-    //         console.error('Send failed');
-    //     }
-    // };
 
     const handleSubmit = (event) => {
         event.preventDefault();

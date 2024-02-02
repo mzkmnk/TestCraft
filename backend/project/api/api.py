@@ -254,7 +254,6 @@ def change_pass_send(request,payload:PassChangeSchema):
     send_email = payload.email
     verification_url = payload.url
     try:
-        
         rand_key = [random.choice(string.ascii_letters + string.digits) for i in range(10)]
         rand_key=str(rand_key)
         
@@ -262,12 +261,16 @@ def change_pass_send(request,payload:PassChangeSchema):
         
         user_object.key=rand_key
         user_object.save()
-        # if(Certification.objects.get(username=payload.username))
-        certification = Certification.objects.create(
-            key = rand_key,
-            username = payload.username,
-        )
-        certification.save()
+        if(Certification.objects.filter(username=payload.username).exists()):
+            certification_instance = Certification.objects.get(username=payload.username)
+            certification_instance.key = rand_key
+            certification_instance.save()
+        else:
+            certification = Certification.objects.create(
+                key = rand_key,
+                username = payload.username,
+            )
+            certification.save()
         
         subject = "パスワード変更画面"
         message = f"このメールは問題作成アプリのパスワード変更用メールです。\nパスワードを忘れた場合下記のURLをクリックしてメールアドレスを認証してください。\nこのメールに心当たりがない場合メールの削除をお願いいたします。\n{verification_url}"
@@ -281,9 +284,21 @@ def change_pass_send(request,payload:PassChangeSchema):
             ],
             fail_silently=False
         )
+        return JsonResponse(
+            {
+                "success":True,
+                "error":None,
+            }
+        )
     except Exception as e:
         print("Exception:",e)
-        return JsonResponse({"success":False, "message" : str(e) },status = 400)
+        return JsonResponse(
+            {
+                "success":False,
+                "error" : str(e)
+            },
+            status = 400
+        )
 
 #パスワードを変更するAPI
 @api.post("/change_pass")
@@ -298,8 +313,23 @@ def change_pass(request,payload :LoginSchema):
             user_object.set_password(payload.password)
             user_object.save()
         certification_instance.delete()
-    except ObjectDoesNotExist:
-        return JsonResponse({"success": False, "message": "ユーザーが見つかりませんでした。"}, status=400)
+        print("Ok")
+        return JsonResponse(
+            {
+                "success":True,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success": False,
+                "message": "ユーザーが見つかりませんでした。",
+                "error": str(e)
+            }, 
+            status=400
+        )
 
 #登録情報を変更するAPI
 @api.post("/user_change")
