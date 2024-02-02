@@ -10,5 +10,17 @@
       "is_public": true,
       "is_edit": true
     }
+  },
+  {
+    "model":"api.workbook",
+    "fields": {
+      "workbook_name": "「世界の首都」",
+      "description": "テスト問題です。",
+      "create_id": 2,
+      "created_at": "2024-01-04",
+      "updated_at": "2024-01-05",
+      "is_public": true,
+      "is_edit": true
+    }
   }
 ]

@@ -18,10 +18,8 @@ import { useAPI } from "./hooks/useAPI";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 
 const theme = createTheme();
-//　名前を空にできてしまうのを直す必要がある。
 function UserChange() {
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const API = useAPI({
@@ -33,7 +31,6 @@ function UserChange() {
     if (API.isSuccess === false) {
       navigate("/error");
     } else if (API.isSuccess === true) {
-      localStorage.setItem("username", API.data.username);
       navigate("/mypage", {
         state: {
           message: `ユーザ情報を変更しました`,
@@ -45,7 +42,7 @@ function UserChange() {
 
   const handleChange = async () => {
     API.sendAPI({
-      body: JSON.stringify({ username: username, password: password }),
+      body: JSON.stringify({ password: password }),
     });
   };
 
@@ -91,18 +88,6 @@ function UserChange() {
                 margin="normal"
                 required
                 fullWidth
-                id="username"
-                label="Username"
-                name="username"
-                autoComplete="username"
-                autoFocus
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-              />
-              <TextField
-                margin="normal"
-                required
-                fullWidth
                 name="password"
                 label="Password"
                 type="password"
@@ -111,10 +96,6 @@ function UserChange() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              {/* <FormControlLabel
-                    control={<Checkbox value="remember" color="primary" />}
-                    label="Remember me"
-                /> */}
               <Button
                 type="submit"
                 fullWidth

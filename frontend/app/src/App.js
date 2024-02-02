@@ -17,6 +17,10 @@ import SendMessage from "./SendMessage.js";
 import AddUser from "./add_user.js";
 import UserChange from "./user_change.js";
 import ReadWorkbook from "./ReadWorkbook.js";
+import EmailVerification from "./email_verification";
+import ChangePassSend from "./change_pass_send";
+import ChangePass from "./change_pass";
+
 import Error from "./Error.js";
 
 function App() {
@@ -30,6 +34,9 @@ function App() {
         <Route path="/questionsAll" element={<QuestionsAll />} />
         <Route path="/user_change" element={<UserChange />} />
         <Route path="/editor" element={<Editor />} />
+        <Route path="/email_verification" element={<EmailVerification />}/>
+        <Route path='/change_pass_send' element={<ChangePassSend />}/>
+        <Route path='/change_pass' element={<ChangePass />}/>
 
         <Route
           path="/editor/:workbookId"
