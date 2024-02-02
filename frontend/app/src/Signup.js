@@ -42,11 +42,12 @@ function Signup() {
         },
       });
     }
-  }, [checkAuthAPI.data, navigate]);
+  }, [checkAuthAPI.data.authenticated, checkAuthAPI.isSuccess, navigate]);
 
   // signupAPIの終了に反応するuseEffect。
+  // usernameとpasswordが変更されるたびに呼び出されてしまう。
   useEffect(() => {
-    if (signupAPI.isSuccess === true) {
+    if (signupAPI.isSuccess === true && loginAPI.isLoading === null) {
       loginAPI.sendAPI({
         body: JSON.stringify({
           username: username,
