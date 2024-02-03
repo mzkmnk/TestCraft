@@ -30,8 +30,6 @@ export function useGrade({ questionTree, questionIds, answers }) {
   // ここでAI採点を行う。
   useEffect(() => {
     console.log("aIScoringQuestionIds", aIScoringQuestionIds);
-    console.log("questionTree", questionTree);
-    console.log("questionTree type",typeof questionTree);
     AIAPI.sendAPI({
       body: JSON.stringify(
         {
