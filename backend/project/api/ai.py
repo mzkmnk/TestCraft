@@ -1,7 +1,17 @@
 import openai
 import json
+from dotenv import load_dotenv
+from pathlib import Path
+import os
 
-openai.api_key = "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"#あとで修正
+current_path = Path(__file__).resolve().parent
+print("current_path:", current_path)
+load_dotenv(dotenv_path=current_path / "key.env")
+
+print(os.getenv("KEY"))
+
+
+openai.api_key = os.getenv("KEY")
 
 def check_answer(
         question_text:str,
@@ -11,21 +21,32 @@ def check_answer(
     ) -> list[bool]:
     
     results = []
-
+    print(f"{question_text=}")
+    print(f"{questions=}")
+    print(f"{user_answers=}")
+    print(f"{correct_answers=}")
     for q, user_answer, correct_answer in zip(questions, user_answers, correct_answers):
+        print(f"{q=}")
+        print(f"{user_answer=}")
+        print(f"{correct_answer=}")
         prompt = f"""
+        あなたは先生です。問題文、問題、ユーザの解答、正解を比べて正解かどうかを判断してください。
         問題文: {question_text}
         問題: {q}
-        ユーザーの解答: {user_answer}
-        この解答は正しいですか？
+        ユーザの解答: {user_answer}
+        正解: {correct_answer}
+        この'ユーザの解答'は'正解'と同じですか？
         正解の確率を0~100%の範囲で答えてください。
+        ユーザーの解答が、ユーザは解答していません。という場合はユーザは解答していません。
+        また記述式のため、ニュアンスや表現の違いがある場合でも、同じような意味であれば正解としてください。
         なぜ間違ってるかを説明してください。
         また返答はjson形式だけでお願いします。
+        is_correctはtrueかfalseで、confidenceは0~100の間で、explanationは説明を書いてください。
         例:
             {{
             "is_correct": true,
             "confidence": 100,
-            "explanation": "東京は正解です。"
+            "explanation": "正解です。"
             }}
         """
 
@@ -48,10 +69,10 @@ def check_answer(
 
 
 # 使用例
-question_text = """次の文章を読み、正しい都道府県名を答えてください。"""
-question = ["日本の首都は(1)です。","また(1)を英語で書くと(2)です。"]
-user_answer = ["東京", "Tkyo"]
-correct_answer = ["東京", "Tokyo"]
+question_text = """次の文章を読み、問題に答えてください。"""
+question = ["エジプトの首都は(1)です。","また(1)を英語で書くと(2)です。"]
+user_answer = ["かいろ", "Kairo"]
+correct_answer = ["カイロ", "Cairo"]
 
 
 # is_correct = check_answer(question_text,question, user_answer, correct_answer)
