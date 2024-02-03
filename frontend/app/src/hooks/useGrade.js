@@ -48,11 +48,14 @@ export function useGrade({ questionTree, questionIds, answers }) {
   return { isFinished, correctIds, questionCount };
 }
 
+// ネスト問題のすべての問題文を取得。
 function getAllQuestion(questionTree, id) {
   let questions = [questionTree[id].question];
+  let currentId = questionTree[id].parentId;
   while (true) {
-    if (questionTree[questionTree[id].parent_id] === "nested") {
-      questions.push(questionTree[questionTree[id].parent_id].question);
+    if (questionTree[currentId].questionType === "nested") {
+      questions.push(questionTree[currentId].question);
+      currentId = questionTree[currentId].parentId;
     } else {
       break;
     }
