@@ -1,49 +1,80 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export function useGrade({ questionTree, questionIds, answers }) {
   const [correctIds, setCorrectIds] = useState([]);
   const [isFinished, setIsFinished] = useState(false);
   const [questionCount, setQuestionCount] = useState(0);
 
+  const [isAIScoringFinished, setIsAIScoringFinished] = useState(null);
+  const [correctIdsByAI, setCorrectIdsByAI] = useState([]);
+
+  // AI採点を行う問題のIDを取得する。
+  const aIScoringQuestionIds = useMemo(() => {
+    const ids = [];
+    Object.keys(questionTree).forEach((id) => {
+      if (questionTree[id].useAIScoring === true) {
+        ids.push(id);
+      }
+    });
+    return ids;
+  }, [questionTree]);
+
+  // ここでAI採点を行う。
   useEffect(() => {
-    let newQuestionCount = 0;
-    let newCorrectIds = [];
+    console.log("aIScoringQuestionIds", aIScoringQuestionIds);
+    setCorrectIdsByAI([]);
+    setIsAIScoringFinished(true);
+  }, [aIScoringQuestionIds]);
 
-    const grade = (questionIds) => {
-      for (const id of questionIds) {
-        if (questionTree[id].questionType === "nested") {
-          grade(questionTree[id].childIds, id);
-          continue;
-        }
+  useEffect(() => {
+    if (isAIScoringFinished === true && isFinished === false) {
+      let newQuestionCount = 0;
+      let newCorrectIds = [];
 
-        newQuestionCount += 1;
+      const grade = (questionIds) => {
+        for (const id of questionIds) {
+          if (questionTree[id].questionType === "nested") {
+            grade(questionTree[id].childIds, id);
+            continue;
+          }
 
-        const answer = answers[id];
-        if (answer === undefined) {
-          continue;
-        }
+          newQuestionCount += 1;
 
-        // AI採点の場合
-        if (questionTree[id].useAIScoring === true) {
-          console.log(getAllQuestion(questionTree, id));
-        }
+          const answer = answers[id];
+          if (answer === undefined) {
+            continue;
+          }
 
-        const correctObjArray = questionTree[id].answers;
-        for (const correctObj of correctObjArray) {
-          if (correctObj.value === answer) {
-            newCorrectIds.push(id);
-            break;
+          // AI採点の場合
+          if (questionTree[id].useAIScoring === true) {
+            continue;
+          }
+
+          const correctObjArray = questionTree[id].answers;
+          for (const correctObj of correctObjArray) {
+            if (correctObj.value === answer) {
+              newCorrectIds.push(id);
+              break;
+            }
           }
         }
-      }
-    };
+      };
 
-    grade(questionIds);
+      grade(questionIds);
 
-    setQuestionCount(newQuestionCount);
-    setCorrectIds(newCorrectIds);
-    setIsFinished(true);
-  }, [questionTree, questionIds, answers, questionCount]);
+      setQuestionCount(newQuestionCount);
+      setCorrectIds(...correctIdsByAI, newCorrectIds);
+      setIsFinished(true);
+    }
+  }, [
+    questionTree,
+    questionIds,
+    answers,
+    questionCount,
+    isAIScoringFinished,
+    isFinished,
+    correctIdsByAI,
+  ]);
 
   return { isFinished, correctIds, questionCount };
 }

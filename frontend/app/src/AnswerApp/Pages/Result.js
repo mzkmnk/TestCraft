@@ -32,7 +32,6 @@ export default function Result({ exitFunc }) {
     }
   }, [answers, correctIds, isFinished, saveAPI, workbookId]);
 
-  console.log("isSuccess", saveAPI.isSuccess ? "true" : "false");
   return (
     <>
       {saveAPI.isSuccess ? (
