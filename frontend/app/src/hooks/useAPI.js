@@ -29,6 +29,7 @@ const APIs = {
   email_verification: `${urlBase}/email_verification`,
   change_pass_send: `${urlBase}/change_pass_send`,
   change_pass: `${urlBase}/change_pass`,
+  ai_scoring: `${urlBase}/ai_scoring`,
 };
 
 /**

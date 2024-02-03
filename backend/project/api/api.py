@@ -118,11 +118,16 @@ class PassChangeSchema(Schema):
     url:str
     email:str
     username:str
-# API
+
+class AiScore(BaseModel):
+    question_tree:Dict[str,Question]
+    target_answer:List[str]
+
+# APIz
 # ユーザー登録するAPI
 @api.post("/signup")
 def signup(request, payload: SignUpSchema):
-    try:  
+    try:
         user = User.objects.create_user(
             username = payload.username,
             email = payload.email,
@@ -797,6 +802,7 @@ def message(request):
             status = 400,
         )
 
+# 会社のユーザかどうかを確認するAPI
 @api.get("/get_company_user")
 def get_company_user(request):
     try:
@@ -836,7 +842,8 @@ def get_company_user(request):
             },
             status = 400,
         )
-    
+
+# メッセージを送信するAPI 
 @api.post("/send_message")
 def send_messsage(request,payload:MessageSchema):
     try:
@@ -873,6 +880,7 @@ def send_messsage(request,payload:MessageSchema):
             status = 400,
         )
 
+# 会社のユーザかどうかを確認するAPI
 @api.get("is_company_user")
 def is_company_user(request):
     try:
@@ -905,6 +913,7 @@ def is_company_user(request):
             status = 400,
         )
 
+# 会社のユーザーを取得するAPI
 @api.get("/all_company_users")
 def all_users(request):
     try:
@@ -930,6 +939,38 @@ def all_users(request):
             {
                 "success":False,
                 "data":None,
+                "error":str(e),
+            },
+            status = 400,
+        )
+
+# AI採点を行うAPI
+# わかりにくいからここでai.pyをimportしている。
+from .ai import check_answer
+@api.post("/ai_scoring")
+def ai_score(request,payload:AiScore):
+    try:
+        question_trees = payload.question_tree
+        target_answers = payload.target_answer
+        print("="*20)
+        print(f"{question_trees=}")
+        print("="*20)
+        print(f"{target_answers=}")
+        print("="*20)
+        for target_answer in target_answers:
+            print(question_trees[target_answer])
+            print(type(question_trees[target_answer]))
+        return JsonResponse(
+            {
+                "success":True,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
                 "error":str(e),
             },
             status = 400,

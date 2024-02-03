@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
+import { useAPI } from "./useAPI";
+
 export function useGrade({ questionTree, questionIds, answers }) {
   const [correctIds, setCorrectIds] = useState([]);
   const [isFinished, setIsFinished] = useState(false);
@@ -7,6 +9,12 @@ export function useGrade({ questionTree, questionIds, answers }) {
 
   const [isAIScoringFinished, setIsAIScoringFinished] = useState(null);
   const [correctIdsByAI, setCorrectIdsByAI] = useState([]);
+
+  const AIAPI = useAPI(
+    {
+      APIName: "ai_scoring",
+    }
+  );
 
   // AI採点を行う問題のIDを取得する。
   const aIScoringQuestionIds = useMemo(() => {
@@ -22,6 +30,16 @@ export function useGrade({ questionTree, questionIds, answers }) {
   // ここでAI採点を行う。
   useEffect(() => {
     console.log("aIScoringQuestionIds", aIScoringQuestionIds);
+    console.log("questionTree", questionTree);
+    console.log("questionTree type",typeof questionTree);
+    AIAPI.sendAPI({
+      body: JSON.stringify(
+        {
+          question_tree : questionTree,
+          target_answer : aIScoringQuestionIds,
+        }
+      )
+    })
     setCorrectIdsByAI([]);
     setIsAIScoringFinished(true);
   }, [aIScoringQuestionIds]);
