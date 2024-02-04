@@ -62,7 +62,7 @@ export default function AnswersApp({ workbook }) {
 
   return (
     <>
-      <UserHeader position="fixed" />
+      <UserHeader />
       {isSettingsOpen ? (
         <SettingsModal
           exitFunc={startInputAnswers}

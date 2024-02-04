@@ -11,3 +11,5 @@ db.sqlite3
 desktop.ini
 
 mac_env.sh
+
+key.env

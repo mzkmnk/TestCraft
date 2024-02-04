@@ -69,10 +69,8 @@ export function AnswerForms({
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
-          height: "100vh",
           width: "100%",
         }}
-        position={"fixed"}
       >
         <Box
           sx={{

@@ -5,7 +5,7 @@ import { AnswerForms } from "../components/AnswerForms";
 export function InputAnswers({ exitFunc, time }) {
   return (
     <>
-      <Box sx={{ marginTop: 10, position: "absolute", right: 10 }}>
+      <Box sx={{ position: "absolute", right: 10 }}>
         <Typography>
           {time.minutes}分{time.seconds}秒
         </Typography>

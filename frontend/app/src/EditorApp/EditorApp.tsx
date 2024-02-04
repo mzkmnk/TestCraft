@@ -14,6 +14,9 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { SwitchableTextField } from "./SwitchableTextField";
 import { useAPI } from "../hooks/useAPI";
+import Switch from "@mui/material/Switch";
+import FormGroup from "@mui/material/FormGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
 
 const theme = createTheme({
   palette: {
@@ -60,13 +63,9 @@ interface TextareaQuestion {
   parentId: string;
   question: string;
   maxlength: string;
+  useAIScoring: boolean;
   answers: { id: Id; value: string }[];
 }
-
-type JsonFormat = {
-  info: {}; //未定
-  questions: QuestionTree;
-};
 
 const createId = () =>
   new Date().getTime().toString(32) + Math.random().toString(32);
@@ -91,7 +90,7 @@ export default function EditorApp({ workBook }) {
   const [title, setTitle] = useState(workBook.info.title);
   const navigate = useNavigate();
   const saveAPI = useAPI({ APIName: "save_data" });
-  const {workbookId} = useParams();
+  const { workbookId } = useParams();
 
   useEffect(() => {
     if (saveAPI.isSuccess === true) {
@@ -111,7 +110,7 @@ export default function EditorApp({ workBook }) {
     workBook = {
       info: {
         title: title,
-        workbook_id:workbookId,
+        workbook_id: workbookId,
       },
       questions: questionTree,
     };
@@ -301,7 +300,62 @@ export default function EditorApp({ workBook }) {
         },
       });
     }
-    console.log(changedQuestion);
+  }
+
+  function handleChangeBool(
+    updatedValue: boolean,
+    changedQuestionId: Id,
+    changedPropertyName: string,
+    changedId: string | undefined = undefined
+  ) {
+    const changedQuestion = questionTree[changedQuestionId];
+
+    if (
+      changedId !== undefined &&
+      changedPropertyName === "options" &&
+      changedQuestion.questionType === "radio"
+    ) {
+      setQuestionTree({
+        ...questionTree,
+        [changedQuestionId]: {
+          ...changedQuestion,
+          options: [
+            ...changedQuestion.options.map((option) =>
+              option.id === changedId
+                ? { id: option.id, value: updatedValue }
+                : option
+            ),
+          ],
+        },
+      });
+    } else if (
+      changedId !== undefined &&
+      changedPropertyName === "answers" &&
+      (changedQuestion.questionType === "textarea" ||
+        changedQuestion.questionType === "radio")
+    ) {
+      setQuestionTree({
+        ...questionTree,
+        [changedQuestionId]: {
+          ...changedQuestion,
+          answers: [
+            ...changedQuestion.answers.map((answers) =>
+              answers.id === changedId
+                ? { id: answers.id, value: updatedValue }
+                : answers
+            ),
+          ],
+        },
+      });
+    } else {
+      setQuestionTree({
+        ...questionTree,
+        [changedQuestionId]: {
+          ...questionTree[changedQuestionId],
+          [changedPropertyName]: updatedValue,
+        },
+      });
+    }
   }
 
   // QuestionTypeを変更たびにidも変えないと、muiからstateに登録していないものが変更されていると警告がでる。
@@ -349,6 +403,7 @@ export default function EditorApp({ workBook }) {
         parentId: parentId,
         question: updatedQuestion.question || "",
         maxlength: "60",
+        useAIScoring: false,
         answers: [],
       };
     } else {
@@ -358,6 +413,7 @@ export default function EditorApp({ workBook }) {
         parentId: parentId,
         question: updatedQuestion.question || "",
         maxlength: "60",
+        useAIScoring: false,
         answers: [],
       };
     }
@@ -464,6 +520,7 @@ export default function EditorApp({ workBook }) {
                 handleRemoveQuestion={handleRemoveQuestion}
                 handleChangeText={handleChangeText}
                 handleSelectQuestionType={handleSelectQuestionType}
+                handleChangeBool={handleChangeBool}
               />
             </Paper>
           ))}
@@ -497,6 +554,12 @@ interface Props {
     updateQuestionId: Id,
     parentId: Id
   ) => void;
+  handleChangeBool: (
+    updatedValue: boolean,
+    changedQuestionId: Id,
+    changedPropertyName: string,
+    changedId?: string | undefined
+  ) => void;
 }
 
 function QuestionEditor({
@@ -511,6 +574,7 @@ function QuestionEditor({
   handleRemoveQuestion,
   handleChangeText,
   handleSelectQuestionType,
+  handleChangeBool,
 }: Props) {
   const displayQuestion = questionTree[questionId];
 
@@ -595,6 +659,7 @@ function QuestionEditor({
               handleRemoveQuestion={handleRemoveQuestion}
               handleChangeText={handleChangeText}
               handleSelectQuestionType={handleSelectQuestionType}
+              handleChangeBool={handleChangeBool}
             />
           </Box>
         ))}
@@ -685,7 +750,7 @@ function QuestionEditor({
           onChange={(event) => {
             handleChangeText(event.target.value, questionId, "maxlength");
           }}
-          sx={{ marginLeft: 1 }}
+          sx={{ marginLeft: 1, marginBottom: 1 }}
         ></TextField>
       </>
     );
@@ -696,6 +761,23 @@ function QuestionEditor({
         {questionField}
         {maxlengthField}
         {answersField}
+        <FormGroup>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={displayQuestion.useAIScoring}
+                onChange={(e) => {
+                  handleChangeBool(
+                    !displayQuestion.useAIScoring,
+                    questionId,
+                    "useAIScoring"
+                  );
+                }}
+              />
+            }
+            label="AI採点"
+          />
+        </FormGroup>
       </Box>
     );
   }
