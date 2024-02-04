@@ -960,10 +960,10 @@ def ai_score(request,payload:AiScore):
                             correct_answers.append(bef_answer[start:end])
                         check_answer_data = check_answer(question_text,questions,user_answers,correct_answers) 
 
-                        for data in check_answer_data:
+                        for i,data in enumerate(check_answer_data):
                             results.append(
                                 {
-                                    "id":childIds_parent,
+                                    "id":child_keys[i],
                                     "is_correct":data["is_correct"],
                                     "confidence":data["confidence"],
                                     "explanation":data["explanation"],
@@ -976,10 +976,10 @@ def ai_score(request,payload:AiScore):
                     print("No childIds child")
         else:
             print("No childIds parent")
-        print("results",results)
         return JsonResponse(
             {
                 "success":True,
+                "results":results,
                 "error":None,
             },
             status = 200,
