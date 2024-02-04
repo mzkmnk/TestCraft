@@ -931,10 +931,36 @@ from .ai import check_answer
 @api.post("/ai_scoring")
 def ai_score(request,payload:AiScore):
     try:
+
         question_trees = payload.question_tree
         target_answers = payload.target_answer
         answers = payload.answers
         question_keys = list(question_trees.keys())
+
+        debug = True#ここ変更するとデバックデータを返す。
+
+        if(debug):
+            from random import choice
+            debug_results = []
+            for target_answer in target_answers:
+                is_correct = choice([True,False])
+                debug_results.append(
+                    {
+                        "id":target_answer,
+                        "is_correct":is_correct,
+                        "confidence":100,
+                        "explanation":f"{'正解' if is_correct else '不正解'}です。(デバックデータです。)",
+                    }
+                )
+            print(debug_results)
+            return JsonResponse(
+                {
+                    "success":True,
+                    "results":debug_results,
+                    "error":None,
+                },
+                status = 200,
+            )
         results = []
         print("question_trees",question_trees[question_keys[0]])
         if(hasattr(question_trees[question_keys[0]],"childIds")):
