@@ -126,7 +126,7 @@ class AiScore(BaseModel):
     target_answer:List[str]
 
 class FollowSchema(Schema):
-    follow:bool
+    isFollow:bool
     userId:str
 
 # API
@@ -347,14 +347,14 @@ def change_pass(request,payload :LoginSchema):
 def profile(request,userId:int):
     try:
         user = User.objects.get(id=userId)
-        is_following = Follow.objects.filter(follower=request.user,following=user).exists()
+        isFollow = Follow.objects.filter(follower=request.user,following=user).exists()
         return JsonResponse(
             {
                 "success":True,
                 "username":user.username,
                 "email":user.email,
                 "school":user.school,
-                "isFollow":is_following,
+                "isFollow":isFollow,
                 "error":None,
             },
             status = 200,
@@ -374,23 +374,19 @@ def profile(request,userId:int):
 @api.post("/follow")
 def follow(request,payload:FollowSchema):
     try:
-        """
-        is_followがTrueならフォロー状態、Falseならアンフォロー状態
-        初期値をFalseにしているのは、フォローしていない状態をデフォルトにするため。
-        """
-        is_follow = payload.follow
+        isFollow = payload.isFollow
         userId = int(payload.userId)
-        if is_follow==False:#フォローする
+        if isFollow==False:#フォローする
             Follow.objects.get_or_create(follower=request.user,following=User.objects.get(id=userId))
-            is_follow = True
+            isFollow = True
         else:#アンフォローする
             Follow.objects.filter(follower=request.user, following=User.objects.get(id=userId)).delete()
-            is_follow = False
-        print(f"{is_follow}")
+            isFollow = False
+        print(f"{isFollow=}")
         return JsonResponse(
             {
                 "success":True,
-                "is_follow":is_follow,
+                "isFollow":isFollow,
             },
             status = 200,
         )

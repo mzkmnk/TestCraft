@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useNavigate,useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import {
   MDBCol,
@@ -13,19 +13,19 @@ import {
 
 import UserHeader from "./UserHeader";
 import { useAPI } from "./hooks/useAPI";
+import { set } from 'date-fns';
 
 
 export default function ProfilePage() {
     const [username, setUsername] = React.useState('');
     const [userSchool, setUserSchool] = React.useState('');
-    const [isFollow , setIsFollow] = React.useState(false);
+    const [isFollow , setIsFollow] = React.useState(Boolean );
     const { userId } = useParams();
 
     const getProfileAPI = useAPI(
         {
             APIName:'profile',
             params: userId,
-            isLoginRequired: true,
             loadOnStart: true,
         }
     );
@@ -41,7 +41,6 @@ export default function ProfilePage() {
         if(getProfileAPI.isSuccess){
             const data = getProfileAPI.data;
             if(data.success){
-                console.log(data);
                 setUsername(data.username);
                 setIsFollow(data.isFollow);
                 if(data.school === null){
@@ -49,37 +48,41 @@ export default function ProfilePage() {
                 }
                 else{
                     setUserSchool(data.school);
-                    followAPI.sendAPI({
-                        body: JSON.stringify(
-                            {
-                                follow:isFollow,
-                                userId: userId,
-                            }
-                        )
-                    });
                 }
             }else{
-                console.log("api error")
+                console.error(data.error);
             }
         }else{
-            console.log("useAPI error");
+            console.error("useAPI error");
         }
-    },[getProfileAPI.isSuccess, getProfileAPI.data,userId]);
+    },[getProfileAPI.isSuccess]);
 
     useEffect(() => {
-        if(followAPI.isSuccess && followAPI.data.success){
-            console.log(followAPI.data);
-            setIsFollow(!isFollow);
-        }else{
-            console.log(followAPI.error);
+        if(followAPI.isSuccess){
+            if(followAPI.data.success){
+                setIsFollow(!isFollow);
+            }else{
+                console.error(followAPI.data.error);
+            }
         }
-    },[followAPI.isSuccess, followAPI.data, followAPI.error]);
+        // else{
+        //     console.error("useAPI error");
+        //     profile.tsx:69 useAPI error 
+        //     at ProfilePage (http://localhost:3000/static/js/bundle.js:8508:80)
+        //     at RenderedRoute (http://localhost:3000/static/js/bundle.js:174646:5)
+        //     at Routes (http://localhost:3000/static/js/bundle.js:175337:5)
+        //     at Router (http://localhost:3000/static/js/bundle.js:175271:15)
+        //     at BrowserRouter (http://localhost:3000/static/js/bundle.js:173243:5)
+        //     at App
+        //     このようなエラーが出てるから後で確認
+        // }
+    },[followAPI.isSuccess,followAPI.data.isFollow]);
 
-    const handleFollow = async () => {
+    const handleFollow = () => {
         followAPI.sendAPI({
             body: JSON.stringify(
                 {
-                    follow:isFollow,
+                    isFollow:isFollow,
                     userId: userId,
                 }
 

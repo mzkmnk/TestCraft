@@ -20,7 +20,7 @@ import EmailVerification from "./email_verification";
 import ChangePassSend from "./change_pass_send";
 import ChangePass from "./change_pass";
 import ChangeProfilePage from "./ChangeProfile.tsx";
-import ProfilePage from "./Profile.tsx";
+import ProfilePage from "./profile.tsx";
 
 import Error from "./Error.js";
 
