@@ -20,6 +20,7 @@ import ReadWorkbook from "./ReadWorkbook.js";
 import EmailVerification from "./email_verification";
 import ChangePassSend from "./change_pass_send";
 import ChangePass from "./change_pass";
+import ProfilePage from "./profile.tsx";
 
 import Error from "./Error.js";
 
@@ -30,6 +31,9 @@ function App() {
         <Route path="/" element={<TopPage />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/mypage" element={<MyPage />} />
+
+        <Route path="/profile" element={<ProfilePage />} />
+
         <Route path="/signup" element={<Signup />} />
         <Route path="/questionsAll" element={<QuestionsAll />} />
         <Route path="/user_change" element={<UserChange />} />
