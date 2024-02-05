@@ -117,11 +117,17 @@ class PassChangeSchema(Schema):
     url:str
     email:str
     username:str
-# API
+
+class AiScore(BaseModel):
+    question_tree:Dict[str,Question]
+    answers:Dict[str,Union[str,int]]
+    target_answer:List[str]
+
+# APIz
 # ユーザー登録するAPI
 @api.post("/signup")
 def signup(request, payload: SignUpSchema):
-    try:  
+    try:
         user = User.objects.create_user(
             username = payload.username,
             email = payload.email,
@@ -187,20 +193,14 @@ def send_email(request,payload:PassChangeSchema):
     try:
         rand_key = [random.choice(string.ascii_letters + string.digits) for i in range(10)]
         rand_key=str(rand_key)
-        print(rand_key)
-        
         user_object = User.objects.get(username=payload.username)
-        print(user_object)
-        
         user_object.key=rand_key
         user_object.save()
-
         certification = Certification.objects.create(
             key = rand_key,
             username = payload.username,
         )
         certification.save()
-        
         subject = "メールアドレス認証"
         message = f"このメールは問題作成アプリ新規登録用です。\n新規登録をお済でない場合下記のURLをクリックしてメールアドレスを認証してください。\nこのメールに心当たりがない場合メールの削除をお願いいたします。\n{verification_url}"
         from_email = "testcrarts.official@gmail.com"
@@ -214,7 +214,6 @@ def send_email(request,payload:PassChangeSchema):
             fail_silently=False
         )
     except Exception as e:
-        print(e)
         return JsonResponse({"success":False, "message" : str(e) },status = 400)
 
 #メールアドレス認証を完了するAPI
@@ -292,7 +291,6 @@ def change_pass_send(request,payload:PassChangeSchema):
             }
         )
     except Exception as e:
-        print("Exception:",e)
         return JsonResponse(
             {
                 "success":False,
@@ -392,7 +390,6 @@ def questionsall(request):
             liked_by_user = Like.objects.filter(user=request.user, workbook_id=workbook['id']).exists()
             workbook['liked_by_user'] = liked_by_user
             workbooks_with_likes.append(workbook)
-        print(workbooks_with_likes)
         return JsonResponse(
             {
                 'success':True,
@@ -470,8 +467,6 @@ def add_user(request ,payload:CsvUploadSchema):
             
             df.at[index, 'ユーザー名'] = user_name
         user_csv=df.to_csv(index=False)
-        print(user_csv)
-        
         return JsonResponse(
             {
                 "success":True,
@@ -648,7 +643,6 @@ def add_like(request,workbookId:int):
 @api.post("/save_answer")
 def save_answer(request,payload:SaveAnswerSchema):
     try:
-        print(payload)
         workbook_id = payload.workbook_id
         is_user_count_answer = UserCountAnswer.objects.filter(user = request.user, workbook = Workbook.objects.get(id = workbook_id))
         solved_count = 0
@@ -720,7 +714,6 @@ def solve_workbook(request):
                 **user_answer,
                 'categories': list(categories)
             })
-        print(user_answers_with_categories)
         return JsonResponse(
             {
                 'success' : True,
@@ -740,10 +733,8 @@ def solve_workbook(request):
 @api.get("/solve_detail/{workbookId}/{solved_count}")
 def solve_detail(request,workbookId:int,solved_count:int):
     try:
-        print(workbookId,solved_count)
         workbook = Workbook.objects.get(id = workbookId)
         user_answer = UserAnswer.objects.get(user = request.user, workbook = workbook, solved_count = solved_count)
-        print("ok")
         problem = Problem.objects.get(workbook_id = workbookId).problem_json
         return JsonResponse(
             {
@@ -776,7 +767,6 @@ def message(request):
             }
             for i,data in enumerate(Message.objects.filter(receiver = request.user).order_by('-timestamp'))
         ]
-        print(f"{request.user.is_company_user = }")
         return JsonResponse(
             {
                 "success":True,
@@ -796,6 +786,7 @@ def message(request):
             status = 400,
         )
 
+# 会社のユーザかどうかを確認するAPI
 @api.get("/get_company_user")
 def get_company_user(request):
     try:
@@ -814,8 +805,6 @@ def get_company_user(request):
             }
             for _i,workbook in enumerate(Workbook.objects.filter(create_id = request.user))
         ]
-        print(workbooks)
-        print(company_user)
         return JsonResponse(
             {
                 "success":True,
@@ -835,7 +824,8 @@ def get_company_user(request):
             },
             status = 400,
         )
-    
+
+# メッセージを送信するAPI 
 @api.post("/send_message")
 def send_messsage(request,payload:MessageSchema):
     try:
@@ -846,7 +836,6 @@ def send_messsage(request,payload:MessageSchema):
         for workbook in workbooks:
             workbook_id,workbook_name = workbook.split(':')
             workbook_dict[workbook_id] = workbook_name
-        print(workbook_dict)
         for user in users:
             user_id,_username = user.split(':')
             Message.objects.create(
@@ -872,6 +861,7 @@ def send_messsage(request,payload:MessageSchema):
             status = 400,
         )
 
+# 会社のユーザかどうかを確認するAPI
 @api.get("is_company_user")
 def is_company_user(request):
     try:
@@ -904,6 +894,7 @@ def is_company_user(request):
             status = 400,
         )
 
+# 会社のユーザーを取得するAPI
 @api.get("/all_company_users")
 def all_users(request):
     try:
@@ -915,7 +906,6 @@ def all_users(request):
             }
             for user in User.objects.filter(company=request.user.company)
         ]
-        print(data)
         return JsonResponse(
             {
                 "success":True,
@@ -929,6 +919,101 @@ def all_users(request):
             {
                 "success":False,
                 "data":None,
+                "error":str(e),
+            },
+            status = 400,
+        )
+
+# AI採点を行うAPI
+# わかりにくいからここでai.pyをimportしている。
+from .ai import check_answer
+@api.post("/ai_scoring")
+def ai_score(request,payload:AiScore):
+    try:
+
+        question_trees = payload.question_tree
+        target_answers = payload.target_answer
+        answers = payload.answers
+        question_keys = list(question_trees.keys())
+
+        debug = True#ここ変更するとデバックデータを返す。
+
+        if(debug):
+            from random import choice
+            debug_results = []
+            for target_answer in target_answers:
+                is_correct = choice([True,False])
+                debug_results.append(
+                    {
+                        "id":target_answer,
+                        "is_correct":is_correct,
+                        "confidence":100,
+                        "explanation":f"{'正解' if is_correct else '不正解'}です。(デバックデータです。)",
+                    }
+                )
+            print(debug_results)
+            return JsonResponse(
+                {
+                    "success":True,
+                    "results":debug_results,
+                    "error":None,
+                },
+                status = 200,
+            )
+        results = []
+        print("question_trees",question_trees[question_keys[0]])
+        if(hasattr(question_trees[question_keys[0]],"childIds")):
+            for childIds_parent in question_trees[question_keys[0]].childIds:
+                if(hasattr(question_trees[childIds_parent],"childIds")):
+                    child_keys = list(question_trees[childIds_parent].childIds)
+                    if(any( child_key in target_answers for child_key in child_keys )):
+                        print(question_trees[childIds_parent])
+                        print("questions : ",question_trees[child_keys[0]])
+                        question_text : str = question_trees[childIds_parent].question
+                        questions : list[str] = [ question_trees[child_key].question for child_key in child_keys ]
+                        user_answers : list[str] = [ answers.get(child_key,'ユーザは解答していません。') for child_key in child_keys ]#ユーザが解答してない場合、空文字を返す。
+                        """
+                        現状正解データがstr型であるので構文解析っぽい感じで正解データを取得する必要がある。
+                        形式 : [Answer(id='<id>', value='<正解データ>')]
+                        そのため、value='を区切り文字として正解データを取得する。
+                        """
+                        correct_answers : list[str] = []
+                        for child_key in child_keys:
+                            bef_answer = str(question_trees[child_key].answers[0])
+                            start = bef_answer.find("value='") + len("value='")
+                            end = bef_answer.find("'",start)
+                            correct_answers.append(bef_answer[start:end])
+                        check_answer_data = check_answer(question_text,questions,user_answers,correct_answers) 
+
+                        for i,data in enumerate(check_answer_data):
+                            results.append(
+                                {
+                                    "id":child_keys[i],
+                                    "is_correct":data["is_correct"],
+                                    "confidence":data["confidence"],
+                                    "explanation":data["explanation"],
+                                }
+                            )
+                    else:
+                        print("No")
+                    print("*"*30)
+                else:
+                    print("No childIds child")
+        else:
+            print("No childIds parent")
+        return JsonResponse(
+            {
+                "success":True,
+                "results":results,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        print("error:",e)
+        return JsonResponse(
+            {
+                "success":False,
                 "error":str(e),
             },
             status = 400,
