@@ -110,6 +110,7 @@ class MessageSchema(Schema):
     
 class UserChangeSchema(Schema):
     password : str
+    school : str
     
 class EmailVerificationSchema(Schema):
     username : str
@@ -124,7 +125,11 @@ class AiScore(BaseModel):
     answers:Dict[str,Union[str,int]]
     target_answer:List[str]
 
-# APIz
+class FollowSchema(Schema):
+    follow:bool
+    userId:str
+
+# API
 # ユーザー登録するAPI
 @api.post("/signup")
 def signup(request, payload: SignUpSchema):
@@ -138,7 +143,6 @@ def signup(request, payload: SignUpSchema):
             )
         user.set_password(payload.password)
         user.save()
-        
         if payload.is_own_company:
             company = Company.objects.create(
                 name = payload.username,
@@ -338,26 +342,122 @@ def change_pass(request,payload :LoginSchema):
             status=400
         )
 
+# ユーザ詳細画面
+@api.get("/profile/{userId}")
+def profile(request,userId:int):
+    try:
+        user = User.objects.get(id=userId)
+        is_following = Follow.objects.filter(follower=request.user,following=user).exists()
+        return JsonResponse(
+            {
+                "success":True,
+                "username":user.username,
+                "email":user.email,
+                "school":user.school,
+                "isFollow":is_following,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "user":None,
+                "email":None,
+                "error":str(e),
+            },
+            status = 400,
+        )
+
+#フォロー、アンフォローするAPI
+@api.post("/follow")
+def follow(request,payload:FollowSchema):
+    try:
+        """
+        is_followがTrueならフォロー状態、Falseならアンフォロー状態
+        初期値をFalseにしているのは、フォローしていない状態をデフォルトにするため。
+        """
+        is_follow = payload.follow
+        userId = int(payload.userId)
+        if is_follow==False:#フォローする
+            Follow.objects.get_or_create(follower=request.user,following=User.objects.get(id=userId))
+            is_follow = True
+        else:#アンフォローする
+            Follow.objects.filter(follower=request.user, following=User.objects.get(id=userId)).delete()
+            is_follow = False
+        print(f"{is_follow}")
+        return JsonResponse(
+            {
+                "success":True,
+                "is_follow":is_follow,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "error":str(e),
+            },
+            status = 400,
+        )
+
+#　ログインユーザ情報取得API
+@api.get("/get_user_info_change")
+def get_user_info(request):
+    try:
+        user = request.user
+        return JsonResponse(
+            {
+                "success":True,
+                "username":user.username,
+                "email":user.email,
+                "school":user.school,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "user":None,
+                "email":None,
+                "error":str(e),
+            },
+            status = 400,
+        )
+    
 #登録情報を変更するAPI
 @api.post("/user_change")
 def user_change(request,payload: UserChangeSchema):
     try:
+        print(payload)
         user = User.objects.get(
             pk=request.user.id,
         )
-        # user.username = payload.username
-        user.set_password(payload.password)
+        print(payload)
+        password = payload.password
+        if(password != ""):
+            user.set_password(payload.password)
+        user.school = payload.school
         user.save()
         django_login(request,user)
         return JsonResponse({
             "success":True,
-            "id" : user.id,
             "username":user.username,
             },
                 status = 200
         )
     except Exception as e:
-        return JsonResponse({"success":False, "message" : str(e) },status = 400)
+        return JsonResponse(
+            {
+                "success":False,
+                "message" : str(e)
+            },
+            status = 400
+        )
         
 # 会社登録するAPI
 @api.post("/company_signup")

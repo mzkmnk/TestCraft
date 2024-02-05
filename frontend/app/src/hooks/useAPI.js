@@ -30,6 +30,9 @@ const APIs = {
   change_pass_send: `${urlBase}/change_pass_send`,
   change_pass: `${urlBase}/change_pass`,
   ai_scoring: `${urlBase}/ai_scoring`,
+  get_user_info_change: `${urlBase}/get_user_info_change`,
+  profile: (userId) => `${urlBase}/profile/${userId}`,
+  follow: `${urlBase}/follow`,
 };
 
 /**

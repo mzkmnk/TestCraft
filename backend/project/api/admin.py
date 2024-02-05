@@ -51,3 +51,8 @@ class CustomCertification(admin.ModelAdmin):
     list_display = ('username','key')
     search_fields = ('id',)
 admin.site.register(Certification,CustomCertification)
+
+class CustomFollow(admin.ModelAdmin):
+    list_display = ('follower','following')
+    search_fields = ('id',)
+admin.site.register(Follow,CustomFollow)

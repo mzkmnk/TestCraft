@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useNavigate,useParams } from 'react-router-dom';
+import Button from '@mui/material/Button';
 import {
   MDBCol,
   MDBContainer,
@@ -7,198 +9,147 @@ import {
   MDBCardText,
   MDBCardBody,
   MDBCardImage,
-  MDBBtn,
-  MDBBreadcrumb,
-  MDBBreadcrumbItem,
-  MDBProgress,
-  MDBProgressBar,
-  MDBIcon,
-  MDBListGroup,
-  MDBListGroupItem
 } from 'mdb-react-ui-kit';
 
+import UserHeader from "./UserHeader";
+import { useAPI } from "./hooks/useAPI";
+
+
 export default function ProfilePage() {
-  return (
-    <section style={{ backgroundColor: '#eee' }}>
-      <MDBContainer className="py-5">
-        <MDBRow>
-          <MDBCol>
-            <MDBBreadcrumb className="bg-light rounded-3 p-3 mb-4">
-              <MDBBreadcrumbItem>
-                <a href='#'>Home</a>
-              </MDBBreadcrumbItem>
-              <MDBBreadcrumbItem>
-                <a href="#">User</a>
-              </MDBBreadcrumbItem>
-              <MDBBreadcrumbItem active>User Profile</MDBBreadcrumbItem>
-            </MDBBreadcrumb>
-          </MDBCol>
-        </MDBRow>
+    const [username, setUsername] = React.useState('');
+    const [userSchool, setUserSchool] = React.useState('');
+    const [isFollow , setIsFollow] = React.useState(false);
+    const { userId } = useParams();
 
-        <MDBRow>
-          <MDBCol lg="4">
-            <MDBCard className="mb-4">
-              <MDBCardBody className="text-center">
-                <MDBCardImage
-                  src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp"
-                  alt="avatar"
-                  className="rounded-circle"
-                  style={{ width: '150px' }}
-                  fluid />
-                <p className="text-muted mb-1">Full Stack Developer</p>
-                <p className="text-muted mb-4">Bay Area, San Francisco, CA</p>
-                <div className="d-flex justify-content-center mb-2">
-                  <MDBBtn>Follow</MDBBtn>
-                  <MDBBtn outline className="ms-1">Message</MDBBtn>
-                </div>
-              </MDBCardBody>
-            </MDBCard>
+    const getProfileAPI = useAPI(
+        {
+            APIName:'profile',
+            params: userId,
+            isLoginRequired: true,
+            loadOnStart: true,
+        }
+    );
 
-            <MDBCard className="mb-4 mb-lg-0">
-              <MDBCardBody className="p-0">
-                <MDBListGroup flush className="rounded-3">
-                  <MDBListGroupItem className="d-flex justify-content-between align-items-center p-3">
-                    <MDBIcon fas icon="globe fa-lg text-warning" />
-                    <MDBCardText>https://mdbootstrap.com</MDBCardText>
-                  </MDBListGroupItem>
-                  <MDBListGroupItem className="d-flex justify-content-between align-items-center p-3">
-                    <MDBIcon fab icon="github fa-lg" style={{ color: '#333333' }} />
-                    <MDBCardText>mdbootstrap</MDBCardText>
-                  </MDBListGroupItem>
-                  <MDBListGroupItem className="d-flex justify-content-between align-items-center p-3">
-                    <MDBIcon fab icon="twitter fa-lg" style={{ color: '#55acee' }} />
-                    <MDBCardText>@mdbootstrap</MDBCardText>
-                  </MDBListGroupItem>
-                  <MDBListGroupItem className="d-flex justify-content-between align-items-center p-3">
-                    <MDBIcon fab icon="instagram fa-lg" style={{ color: '#ac2bac' }} />
-                    <MDBCardText>mdbootstrap</MDBCardText>
-                  </MDBListGroupItem>
-                  <MDBListGroupItem className="d-flex justify-content-between align-items-center p-3">
-                    <MDBIcon fab icon="facebook fa-lg" style={{ color: '#3b5998' }} />
-                    <MDBCardText>mdbootstrap</MDBCardText>
-                  </MDBListGroupItem>
-                </MDBListGroup>
-              </MDBCardBody>
-            </MDBCard>
-          </MDBCol>
-          <MDBCol lg="8">
-            <MDBCard className="mb-4">
-              <MDBCardBody>
-                <MDBRow>
-                  <MDBCol sm="3">
-                    <MDBCardText>Full Name</MDBCardText>
-                  </MDBCol>
-                  <MDBCol sm="9">
-                    <MDBCardText className="text-muted">Johnatan Smith</MDBCardText>
-                  </MDBCol>
-                </MDBRow>
-                <hr />
-                <MDBRow>
-                  <MDBCol sm="3">
-                    <MDBCardText>Email</MDBCardText>
-                  </MDBCol>
-                  <MDBCol sm="9">
-                    <MDBCardText className="text-muted">example@example.com</MDBCardText>
-                  </MDBCol>
-                </MDBRow>
-                <hr />
-                <MDBRow>
-                  <MDBCol sm="3">
-                    <MDBCardText>Phone</MDBCardText>
-                  </MDBCol>
-                  <MDBCol sm="9">
-                    <MDBCardText className="text-muted">(097) 234-5678</MDBCardText>
-                  </MDBCol>
-                </MDBRow>
-                <hr />
-                <MDBRow>
-                  <MDBCol sm="3">
-                    <MDBCardText>Mobile</MDBCardText>
-                  </MDBCol>
-                  <MDBCol sm="9">
-                    <MDBCardText className="text-muted">(098) 765-4321</MDBCardText>
-                  </MDBCol>
-                </MDBRow>
-                <hr />
-                <MDBRow>
-                  <MDBCol sm="3">
-                    <MDBCardText>Address</MDBCardText>
-                  </MDBCol>
-                  <MDBCol sm="9">
-                    <MDBCardText className="text-muted">Bay Area, San Francisco, CA</MDBCardText>
-                  </MDBCol>
-                </MDBRow>
-              </MDBCardBody>
-            </MDBCard>
+    const followAPI = useAPI(
+        {
+            APIName:'follow',
+            isLoginRequired: true,
+        }
+    );
 
+    useEffect(() => {
+        if(getProfileAPI.isSuccess){
+            const data = getProfileAPI.data;
+            if(data.success){
+                console.log(data);
+                setUsername(data.username);
+                setIsFollow(data.isFollow);
+                if(data.school === null){
+                    setUserSchool("未設定");
+                }
+                else{
+                    setUserSchool(data.school);
+                    followAPI.sendAPI({
+                        body: JSON.stringify(
+                            {
+                                follow:isFollow,
+                                userId: userId,
+                            }
+                        )
+                    });
+                }
+            }else{
+                console.log("api error")
+            }
+        }else{
+            console.log("useAPI error");
+        }
+    },[getProfileAPI.isSuccess, getProfileAPI.data,userId]);
+
+    useEffect(() => {
+        if(followAPI.isSuccess && followAPI.data.success){
+            console.log(followAPI.data);
+            setIsFollow(!isFollow);
+        }else{
+            console.log(followAPI.error);
+        }
+    },[followAPI.isSuccess, followAPI.data, followAPI.error]);
+
+    const handleFollow = async () => {
+        followAPI.sendAPI({
+            body: JSON.stringify(
+                {
+                    follow:isFollow,
+                    userId: userId,
+                }
+
+            )
+        });
+    };
+
+    const follow = (event) => {
+        event.preventDefault();
+        handleFollow();
+    };
+
+
+    return (
+        <>
+        <section style={{ backgroundColor: '#eee' }}>
+        <UserHeader />
+        <MDBContainer className="py-5">
             <MDBRow>
-              <MDBCol md="6">
-                <MDBCard className="mb-4 mb-md-0">
-                  <MDBCardBody>
-                    <MDBCardText className="mb-4"><span className="text-primary font-italic me-1">assigment</span> Project Status</MDBCardText>
-                    <MDBCardText className="mb-1" style={{ fontSize: '.77rem' }}>Web Design</MDBCardText>
-                    <MDBProgress className="rounded">
-                      <MDBProgressBar width={80} valuemin={0} valuemax={100} />
-                    </MDBProgress>
+                <MDBCol lg="4">
+                    <MDBCard className="mb-4">
+                        <MDBCardBody className="text-center">
+                            <MDBCardImage
+                            // src="~/Users/mizuki/programming/TestCraft/frontend/app/src/icon/test.png"
+                            // srcなぜかうまくいかないのでパス
+                            alt="avatar"
+                            className="rounded-circle"
+                            style={{ width: '150px' }}
+                            fluid />
+                            <p className="text-muted mb-1">今後対応予定です。</p>
+                            <p className="text-muted mb-4">今後対応予定です。</p>
+                            <div className="d-flex justify-content-center mb-2">
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={follow}
+                                >
+                                    {isFollow ? "フォロー解除":"フォローする"}
+                                </Button>
+                            </div>
+                        </MDBCardBody>
+                    </MDBCard>
 
-                    <MDBCardText className="mt-4 mb-1" style={{ fontSize: '.77rem' }}>Website Markup</MDBCardText>
-                    <MDBProgress className="rounded">
-                      <MDBProgressBar width={72} valuemin={0} valuemax={100} />
-                    </MDBProgress>
-
-                    <MDBCardText className="mt-4 mb-1" style={{ fontSize: '.77rem' }}>One Page</MDBCardText>
-                    <MDBProgress className="rounded">
-                      <MDBProgressBar width={89} valuemin={0} valuemax={100} />
-                    </MDBProgress>
-
-                    <MDBCardText className="mt-4 mb-1" style={{ fontSize: '.77rem' }}>Mobile Template</MDBCardText>
-                    <MDBProgress className="rounded">
-                      <MDBProgressBar width={55} valuemin={0} valuemax={100} />
-                    </MDBProgress>
-
-                    <MDBCardText className="mt-4 mb-1" style={{ fontSize: '.77rem' }}>Backend API</MDBCardText>
-                    <MDBProgress className="rounded">
-                      <MDBProgressBar width={66} valuemin={0} valuemax={100} />
-                    </MDBProgress>
-                  </MDBCardBody>
-                </MDBCard>
-              </MDBCol>
-
-              <MDBCol md="6">
-                <MDBCard className="mb-4 mb-md-0">
-                  <MDBCardBody>
-                    <MDBCardText className="mb-4"><span className="text-primary font-italic me-1">assigment</span> Project Status</MDBCardText>
-                    <MDBCardText className="mb-1" style={{ fontSize: '.77rem' }}>Web Design</MDBCardText>
-                    <MDBProgress className="rounded">
-                      <MDBProgressBar width={80} valuemin={0} valuemax={100} />
-                    </MDBProgress>
-
-                    <MDBCardText className="mt-4 mb-1" style={{ fontSize: '.77rem' }}>Website Markup</MDBCardText>
-                    <MDBProgress className="rounded">
-                      <MDBProgressBar width={72} valuemin={0} valuemax={100} />
-                    </MDBProgress>
-
-                    <MDBCardText className="mt-4 mb-1" style={{ fontSize: '.77rem' }}>One Page</MDBCardText>
-                    <MDBProgress className="rounded">
-                      <MDBProgressBar width={89} valuemin={0} valuemax={100} />
-                    </MDBProgress>
-
-                    <MDBCardText className="mt-4 mb-1" style={{ fontSize: '.77rem' }}>Mobile Template</MDBCardText>
-                    <MDBProgress className="rounded">
-                      <MDBProgressBar width={55} valuemin={0} valuemax={100} />
-                    </MDBProgress>
-
-                    <MDBCardText className="mt-4 mb-1" style={{ fontSize: '.77rem' }}>Backend API</MDBCardText>
-                    <MDBProgress className="rounded">
-                      <MDBProgressBar width={66} valuemin={0} valuemax={100} />
-                    </MDBProgress>
-                  </MDBCardBody>
-                </MDBCard>
-              </MDBCol>
+                </MDBCol>
+                <MDBCol lg="8">
+                    <MDBCard className="mb-4">
+                    <MDBCardBody>
+                        <MDBRow>
+                        <MDBCol sm="3">
+                            <MDBCardText>Name</MDBCardText>
+                        </MDBCol>
+                        <MDBCol sm="9">
+                            <MDBCardText className="text-muted">{ username }</MDBCardText>
+                        </MDBCol>
+                        </MDBRow>
+                        <hr />
+                        <MDBRow>
+                            <MDBCol sm="3">
+                                <MDBCardText>School</MDBCardText>
+                            </MDBCol>
+                            <MDBCol sm="9">
+                                <MDBCardText className="text-muted">{ userSchool }</MDBCardText>
+                            </MDBCol>
+                        </MDBRow>
+                    </MDBCardBody>
+                    </MDBCard>
+                </MDBCol>
             </MDBRow>
-          </MDBCol>
-        </MDBRow>
-      </MDBContainer>
-    </section>
+        </MDBContainer>
+        </section>
+    </>
   );
 }
