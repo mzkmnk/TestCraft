@@ -41,7 +41,7 @@ export function InfoHeader({ isTimerActive, TimerFinishedFunc }) {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             {info.title}
           </Typography>
-          <Typography sx={{ flexGrow: 1 }}>
+          <Typography sx={{ paddingRight: 10 }}>
             解答数：{answersCount} / {questionCount}
           </Typography>
 
