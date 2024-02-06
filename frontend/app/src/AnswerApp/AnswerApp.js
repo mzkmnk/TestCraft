@@ -56,11 +56,12 @@ export default function AnswersApp({ workbook }) {
             <SettingsModal exitFunc={startInputAnswers} />
           ) : null}
           <QuestionsProvider workbook={workbook}>
-            <InfoHeader
-              isTimerActive={isTimerActive}
-              TimerFinishedFunc={finishInputAnswers}
-            />
             <AnswersProvider>
+              <InfoHeader
+                isTimerActive={isTimerActive}
+                TimerFinishedFunc={finishInputAnswers}
+              />
+
               {isInputOpen ? (
                 <AnswerForms exitFunc={finishInputAnswers} />
               ) : null}

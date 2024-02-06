@@ -12,9 +12,10 @@ export function useAnswers() {
  */
 export function AnswersProvider({ children }) {
   const [answers, setAnswers] = useState({});
+  const answersCount = Object.keys(answers).length;
 
   return (
-    <AnswersContext.Provider value={{ answers, setAnswers }}>
+    <AnswersContext.Provider value={{ answers, setAnswers, answersCount }}>
       {children}
     </AnswersContext.Provider>
   );

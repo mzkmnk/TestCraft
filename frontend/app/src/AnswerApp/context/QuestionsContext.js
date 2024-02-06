@@ -19,8 +19,16 @@ export const QuestionsProvider = ({ children, workbook }) => {
   const rootId = Object.keys(questionTree).find(
     (key) => questionTree[key].questionType === "root"
   );
+  const questionCount = Object.keys(questionTree).filter(
+    (key) =>
+      questionTree[key].questionType !== "root" &&
+      questionTree[key].questionType !== "nested"
+  ).length;
+
   return (
-    <QuestionsContext.Provider value={{ info, questionTree, rootId }}>
+    <QuestionsContext.Provider
+      value={{ info, questionTree, rootId, questionCount }}
+    >
       {children}
     </QuestionsContext.Provider>
   );

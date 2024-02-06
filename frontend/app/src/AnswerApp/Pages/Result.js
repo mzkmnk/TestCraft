@@ -5,6 +5,8 @@ import { useQuestions } from "../context/QuestionsContext";
 import { useAnswers } from "../context/AnswersContext";
 import { useAPI } from "../../hooks/useAPI";
 import { useGrade } from "../../hooks/useGrade";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 
 export default function Result({ exitFunc }) {
   const { questionTree, rootId } = useQuestions();
@@ -35,14 +37,27 @@ export default function Result({ exitFunc }) {
   return (
     <>
       {saveAPI.isSuccess ? (
-        <AnswerForms
-          exitFunc={exitFunc}
-          resultMode={true}
-          correctIds={correctIds}
-          questionCount={questionCount}
-        />
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          height="calc(100vh - 180px)"
+        >
+          <Typography variant="h3" align="center">
+            採点中
+          </Typography>
+        </Box>
       ) : (
-        <div style={{ marginTop: 100, fontSize: 30 }}>採点中</div>
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          height="calc(100vh - 180px)"
+        >
+          <Typography variant="h3" align="center">
+            採点中
+          </Typography>
+        </Box>
       )}
     </>
   );

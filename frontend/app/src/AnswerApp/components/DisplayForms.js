@@ -13,8 +13,8 @@ import Grid from "@mui/material/Grid";
 // 再帰的に問題を表示する関数
 export function DisplayForms({ info = {}, questionTree, questionId }) {
   const { answers, setAnswers } = useAnswers();
-  const handleSetAnswers = (event) => {
-    setAnswers({ ...answers, [questionId]: event.target.value });
+  const handleSetAnswers = (event, id = questionId) => {
+    setAnswers({ ...answers, [id]: event.target.value });
   };
   // 今回表示する問題
   const question = questionTree[questionId];
@@ -37,7 +37,7 @@ export function DisplayForms({ info = {}, questionTree, questionId }) {
       <FormatInputField
         key={childId}
         question={questionTree[childId]}
-        questionId={questionId}
+        questionId={childId}
         answers={answers}
         handleSetAnswers={handleSetAnswers}
         index={index}
@@ -113,14 +113,16 @@ function FormatInputField({
   index,
   isNested = false,
 }) {
-  const mainBottom = 2;
+  const marginBottom = 2;
+  console.log(questionId);
+  console.log(answers);
   if (question.questionType === "radio") {
     return (
-      <Box marginBottom={mainBottom}>
+      <Box marginBottom={marginBottom}>
         {isNested ? <Typography>{"問題" + (index + 1)}</Typography> : null}
         <RadioGroup
           name={questionId}
-          onChange={(event) => handleSetAnswers(event)}
+          onChange={(event) => handleSetAnswers(event, questionId)}
           value={answers[questionId] || ""}
         >
           {question.options.map((option) => (
@@ -136,11 +138,11 @@ function FormatInputField({
     );
   } else if (question.questionType === "textarea") {
     return (
-      <Box marginBottom={mainBottom}>
+      <Box marginBottom={marginBottom}>
         {isNested ? <Typography>{"問題" + (index + 1)}</Typography> : null}
         <TextField
           inputProps={{ maxLength: question.maxlength }}
-          onChange={(event) => handleSetAnswers(event)}
+          onChange={(event) => handleSetAnswers(event, questionId)}
           defaultValue={answers[questionId] || ""}
         />
       </Box>

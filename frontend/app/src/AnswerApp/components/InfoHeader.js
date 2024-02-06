@@ -5,13 +5,15 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { useQuestions } from "../context/QuestionsContext";
+import { useAnswers } from "../context/AnswersContext";
 import { useTimer } from "../../hooks/useTimer";
 import { useAnswerSettings } from "../context/AnswerSettingsContext";
 
 export function InfoHeader({ isTimerActive, TimerFinishedFunc }) {
   const { answerSettings } = useAnswerSettings();
   const Timer = useTimer();
-  const { info } = useQuestions();
+  const { info, questionCount } = useQuestions();
+  const { answersCount } = useAnswers();
 
   // タイマーが停止しているかつisTimerActiveがtrueのとき、タイマーをスタートする
   if (!Timer.isActive && isTimerActive) {
@@ -38,6 +40,9 @@ export function InfoHeader({ isTimerActive, TimerFinishedFunc }) {
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             {info.title}
+          </Typography>
+          <Typography sx={{ flexGrow: 1 }}>
+            解答数：{answersCount} / {questionCount}
           </Typography>
 
           <Typography>
