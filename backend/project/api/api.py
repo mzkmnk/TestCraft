@@ -348,6 +348,56 @@ def profile(request,userId:int):
     try:
         user = User.objects.get(id=userId)
         isFollow = Follow.objects.filter(follower=request.user,following=user).exists()
+        user_answers = UserAnswer.objects.filter(user = user).values(
+            'workbook__id',
+            'workbook__workbook_name',
+            'workbook__description',
+            'workbook__create_id__username',
+            'workbook__created_at',
+            'workbook__updated_at',
+            'workbook__like_count',
+            'answer_json',
+            'solved_count',
+        )
+        user_answers_with_categories = []
+        for user_answer in user_answers:
+            categories = WorkbookCategory.objects.filter(id=user_answer['workbook__id']).values_list('category__category_name', flat=True)
+            user_answers_with_categories.append({
+                **user_answer,
+                'categories': list(categories)
+            })
+        solved_workbook = [
+            {
+                "id":user_answer['workbook__id'],
+                "workbook_name":user_answer['workbook__workbook_name'],
+                "description":user_answer['workbook__description'],
+                "create_id__username":user_answer['workbook__create_id__username'],
+                "created_at":user_answer['workbook__created_at'],
+                "updated_at":user_answer['workbook__updated_at'],
+                "like_count":user_answer['workbook__like_count'],
+                "answer_json":user_answer['answer_json'],
+                "solved_count":user_answer['solved_count'],
+            }
+            for user_answer in user_answers
+        ]
+
+        workbooks = Workbook.objects.filter(create_id__id = user.id).order_by('-created_at').values(
+            'id',
+            'workbook_name',
+            'description',
+            'create_id__username',
+            'created_at',
+            'updated_at',
+            'like_count',   
+        )
+        created_workbook = []
+        for workbook in workbooks:
+            categories = WorkbookCategory.objects.filter(id=workbook['id']).values_list('category__category_name', flat=True)
+            created_workbook.append({
+                **workbook,
+                'categories': list(categories)
+            })
+        
         return JsonResponse(
             {
                 "success":True,
@@ -355,6 +405,8 @@ def profile(request,userId:int):
                 "email":user.email,
                 "school":user.school,
                 "isFollow":isFollow,
+                "solved_workbook":solved_workbook,
+                "created_workbook":created_workbook,
                 "error":None,
             },
             status = 200,

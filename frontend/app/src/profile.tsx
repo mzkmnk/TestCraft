@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams,useNavigate } from 'react-router-dom';
+import { FaHeart } from "react-icons/fa";
 import Button from '@mui/material/Button';
 import {
   MDBCol,
@@ -19,13 +20,16 @@ import CustomTabs from "./components/CustomTabs";
 export default function ProfilePage() {
     const [username, setUsername] = React.useState('');
     const [userSchool, setUserSchool] = React.useState('');
-    const [isFollow , setIsFollow] = React.useState(Boolean );
+    const [isFollow , setIsFollow] = React.useState(Boolean);
+    const [solvedWorkbook, setSolvedWorkbook] = React.useState([]);
+    const [createdWorkbook, setCreatedWorkbook] = React.useState([]);
     const { userId } = useParams();
+    const navigate = useNavigate();
 
     const tabsData = [
-        {label:'投稿',content:'投稿'},
-        {label:'作成問題',content:'作成問題'},
-        {label:'解答問題',content:'解答問題'},
+        {label:'投稿',content:'今後対応予定です'},
+        {label:'作成履歴',content: <Wookbooks workbooks={createdWorkbook} />},
+        {label:'解答履歴',content: <Wookbooks workbooks={solvedWorkbook} />},
     ];
 
     const getProfileAPI = useAPI(
@@ -37,6 +41,11 @@ export default function ProfilePage() {
         }
     );
 
+    const handleQuestionClick = (workbookId) => {
+        window.open(`/solve/${workbookId}`,"_blank");
+        // navigate(`/solve/${workbookId}`);
+    }
+
     const followAPI = useAPI(
         {
             APIName:'follow',
@@ -47,9 +56,12 @@ export default function ProfilePage() {
     useEffect(() => {
         if(getProfileAPI.isSuccess){
             const data = getProfileAPI.data;
+            console.log(data);
             if(data.success){
                 setUsername(data.username);
                 setIsFollow(data.isFollow);
+                setSolvedWorkbook(data.solved_workbook);
+                setCreatedWorkbook(data.created_workbook);
                 if(data.school === null){
                     setUserSchool("未設定");
                 }
@@ -63,6 +75,82 @@ export default function ProfilePage() {
             console.error("useAPI error");
         }
     },[getProfileAPI.isSuccess]);
+
+    const styles = {
+        questionsContainer: {
+            display: "grid",
+            gridTemplateColumns: "repeat(2, 1fr)",
+            gridGap: "20px",
+            maxHeight: "calc(100vh - 70px)",
+            overflowY: "auto",
+            padding: "20px",
+        },
+        question: {
+            flex: "1 0 calc(50% - 20px)",
+            border: "1px solid #ccc",
+            padding: "20px",
+            borderRadius: "8px",
+            cursor: "pointer",
+            color: "#333",
+            backgroundColor: "#fff",
+        },
+        questionHeader: {
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            fontWeight: "bold",
+        },
+        createdBy: {
+            fontSize: "0.8em",
+            color: "#666",
+            marginLeft: "10px",
+        },
+    };
+    
+    const likeStyle = {
+        display: "flex",
+        alignItems: "center",
+        marginTop: "10px",
+        color: "#1DA1F2",
+        cursor: "pointer",
+    };
+    
+
+    const likeIconStyle = {
+        marginRight: "5px",
+    };
+
+    function Wookbooks({ workbooks }){
+        console.log(workbooks);
+        return (
+            <div style={styles.questionsContainer}>
+                {workbooks.map((workbook,index) => (
+                    <div
+                        style={styles.question}
+                        key={index}
+                        onClick={() => handleQuestionClick(workbook.id)}
+                    >
+                        <div style={styles.questionHeader}>
+                            <h3>{ workbook.workbook_name }</h3>
+                            <span style={styles.createdBy}>
+                                created by {workbook.create_id__username} ({workbook.created_at})
+                            </span>
+                        </div>
+                        <p>{workbook.description}</p>
+                        <div style={likeStyle}>
+                            <FaHeart style={likeIconStyle} />
+                            <span>{workbook.like_count}</span>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        )
+    };
+
+    const buttonStyles = {
+        backgroundColor: isFollow ? "#1565C0" : "#64B5F6",
+        color: "#fff",
+    }
 
     useEffect(() => {
         if(followAPI.isSuccess){
@@ -105,8 +193,8 @@ export default function ProfilePage() {
 
     return (
         <>
+        <UserHeader />
         <section style={{ backgroundColor: '#eee' }}>
-            <UserHeader />
             <MDBContainer className="py-5">
                 <MDBRow>
                     <MDBCol lg="4">
@@ -124,7 +212,7 @@ export default function ProfilePage() {
                                 <div className="d-flex justify-content-center mb-2">
                                     <Button
                                         variant="contained"
-                                        color="primary"
+                                        style={buttonStyles}
                                         onClick={follow}
                                     >
                                         {isFollow ? "フォロー解除":"フォローする"}

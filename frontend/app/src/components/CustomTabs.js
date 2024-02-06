@@ -80,15 +80,14 @@ const TabPanel = styled(BaseTabPanel)(
     background: ${theme.palette.mode === 'dark' ? grey[900] : '#fff'};
     border: 1px solid ${theme.palette.mode === 'dark' ? grey[700] : grey[200]};
     border-radius: 12px;
-    opacity: 0.6;
+    opacity: 1;
     `,
 );
   
 const TabsList = styled(BaseTabsList)(
     ({ theme }) => `
-    width: 65%;
+    width: 68%;
     min-width: 400px;
-    // background-color: ${blue[500]};
     background-color: #1876D2;
     border-radius: 12px;
     margin: 0 auto;
