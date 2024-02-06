@@ -13,7 +13,7 @@ import {
 
 import UserHeader from "./UserHeader";
 import { useAPI } from "./hooks/useAPI";
-import { set } from 'date-fns';
+import CustomTabs from "./components/CustomTabs";
 
 
 export default function ProfilePage() {
@@ -22,10 +22,17 @@ export default function ProfilePage() {
     const [isFollow , setIsFollow] = React.useState(Boolean );
     const { userId } = useParams();
 
+    const tabsData = [
+        {label:'投稿',content:'投稿'},
+        {label:'作成問題',content:'作成問題'},
+        {label:'解答問題',content:'解答問題'},
+    ];
+
     const getProfileAPI = useAPI(
         {
             APIName:'profile',
             params: userId,
+            isLoginRequired: true,
             loadOnStart: true,
         }
     );
@@ -99,60 +106,63 @@ export default function ProfilePage() {
     return (
         <>
         <section style={{ backgroundColor: '#eee' }}>
-        <UserHeader />
-        <MDBContainer className="py-5">
-            <MDBRow>
-                <MDBCol lg="4">
-                    <MDBCard className="mb-4">
-                        <MDBCardBody className="text-center">
-                            <MDBCardImage
-                            // src="~/Users/mizuki/programming/TestCraft/frontend/app/src/icon/test.png"
-                            // srcなぜかうまくいかないのでパス
-                            alt="avatar"
-                            className="rounded-circle"
-                            style={{ width: '150px' }}
-                            fluid />
-                            <p className="text-muted mb-1">今後対応予定です。</p>
-                            <p className="text-muted mb-4">今後対応予定です。</p>
-                            <div className="d-flex justify-content-center mb-2">
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={follow}
-                                >
-                                    {isFollow ? "フォロー解除":"フォローする"}
-                                </Button>
-                            </div>
-                        </MDBCardBody>
-                    </MDBCard>
+            <UserHeader />
+            <MDBContainer className="py-5">
+                <MDBRow>
+                    <MDBCol lg="4">
+                        <MDBCard className="mb-4">
+                            <MDBCardBody className="text-center">
+                                <MDBCardImage
+                                // src="~/Users/mizuki/programming/TestCraft/frontend/app/src/icon/test.png"
+                                // srcなぜかうまくいかないのでパス
+                                alt="avatar"
+                                className="rounded-circle"
+                                style={{ width: '150px' }}
+                                fluid />
+                                <p className="text-muted mb-1">今後対応予定です。</p>
+                                <p className="text-muted mb-4">今後対応予定です。</p>
+                                <div className="d-flex justify-content-center mb-2">
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        onClick={follow}
+                                    >
+                                        {isFollow ? "フォロー解除":"フォローする"}
+                                    </Button>
+                                </div>
+                            </MDBCardBody>
+                        </MDBCard>
 
-                </MDBCol>
-                <MDBCol lg="8">
-                    <MDBCard className="mb-4">
-                    <MDBCardBody>
-                        <MDBRow>
-                        <MDBCol sm="3">
-                            <MDBCardText>Name</MDBCardText>
-                        </MDBCol>
-                        <MDBCol sm="9">
-                            <MDBCardText className="text-muted">{ username }</MDBCardText>
-                        </MDBCol>
-                        </MDBRow>
-                        <hr />
-                        <MDBRow>
+                    </MDBCol>
+                    <MDBCol lg="8">
+                        <MDBCard className="mb-4">
+                        <MDBCardBody>
+                            <MDBRow>
                             <MDBCol sm="3">
-                                <MDBCardText>School</MDBCardText>
+                                <MDBCardText>Name</MDBCardText>
                             </MDBCol>
                             <MDBCol sm="9">
-                                <MDBCardText className="text-muted">{ userSchool }</MDBCardText>
+                                <MDBCardText className="text-muted">{ username }</MDBCardText>
                             </MDBCol>
-                        </MDBRow>
-                    </MDBCardBody>
-                    </MDBCard>
-                </MDBCol>
-            </MDBRow>
-        </MDBContainer>
+                            </MDBRow>
+                            <hr />
+                            <MDBRow>
+                                <MDBCol sm="3">
+                                    <MDBCardText>School</MDBCardText>
+                                </MDBCol>
+                                <MDBCol sm="9">
+                                    <MDBCardText className="text-muted">{ userSchool }</MDBCardText>
+                                </MDBCol>
+                            </MDBRow>
+                        </MDBCardBody>
+                        </MDBCard>
+                    </MDBCol>
+                </MDBRow>
+            </MDBContainer>
         </section>
+        <div>
+            <CustomTabs defaultValue={0} tabsData={tabsData} />
+        </div>
     </>
   );
 }
