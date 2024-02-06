@@ -12,6 +12,7 @@ export function AnswerSettingsProvider({ children }) {
   const defaultAnswerSettings = {
     /**単位は秒 */
     time: 360,
+    notificationTime: 60,
   };
   const [answerSettings, setAnswerSettings] = useState(defaultAnswerSettings);
 

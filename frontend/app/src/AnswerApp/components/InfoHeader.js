@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useState, useEffect } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -8,12 +8,28 @@ import { useQuestions } from "../context/QuestionsContext";
 import { useAnswers } from "../context/AnswersContext";
 import { useTimer } from "../../hooks/useTimer";
 import { useAnswerSettings } from "../context/AnswerSettingsContext";
+import { color } from "@mui/system";
 
+const mainAppBarColor = "#33ab9f";
 export function InfoHeader({ isTimerActive, TimerFinishedFunc }) {
   const { answerSettings } = useAnswerSettings();
-  const Timer = useTimer();
+  const Timer = useTimer({ notificationTime: answerSettings.notificationTime });
   const { info, questionCount } = useQuestions();
   const { answersCount } = useAnswers();
+  const [appBarColor, setAppBarColor] = useState(mainAppBarColor);
+
+  useEffect(() => {
+    if (Timer.isActive && Timer.isNotificationTime && appBarColor !== "red") {
+      setAppBarColor("red");
+    } else if (Timer.isFinished) {
+      TimerFinishedFunc();
+      setAppBarColor(mainAppBarColor);
+      // タイマーが動いているかつisTimerActiveがfalseのとき、タイマーをストップする
+    } else if (!isTimerActive && Timer.isActive) {
+      Timer.stop();
+      setAppBarColor(mainAppBarColor);
+    }
+  }, [Timer, TimerFinishedFunc, appBarColor, isTimerActive]);
 
   // タイマーが停止しているかつisTimerActiveがtrueのとき、タイマーをスタートする
   if (!Timer.isActive && isTimerActive) {
@@ -25,24 +41,21 @@ export function InfoHeader({ isTimerActive, TimerFinishedFunc }) {
     Timer.start();
   }
 
-  if (Timer.isFinished) {
-    TimerFinishedFunc();
-  }
-
-  // タイマーが動いているかつisTimerActiveがfalseのとき、タイマーをストップする
-  if (!isTimerActive && Timer.isActive) {
-    Timer.stop();
-  }
-
   return (
     <Box sx={{ height: 55 }}>
-      <AppBar style={{ position: "fixed", backgroundColor: "#66A666" }}>
+      <AppBar
+        style={{
+          position: "fixed",
+          backgroundColor: appBarColor,
+          transition: "background-color 1s ",
+        }}
+      >
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 2 }}>
             {info.title}
           </Typography>
-          <Typography sx={{ paddingRight: 10 }}>
-            解答数：{answersCount} / {questionCount}
+          <Typography sx={{ paddingRight: 5 }}>
+            {answersCount} / {questionCount}
           </Typography>
 
           <Typography>

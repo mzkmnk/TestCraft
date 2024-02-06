@@ -15,7 +15,10 @@ export function DisplayResult({
   questionId,
   correctIds,
   questionCount,
+  AiComments,
   answers = null,
+  index = 0,
+  isNested = false,
 }) {
   const answersContext = useAnswers();
   if (answers === null) {
@@ -55,21 +58,27 @@ export function DisplayResult({
   } else if (questionTree[questionId].questionType === "nested") {
     return (
       <>
-        {questionJsx}
-        {question.childIds.map((childId) => (
+        <Box marginBottom={6}>{questionJsx}</Box>
+        {question.childIds.map((childId, index) => (
           <DisplayResult
             key={childId}
             questionId={childId}
             questionTree={questionTree}
             correctIds={correctIds}
             answers={answers}
+            AiComments={AiComments}
+            index={index}
+            isNested={true}
           />
         ))}
       </>
     );
   } else if (questionTree[questionId].questionType === "radio") {
     return (
-      <>
+      <Box marginBottom={6}>
+        {isNested ? (
+          <Typography fontSize={"1.1rem"}>{"問題" + (index + 1)}</Typography>
+        ) : null}
         {questionJsx}
         <Typography color={color + ".main"}>
           {isCorrect ? "正解" : "不正解"}
@@ -84,11 +93,15 @@ export function DisplayResult({
             />
           ))}
         </RadioGroup>
-      </>
+      </Box>
     );
   } else if (questionTree[questionId].questionType === "textarea") {
+    console.log("AIComments", AiComments);
     return (
-      <>
+      <Box marginBottom={6}>
+        {isNested ? (
+          <Typography fontSize={"1.1rem"}>{"問題" + (index + 1)}</Typography>
+        ) : null}
         {questionJsx}
         <Typography color={color + ".main"}>
           {isCorrect ? "正解" : "不正解"}
@@ -101,7 +114,29 @@ export function DisplayResult({
           multiline
           fullWidth
         />
-      </>
+        {questionTree[questionId].useAIScoring ? (
+          <Box
+            sx={{
+              borderLeft: "double 7px",
+              borderRight: "double 7px",
+              borderColor: "#33ab9f",
+              marginTop: 2,
+              marginBottom: 2,
+              padding: 2,
+              backgroundColor: "whitesmoke",
+            }}
+          >
+            <Typography
+              variant="h6"
+              fontStyle={"italic"}
+              style={{ opacity: 0.4, fontStyle: "oblique" }}
+            >
+              AIコメント
+            </Typography>
+            {format(AiComments[questionId])}
+          </Box>
+        ) : null}
+      </Box>
     );
   }
 }

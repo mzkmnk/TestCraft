@@ -10,7 +10,13 @@ import { format } from "../../EditorApp/SwitchableTextField";
 import { useMemo } from "react";
 
 // 再帰的に問題を表示する関数
-export function DisplayFormsForSP({ info = {}, questionTree, questionId }) {
+export function DisplayFormsForSP({
+  info = {},
+  questionTree,
+  questionId,
+  index = 0,
+  isNested = false,
+}) {
   const { answers, setAnswers } = useAnswers();
   // 今回表示する問題
   const question = questionTree[questionId];
@@ -39,21 +45,26 @@ export function DisplayFormsForSP({ info = {}, questionTree, questionId }) {
   } else if (questionTree[questionId].questionType === "nested") {
     return (
       <>
-        {questionJsx}
-        {question.childIds.map((childId) => (
+        <Box marginBottom={6}>{questionJsx}</Box>
+        {question.childIds.map((childId, index) => (
           <DisplayFormsForSP
             key={childId}
             questionTree={questionTree}
             questionId={childId}
             answers={answers}
             setAnswers={setAnswers}
+            index={index}
+            isNested={true}
           />
         ))}
       </>
     );
   } else if (questionTree[questionId].questionType === "radio") {
     return (
-      <>
+      <Box marginBottom={6}>
+        {isNested ? (
+          <Typography fontSize={"1.1rem"}>{"問題" + (index + 1)}</Typography>
+        ) : null}
         {questionJsx}
         <RadioGroup
           name={questionId}
@@ -69,11 +80,14 @@ export function DisplayFormsForSP({ info = {}, questionTree, questionId }) {
             />
           ))}
         </RadioGroup>
-      </>
+      </Box>
     );
   } else if (questionTree[questionId].questionType === "textarea") {
     return (
-      <>
+      <Box marginBottom={6}>
+        {isNested ? (
+          <Typography fontSize={"1.1rem"}>{"問題" + (index + 1)}</Typography>
+        ) : null}
         {questionJsx}
         <TextField
           inputProps={{ maxLength: question.maxlength }}
@@ -81,10 +95,9 @@ export function DisplayFormsForSP({ info = {}, questionTree, questionId }) {
           defaultValue={answers[questionId] || ""}
           multiline
           fullWidth
-          maxRows={4}
           rows={4}
         />
-      </>
+      </Box>
     );
   }
 }

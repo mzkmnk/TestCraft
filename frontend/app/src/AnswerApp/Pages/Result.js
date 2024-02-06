@@ -15,7 +15,7 @@ export default function Result({ exitFunc }) {
   const saveAPI = useAPI({ APIName: "save_answer" });
 
   const { workbookId } = useParams();
-  const { correctIds, questionCount, isFinished } = useGrade({
+  const { correctIds, questionCount, isFinished, AiComments } = useGrade({
     questionTree,
     questionIds,
     answers,
@@ -42,6 +42,7 @@ export default function Result({ exitFunc }) {
           resultMode={true}
           correctIds={correctIds}
           questionCount={questionCount}
+          AiComments={AiComments}
         />
       ) : (
         <Box

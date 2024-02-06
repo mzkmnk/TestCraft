@@ -10,10 +10,11 @@ import { useState, useEffect } from "react";
  * @param {Number} startSeconds
  * @returns {Object} {time:{hour, minutes, seconds}, toggleActive, reset}
  */
-export function useTimer(startSeconds = 0) {
+export function useTimer({ startSeconds = 0, notificationTime = 0 }) {
   const [secondsTimer, setSecondsTimer] = useState(startSeconds);
   const [isActive, setIsActive] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
+  const [isNotificationTime, setIsNotificationTime] = useState(false);
 
   const set = (startSeconds) => {
     setIsActive(false);
@@ -42,6 +43,9 @@ export function useTimer(startSeconds = 0) {
     const timer = setInterval(() => {
       // 直接更新ではなく、更新関数を渡すと、依存配列に追加する必要がなくなる。
       setSecondsTimer((time) => time - 1);
+      if (secondsTimer === notificationTime) {
+        setIsNotificationTime(true);
+      }
       if (secondsTimer === 0) {
         finish();
       }
@@ -73,5 +77,5 @@ export function useTimer(startSeconds = 0) {
     time.seconds = seconds;
   }
 
-  return { time, set, start, stop, isActive, isFinished };
+  return { time, set, start, stop, isActive, isFinished, isNotificationTime };
 }

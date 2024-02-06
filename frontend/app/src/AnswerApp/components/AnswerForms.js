@@ -16,6 +16,7 @@ export function AnswerForms({
   questionTree = null,
   rootId = null,
   answers = null,
+  AiComments = null,
 }) {
   const QuestionsContext = useQuestions();
 
@@ -84,6 +85,7 @@ export function AnswerForms({
               correctIds={correctIds}
               questionCount={questionCount}
               answers={answers}
+              AiComments={AiComments}
             />
           )}
         </Box>
@@ -148,6 +150,7 @@ export function AnswerForms({
                 correctIds={correctIds}
                 questionCount={questionCount}
                 answers={answers}
+                AiComments={AiComments}
               />
             </Box>
           )}
@@ -159,7 +162,7 @@ export function AnswerForms({
             justifyContent: "space-between",
             width: "100%",
             bottom: 0,
-            backgroundColor: "#F5F8F5",
+            backgroundColor: "whitesmoke",
           }}
         >
           <Box sx={{ padding: 1, margin: 1 }}>

@@ -67,11 +67,16 @@ export function DisplayForms({ info = {}, questionTree, questionId }) {
 
   if (questionTree[questionId].questionType === "root") {
     leftJsx = (
-      <>
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        height="calc(100vh - 180px)"
+      >
         <Typography align="center" variant="h3">
           {info.title}
         </Typography>
-      </>
+      </Box>
     );
   }
 
@@ -114,12 +119,12 @@ function FormatInputField({
   isNested = false,
 }) {
   const marginBottom = 2;
-  console.log(questionId);
-  console.log(answers);
   if (question.questionType === "radio") {
     return (
       <Box marginBottom={marginBottom}>
-        {isNested ? <Typography>{"問題" + (index + 1)}</Typography> : null}
+        {isNested ? (
+          <Typography fontSize={"1.1rem"}>{"問題" + (index + 1)}</Typography>
+        ) : null}
         <RadioGroup
           name={questionId}
           onChange={(event) => handleSetAnswers(event, questionId)}
@@ -139,14 +144,15 @@ function FormatInputField({
   } else if (question.questionType === "textarea") {
     return (
       <Box marginBottom={marginBottom}>
-        {isNested ? <Typography>{"問題" + (index + 1)}</Typography> : null}
+        {isNested ? (
+          <Typography fontSize={"1.1rem"}>{"問題" + (index + 1)}</Typography>
+        ) : null}
         <TextField
           inputProps={{ maxLength: question.maxlength }}
           onChange={(event) => handleSetAnswers(event, questionId)}
           defaultValue={answers[questionId] || ""}
           multiline
           fullWidth
-          maxRows={8}
           rows={8}
         />
       </Box>
