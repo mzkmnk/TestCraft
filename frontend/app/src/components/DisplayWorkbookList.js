@@ -96,10 +96,10 @@ export function DisplayWorkbookList({ workbooks, setWorkbooks }) {
 
   return (
     <div style={styles.questionsContainer}>
-      {workbooks.map((question) => (
+      {workbooks.map((question,index) => (
         <div
           style={styles.question}
-          key={question.id}
+          key={index}
           onClick={() => handleQuestionClick(question.id)}
         >
           <div style={styles.questionHeader}>

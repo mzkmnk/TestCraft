@@ -91,10 +91,10 @@ function Mysolve() {
 
   const workbookLists = (
     <>
-      {currentQuestions.map((workbook) => (
+      {currentQuestions.map((workbook,index) => (
         <div
           style={styles.question}
-          key={workbook.solved_count}
+          key={index}
           onClick={() => handleQuestionClick(workbook.id,workbook.solved_count)}
         >
           <div style={styles.questionHeader}>

@@ -96,10 +96,10 @@ function Mycreate() {
     <>
       <UserHeader />
       <div style={styles.questionsContainer}>
-        {currentQuestions.map((question) => (
+        {currentQuestions.map((question,index) => (
           <div
             style={styles.question}
-            key={question.id}
+            key={index}
             onClick={() => handleQuestionClick(question.id)}
           >
             <div style={styles.questionHeader}>
