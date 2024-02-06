@@ -37,16 +37,12 @@ export default function Result({ exitFunc }) {
   return (
     <>
       {saveAPI.isSuccess ? (
-        <Box
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          height="calc(100vh - 180px)"
-        >
-          <Typography variant="h3" align="center">
-            採点中
-          </Typography>
-        </Box>
+        <AnswerForms
+          exitFunc={exitFunc}
+          resultMode={true}
+          correctIds={correctIds}
+          questionCount={questionCount}
+        />
       ) : (
         <Box
           display="flex"
