@@ -463,6 +463,8 @@ def get_user_info(request):
                 "username":user.username,
                 "email":user.email,
                 "school":user.school,
+                "followCount":user.count_following(),
+                "followerCount":user.count_followers(),
                 "error":None,
             },
             status = 200,

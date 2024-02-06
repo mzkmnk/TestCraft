@@ -1,7 +1,10 @@
 import React, { useEffect } from 'react';
-import { useParams,useNavigate } from 'react-router-dom';
+import { useParams,useLocation } from 'react-router-dom';
 import { FaHeart } from "react-icons/fa";
 import Button from '@mui/material/Button';
+import Pagination from "@mui/material/Pagination";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 import {
   MDBCol,
   MDBContainer,
@@ -26,7 +29,7 @@ export default function ProfilePage() {
     const [followCount, setFollowCount] = React.useState(0);
     const [followerCount, setFollowerCount] = React.useState(0);
     const { userId } = useParams();
-    const navigate = useNavigate();
+    const location = useLocation();
 
     const tabsData = [
         {label:'投稿',content:'今後対応予定です'},
@@ -93,7 +96,7 @@ export default function ProfilePage() {
             flex: "1 0 calc(50% - 20px)",
             border: "1px solid #ccc",
             padding: "20px",
-            borderRadius: "8px",
+            borderRadius: "10px",
             cursor: "pointer",
             color: "#333",
             backgroundColor: "#fff",
@@ -125,29 +128,47 @@ export default function ProfilePage() {
     };
 
     function Wookbooks({ workbooks }){
+        const [currentPage, setCurrentPage] = React.useState(1);
+        const questionsPerPage = 6;
+        const indexOfLastQuestion = currentPage * questionsPerPage;
+        const indexOfFirstQuestion = indexOfLastQuestion - questionsPerPage;
+        const currentQuestions = workbooks.slice(
+            indexOfFirstQuestion,
+            indexOfLastQuestion
+        );
+        const handleChangePage = (event,value) => {
+            setCurrentPage(value);
+          };
         console.log(workbooks);
         return (
-            <div style={styles.questionsContainer}>
-                {workbooks.map((workbook,index) => (
-                    <div
-                        style={styles.question}
-                        key={index}
-                        onClick={() => handleQuestionClick(workbook.id)}
-                    >
-                        <div style={styles.questionHeader}>
-                            <h3>{ workbook.workbook_name }</h3>
-                            <span style={styles.createdBy}>
-                                created by {workbook.create_id__username} ({workbook.created_at})
-                            </span>
+            <>
+                <div style={styles.questionsContainer}>
+                    {currentQuestions.map((workbook,index) => (
+                        <div
+                            style={styles.question}
+                            key={index}
+                            onClick={() => handleQuestionClick(workbook.id)}
+                        >
+                            <div style={styles.questionHeader}>
+                                <h3>{ workbook.workbook_name }</h3>
+                                <span style={styles.createdBy}>
+                                    created by {workbook.create_id__username} ({workbook.created_at})
+                                </span>
+                            </div>
+                            <p>{workbook.description}</p>
+                            <div style={likeStyle}>
+                                <FaHeart style={likeIconStyle} />
+                                <span>{workbook.like_count}</span>
+                            </div>
                         </div>
-                        <p>{workbook.description}</p>
-                        <div style={likeStyle}>
-                            <FaHeart style={likeIconStyle} />
-                            <span>{workbook.like_count}</span>
-                        </div>
-                    </div>
-                ))}
-            </div>
+                    ))}
+                </div>
+                <Pagination 
+                    count={Math.ceil(workbooks.length / questionsPerPage)}
+                    page={currentPage}
+                    onChange={handleChangePage}
+                />
+            </>
         )
     };
 

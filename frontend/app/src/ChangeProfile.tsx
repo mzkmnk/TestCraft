@@ -21,6 +21,8 @@ export default function ChangeProfilePage() {
     const [username, setUsername] = React.useState('');
     const [password, setPassword] = React.useState('');
     const [userSchool, setUserSchool] = React.useState('');
+    const [followCount, setFollowCount] = React.useState(0);
+    const [followerCount, setFollowerCount] = React.useState(0);
 
     const navigate = useNavigate();
 
@@ -40,6 +42,8 @@ export default function ChangeProfilePage() {
     useEffect(() => {
         if(getInfoAPI.isSuccess){
             setUsername(getInfoAPI.data.username);
+            setFollowCount(getInfoAPI.data.followCount);
+            setFollowerCount(getInfoAPI.data.followerCount);
             if(getInfoAPI.data.school === null || getInfoAPI.data.school === ''){setUserSchool('まだ情報がありません。')}
             else{setUserSchool(getInfoAPI.data.school)}
         }else{
@@ -86,6 +90,13 @@ export default function ChangeProfilePage() {
         handleSaveUserInfo();
     };
 
+    const followFollowerStyle = {
+        display: "flex",
+        justifyContent: "space-around",
+        padding: "0 20px",
+        width: "100%",
+    };
+
     return (
         <>
         <section style={{ backgroundColor: '#eee' }}>
@@ -104,6 +115,16 @@ export default function ChangeProfilePage() {
                         fluid />
                         <p className="text-muted mb-1">今後対応予定です。</p>
                         <p className="text-muted mb-4">今後対応予定です。</p>
+                        <div style={followFollowerStyle}>
+                            <div className="d-flex flex-column align-items-center">
+                                <p className="font-weight-bold mb-0">follow</p>
+                                <p className="font-weight-bold">{followCount}</p>
+                            </div>
+                            <div className="d-flex flex-column align-items-center">
+                                <p className="font-weight-bold mb-0">follower</p>
+                                <p className="font-weight-bold">{followerCount}</p>
+                            </div>
+                        </div>
                     </MDBCardBody>
                     </MDBCard>
 
@@ -154,15 +175,21 @@ export default function ChangeProfilePage() {
                     </MDBCardBody>
                     </MDBCard>
                 </MDBCol>
-                <MDBBtn
-                    outline
-                    size="sm"
-                    style={{ padding: '0.25rem 0.5rem', fontSize: '0.875rem' }}
-                    className="ms-1"
-                    onClick={saveUserInfo}
-                >
-                    Save
-                </MDBBtn>
+                <MDBCol lg="12" className='d-flex justify-content-center'>
+                    <MDBBtn
+                        outline
+                        size="sm"
+                        style={{
+                            padding: '0.25rem 0.5rem',
+                            fontSize: '0.875rem',
+                            width:'100px',
+                        }}
+                        className="ms-1"
+                        onClick={saveUserInfo}
+                    >
+                        Save
+                    </MDBBtn>
+                </MDBCol>
             </MDBRow>
         </MDBContainer>
         </section>
