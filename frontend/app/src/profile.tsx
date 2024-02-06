@@ -23,6 +23,8 @@ export default function ProfilePage() {
     const [isFollow , setIsFollow] = React.useState(Boolean);
     const [solvedWorkbook, setSolvedWorkbook] = React.useState([]);
     const [createdWorkbook, setCreatedWorkbook] = React.useState([]);
+    const [followCount, setFollowCount] = React.useState(0);
+    const [followerCount, setFollowerCount] = React.useState(0);
     const { userId } = useParams();
     const navigate = useNavigate();
 
@@ -62,6 +64,8 @@ export default function ProfilePage() {
                 setIsFollow(data.isFollow);
                 setSolvedWorkbook(data.solved_workbook);
                 setCreatedWorkbook(data.created_workbook);
+                setFollowCount(data.followCount);
+                setFollowerCount(data.followerCount);
                 if(data.school === null){
                     setUserSchool("未設定");
                 }
@@ -152,9 +156,21 @@ export default function ProfilePage() {
         color: "#fff",
     }
 
+    const followFollowerStyle = {
+        display: "flex",
+        justifyContent: "space-around",
+        padding: "0 20px",
+        width: "100%",
+    };
+
     useEffect(() => {
         if(followAPI.isSuccess){
             if(followAPI.data.success){
+                if(!isFollow){
+                    setFollowerCount(followerCount+1);
+                }else{
+                    setFollowerCount(followerCount-1);
+                }
                 setIsFollow(!isFollow);
             }else{
                 console.error(followAPI.data.error);
@@ -180,7 +196,6 @@ export default function ProfilePage() {
                     isFollow:isFollow,
                     userId: userId,
                 }
-
             )
         });
     };
@@ -201,26 +216,32 @@ export default function ProfilePage() {
                         <MDBCard className="mb-4">
                             <MDBCardBody className="text-center">
                                 <MDBCardImage
-                                // src="~/Users/mizuki/programming/TestCraft/frontend/app/src/icon/test.png"
-                                // srcなぜかうまくいかないのでパス
-                                alt="avatar"
-                                className="rounded-circle"
-                                style={{ width: '150px' }}
-                                fluid />
+                                    alt="avatar"
+                                    className="rounded-circle"
+                                    style={{ width: '150px' }}
+                                    fluid 
+                                />
                                 <p className="text-muted mb-1">今後対応予定です。</p>
                                 <p className="text-muted mb-4">今後対応予定です。</p>
-                                <div className="d-flex justify-content-center mb-2">
-                                    <Button
-                                        variant="contained"
-                                        style={buttonStyles}
-                                        onClick={follow}
-                                    >
-                                        {isFollow ? "フォロー解除":"フォローする"}
-                                    </Button>
+                                <div style={followFollowerStyle}>
+                                    <div className="d-flex flex-column align-items-center">
+                                        <p className="font-weight-bold mb-0">follow</p>
+                                        <p className="font-weight-bold">{followCount}</p>
+                                    </div>
+                                    <div className="d-flex flex-column align-items-center">
+                                        <p className="font-weight-bold mb-0">follower</p>
+                                        <p className="font-weight-bold">{followerCount}</p>
+                                    </div>
                                 </div>
+                                <Button
+                                    variant="contained"
+                                    style={buttonStyles}
+                                    onClick={follow}
+                                >
+                                    {isFollow ? "フォロー解除":"フォローする"}
+                                </Button>
                             </MDBCardBody>
                         </MDBCard>
-
                     </MDBCol>
                     <MDBCol lg="8">
                         <MDBCard className="mb-4">

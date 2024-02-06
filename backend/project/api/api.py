@@ -397,7 +397,6 @@ def profile(request,userId:int):
                 **workbook,
                 'categories': list(categories)
             })
-        
         return JsonResponse(
             {
                 "success":True,
@@ -407,6 +406,8 @@ def profile(request,userId:int):
                 "isFollow":isFollow,
                 "solved_workbook":solved_workbook,
                 "created_workbook":created_workbook,
+                "followCount":user.count_following(),
+                "followerCount":user.count_followers(),
                 "error":None,
             },
             status = 200,

@@ -30,6 +30,8 @@ class User(AbstractUser):
     key = models.CharField(max_length = 48, null = True, blank = True)
     following = models.ManyToManyField('self', through='Follow', symmetrical=False, related_name='followers')
     
+    def count_following(self):return self.following.count()
+    def count_followers(self):return self.followers.count()
     USERNAME_FIELD = 'username'
     
     groups = models.ManyToManyField(
