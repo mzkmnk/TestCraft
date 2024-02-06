@@ -1,4 +1,3 @@
-import { useState } from "react";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -10,29 +9,19 @@ import { useAnswers } from "../context/AnswersContext";
 import { format } from "../../EditorApp/SwitchableTextField";
 import { useMemo } from "react";
 
-export function DisplayResult({
-  questionTree,
-  questionId,
-  correctIds,
-  questionCount,
-  answers = null,
-}) {
-  const answersContext = useAnswers();
-  if (answers === null) {
-    answers = answersContext.answers;
-  }
-
+// 再帰的に問題を表示する関数
+export function DisplayFormsForSP({ info = {}, questionTree, questionId }) {
+  const { answers, setAnswers } = useAnswers();
+  // 今回表示する問題
   const question = questionTree[questionId];
-  let color;
-  const isCorrect = correctIds.includes(questionId);
-  if (isCorrect) {
-    color = "success";
-  } else {
-    color = "error";
-  }
+
   const questionJsx = useMemo(() => {
     return question.question !== undefined ? format(question.question) : null;
   }, [question.question]);
+
+  const handleSetAnswers = (event) => {
+    setAnswers({ ...answers, [questionId]: event.target.value });
+  };
 
   if (questionTree[questionId].questionType === "root") {
     return (
@@ -42,14 +31,9 @@ export function DisplayResult({
         justifyContent="center"
         height="calc(100vh - 180px)"
       >
-        <Box>
-          <Typography variant="h3" align="center">
-            Result
-          </Typography>
-          <Typography align="center">
-            正答率：{correctIds.length} ／ {questionCount}
-          </Typography>
-        </Box>
+        <Typography align="center" variant="h3">
+          {info.title}
+        </Typography>
       </Box>
     );
   } else if (questionTree[questionId].questionType === "nested") {
@@ -57,12 +41,12 @@ export function DisplayResult({
       <>
         {questionJsx}
         {question.childIds.map((childId) => (
-          <DisplayResult
+          <DisplayFormsForSP
             key={childId}
-            questionId={childId}
             questionTree={questionTree}
-            correctIds={correctIds}
+            questionId={childId}
             answers={answers}
+            setAnswers={setAnswers}
           />
         ))}
       </>
@@ -71,15 +55,16 @@ export function DisplayResult({
     return (
       <>
         {questionJsx}
-        <Typography color={color + ".main"}>
-          {isCorrect ? "正解" : "不正解"}
-        </Typography>
-        <RadioGroup name={questionId} value={answers[questionId] || "未回答"}>
+        <RadioGroup
+          name={questionId}
+          onChange={(event) => handleSetAnswers(event)}
+          value={answers[questionId] || ""}
+        >
           {question.options.map((option) => (
             <FormControlLabel
               key={option.id}
               value={option.value}
-              control={<Radio inputProps={{ readOnly: true }} color={color} />}
+              control={<Radio />}
               label={option.value}
             />
           ))}
@@ -90,14 +75,10 @@ export function DisplayResult({
     return (
       <>
         {questionJsx}
-        <Typography color={color + ".main"}>
-          {isCorrect ? "正解" : "不正解"}
-        </Typography>
         <TextField
-          inputProps={{ readOnly: true }}
-          defaultValue={answers[questionId] || "未回答"}
-          color={color}
-          focused
+          inputProps={{ maxLength: question.maxlength }}
+          onChange={(event) => handleSetAnswers(event)}
+          defaultValue={answers[questionId] || ""}
         />
       </>
     );

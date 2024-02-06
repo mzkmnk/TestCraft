@@ -8,48 +8,116 @@ import TextField from "@mui/material/TextField";
 import { useAnswers } from "../context/AnswersContext";
 import { format } from "../../EditorApp/SwitchableTextField";
 import { useMemo } from "react";
+import Grid from "@mui/material/Grid";
 
 // 再帰的に問題を表示する関数
 export function DisplayForms({ info = {}, questionTree, questionId }) {
   const { answers, setAnswers } = useAnswers();
-  // 今回表示する問題
-  const question = questionTree[questionId];
-
-  const questionJsx = useMemo(() => {
-    return question.question !== undefined ? format(question.question) : null;
-  }, [question.question]);
-
   const handleSetAnswers = (event) => {
     setAnswers({ ...answers, [questionId]: event.target.value });
   };
+  // 今回表示する問題
+  const question = questionTree[questionId];
+
+  // 問題文
+  let questionText = undefined;
+  let inputField = undefined;
+  if (question.questionType === "root") {
+  } else if (question.questionType === "nested") {
+    questionText =
+      question.question +
+      "\n\n" +
+      question.childIds
+        .map((childId, index) => {
+          return `問題${index + 1}\n` + questionTree[childId].question + "";
+        })
+        .join("\n\n");
+
+    inputField = question.childIds.map((childId, index) => (
+      <FormatInputField
+        key={childId}
+        question={questionTree[childId]}
+        questionId={questionId}
+        answers={answers}
+        handleSetAnswers={handleSetAnswers}
+        index={index}
+        isNested={true}
+      />
+    ));
+  } else {
+    questionText = question.question;
+    inputField = (
+      <FormatInputField
+        question={question}
+        questionId={questionId}
+        answers={answers}
+        handleSetAnswers={handleSetAnswers}
+        index={0}
+      />
+    );
+  }
+  // 数式、コードブロックの処理
+  const questionJsx = useMemo(() => {
+    return questionText !== undefined ? format(questionText) : null;
+  }, [questionText]);
+
+  // 表示するもの
+  let leftJsx = questionJsx;
+  let rightJsx = inputField;
 
   if (questionTree[questionId].questionType === "root") {
-    return (
+    leftJsx = (
       <>
         <Typography align="center" variant="h3">
           {info.title}
         </Typography>
       </>
     );
-  } else if (questionTree[questionId].questionType === "nested") {
+  }
+
+  return (
+    <>
+      <Grid container>
+        <Grid
+          item
+          xs={6}
+          style={{
+            overflowX: "hidden",
+            overflowY: "scroll",
+            height: "calc(100vh - 145px)",
+          }}
+        >
+          <Box sx={{ margin: 2 }}>{leftJsx}</Box>
+        </Grid>
+        <Grid
+          item
+          xs={6}
+          style={{
+            overflowX: "hidden",
+            overflowY: "scroll",
+            height: "calc(100vh - 145px)",
+          }}
+        >
+          <Box sx={{ margin: 2 }}>{rightJsx}</Box>
+        </Grid>
+      </Grid>
+    </>
+  );
+}
+
+function FormatInputField({
+  question,
+  questionId,
+  answers,
+  handleSetAnswers,
+  index,
+  isNested = false,
+}) {
+  const mainBottom = 2;
+  if (question.questionType === "radio") {
     return (
-      <>
-        {questionJsx}
-        {question.childIds.map((childId) => (
-          <DisplayForms
-            key={childId}
-            questionTree={questionTree}
-            questionId={childId}
-            answers={answers}
-            setAnswers={setAnswers}
-          />
-        ))}
-      </>
-    );
-  } else if (questionTree[questionId].questionType === "radio") {
-    return (
-      <>
-        {questionJsx}
+      <Box marginBottom={mainBottom}>
+        {isNested ? <Typography>{"問題" + (index + 1)}</Typography> : null}
         <RadioGroup
           name={questionId}
           onChange={(event) => handleSetAnswers(event)}
@@ -64,18 +132,18 @@ export function DisplayForms({ info = {}, questionTree, questionId }) {
             />
           ))}
         </RadioGroup>
-      </>
+      </Box>
     );
-  } else if (questionTree[questionId].questionType === "textarea") {
+  } else if (question.questionType === "textarea") {
     return (
-      <>
-        {questionJsx}
+      <Box marginBottom={mainBottom}>
+        {isNested ? <Typography>{"問題" + (index + 1)}</Typography> : null}
         <TextField
           inputProps={{ maxLength: question.maxlength }}
           onChange={(event) => handleSetAnswers(event)}
           defaultValue={answers[questionId] || ""}
         />
-      </>
+      </Box>
     );
   }
 }

@@ -2,9 +2,9 @@ import { useState } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { DisplayForms } from "./DisplayForms";
+import { DisplayFormsForSP } from "./DisplayFormsForSP";
 
 import { useQuestions } from "../context/QuestionsContext";
-
 import { DisplayResult } from "./DisplayResult";
 
 export function AnswerForms({
@@ -61,25 +61,18 @@ export function AnswerForms({
     }
   };
 
-  return (
-    <>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          width: "100%",
-        }}
-      >
+  // スマホの場合
+  if (document.documentElement.clientWidth < 700) {
+    return (
+      <>
         <Box
           sx={{
-            padding: 1,
-            margin: 1,
+            margin: 3,
+            marginTop: 4,
           }}
         >
           {!resultMode ? (
-            <DisplayForms
+            <DisplayFormsForSP
               info={info}
               questionTree={questionTree}
               questionId={pages[displayPageIndex]}
@@ -98,7 +91,75 @@ export function AnswerForms({
           sx={{
             display: "flex",
             justifyContent: "space-between",
-            width: "80%",
+          }}
+        >
+          <Box sx={{ padding: 1, margin: 1 }}>
+            <Button disabled={isFirstQuestion} onClick={handlePrevQuestion}>
+              前へ
+            </Button>
+          </Box>
+          <Box sx={{ padding: 1, margin: 1 }}>
+            {isLastQuestion ? (
+              <Button onClick={exitFunc}>終了</Button>
+            ) : (
+              <Button onClick={handleNextQuestion}>次へ</Button>
+            )}
+          </Box>
+        </Box>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <Box
+        sx={{
+          width: "100%",
+          overflow: "hidden",
+        }}
+      >
+        <Box
+          sx={{
+            padding: 1,
+            margin: 1,
+          }}
+        >
+          {!resultMode ? (
+            <DisplayForms
+              info={info}
+              questionTree={questionTree}
+              questionId={pages[displayPageIndex]}
+            />
+          ) : (
+            <Box
+              sx={{
+                margin: 3,
+                marginTop: 3,
+                maxWidth: "55rem",
+                marginLeft: "auto",
+                marginRight: "auto",
+                height: "calc(100vh - 180px)",
+                overflowY: "auto",
+              }}
+            >
+              <DisplayResult
+                questionTree={questionTree}
+                questionId={pages[displayPageIndex]}
+                correctIds={correctIds}
+                questionCount={questionCount}
+                answers={answers}
+              />
+            </Box>
+          )}
+        </Box>
+        <Box
+          sx={{
+            position: "fixed",
+            display: "flex",
+            justifyContent: "space-between",
+            width: "100%",
+            bottom: 0,
+            backgroundColor: "#F5F8F5",
           }}
         >
           <Box sx={{ padding: 1, margin: 1 }}>

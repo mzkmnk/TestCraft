@@ -4,6 +4,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Modal from "@mui/material/Modal";
+import { useAnswerSettings } from "../context/AnswerSettingsContext";
 
 const style = {
   position: "absolute",
@@ -16,10 +17,12 @@ const style = {
   boxShadow: 24,
 };
 
-export function SettingsModal({ exitFunc, answerSettings, setAnswerSettings }) {
+export function SettingsModal({ exitFunc }) {
+  const { answerSettings, setAnswerSettings } = useAnswerSettings();
   const [time_min, setTime_min] = useState(
     Math.floor(answerSettings.time / 60)
   );
+
   const [time_sec, setTime_sec] = useState(answerSettings.time % 60);
 
   // textfieldの値を取得する
