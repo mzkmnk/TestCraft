@@ -89,7 +89,6 @@ export default function ProfilePage() {
             gridTemplateColumns: "repeat(2, 1fr)",
             gridGap: "20px",
             maxHeight: "calc(100vh - 70px)",
-            overflowY: "auto",
             padding: "20px",
         },
         question: {
