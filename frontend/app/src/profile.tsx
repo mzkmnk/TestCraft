@@ -42,7 +42,7 @@ export default function ProfilePage() {
     );
 
     const handleQuestionClick = (workbookId) => {
-        window.open(`/solve/${workbookId}`,"_blank");
+        window.open(`/solve/${workbookId}`,"_blank",'noopener,noreferrer');
         // navigate(`/solve/${workbookId}`);
     }
 
