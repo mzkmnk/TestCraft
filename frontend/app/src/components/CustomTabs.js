@@ -89,7 +89,7 @@ const TabsList = styled(BaseTabsList)(
     width: 65%;
     min-width: 400px;
     // background-color: ${blue[500]};
-    background-color: #1876D1;
+    background-color: #1876D2;
     border-radius: 12px;
     margin: 0 auto;
     margin-bottom: 16px;

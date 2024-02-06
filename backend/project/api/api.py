@@ -524,7 +524,7 @@ def get_create_user_workbook(request):
                 **workbook,
                 'categories': list(categories)
             })
-        User = request.user
+        print(workbooks_with_categories)
         return JsonResponse(
             {
                 'success' : True,
@@ -811,10 +811,25 @@ def solve_workbook(request):
                 **user_answer,
                 'categories': list(categories)
             })
+        print(user_answers_with_categories)
+        workbook = [
+            {
+                "id":user_answer['workbook__id'],
+                "workbook_name":user_answer['workbook__workbook_name'],
+                "description":user_answer['workbook__description'],
+                "create_id__username":user_answer['workbook__create_id__username'],
+                "created_at":user_answer['workbook__created_at'],
+                "updated_at":user_answer['workbook__updated_at'],
+                "like_count":user_answer['workbook__like_count'],
+                "answer_json":user_answer['answer_json'],
+                "solved_count":user_answer['solved_count'],
+            }
+            for user_answer in user_answers
+        ]
         return JsonResponse(
             {
                 'success' : True,
-                'workbook' : user_answers_with_categories,
+                'workbook' : workbook,
             },
             status = 200
         )
