@@ -144,6 +144,10 @@ function FormatInputField({
           inputProps={{ maxLength: question.maxlength }}
           onChange={(event) => handleSetAnswers(event, questionId)}
           defaultValue={answers[questionId] || ""}
+          multiline
+          fullWidth
+          maxRows={8}
+          rows={8}
         />
       </Box>
     );

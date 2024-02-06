@@ -79,6 +79,10 @@ export function DisplayFormsForSP({ info = {}, questionTree, questionId }) {
           inputProps={{ maxLength: question.maxlength }}
           onChange={(event) => handleSetAnswers(event)}
           defaultValue={answers[questionId] || ""}
+          multiline
+          fullWidth
+          maxRows={4}
+          rows={4}
         />
       </>
     );

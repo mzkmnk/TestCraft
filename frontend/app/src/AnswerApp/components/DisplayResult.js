@@ -98,6 +98,8 @@ export function DisplayResult({
           defaultValue={answers[questionId] || "未回答"}
           color={color}
           focused
+          multiline
+          fullWidth
         />
       </>
     );
