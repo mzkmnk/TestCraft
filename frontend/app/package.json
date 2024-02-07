@@ -15,6 +15,7 @@
     "chartjs-adapter-date-fns": "^3.0.0",
     "date-fns": "^3.3.0",
     "exceljs": "^4.4.0",
+    "mdb-react-ui-kit": "^7.2.0",
     "node-fetch": "^3.3.2",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
