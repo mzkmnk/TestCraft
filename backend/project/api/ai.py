@@ -4,9 +4,8 @@ from dotenv import load_dotenv
 from pathlib import Path
 import os
 
-current_path = Path(__file__).resolve().parent
-print("current_path:", current_path)
-load_dotenv(dotenv_path=current_path / "key.env")
+dotenv_path = "/home/ec2-user/key.env"
+load_dotenv(dotenv_path=dotenv_path)
 
 print(os.getenv("KEY"))
 
