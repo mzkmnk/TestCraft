@@ -33,7 +33,7 @@ class CustomLike(admin.ModelAdmin):
 admin.site.register(Like,CustomLike)
 
 class CustomUserAnswer(admin.ModelAdmin):
-    list_display = ('user','workbook','solved_count')
+    list_display = ('user','workbook','solved_count','created_at')
     search_fields=('id',)
 admin.site.register(UserAnswer,CustomUserAnswer)
 
