@@ -142,6 +142,8 @@ function FormatInputField({
       </Box>
     );
   } else if (question.questionType === "textarea") {
+    console.log("questionId", questionId);
+    console.log("answers[questionId]", answers[questionId]);
     return (
       <Box marginBottom={marginBottom}>
         {isNested ? (
@@ -150,7 +152,7 @@ function FormatInputField({
         <TextField
           inputProps={{ maxLength: question.maxlength }}
           onChange={(event) => handleSetAnswers(event, questionId)}
-          defaultValue={answers[questionId] || ""}
+          value={answers[questionId] || ""}
           multiline
           fullWidth
           rows={8}

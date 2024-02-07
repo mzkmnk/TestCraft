@@ -92,7 +92,7 @@ export function DisplayFormsForSP({
         <TextField
           inputProps={{ maxLength: question.maxlength }}
           onChange={(event) => handleSetAnswers(event)}
-          defaultValue={answers[questionId] || ""}
+          value={answers[questionId] || ""}
           multiline
           fullWidth
           rows={4}

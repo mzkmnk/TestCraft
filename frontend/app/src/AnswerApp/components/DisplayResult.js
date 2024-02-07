@@ -108,7 +108,7 @@ export function DisplayResult({
         </Typography>
         <TextField
           inputProps={{ readOnly: true }}
-          defaultValue={answers[questionId] || "未回答"}
+          value={answers[questionId] || "未回答"}
           color={color}
           focused
           multiline
