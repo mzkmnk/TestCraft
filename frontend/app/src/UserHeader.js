@@ -11,7 +11,8 @@ import Fade from "@mui/material/Fade";
 
 // アイコンimport
 import BorderColorIcon from "@mui/icons-material/BorderColor";
-import BookIcon from "@mui/icons-material/Book";
+import NoteAddIcon from "@mui/icons-material/NoteAdd";
+import RestorePageIcon from "@mui/icons-material/RestorePage";
 import EqualizerIcon from "@mui/icons-material/Equalizer";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import HistoryIcon from "@mui/icons-material/History";
@@ -159,22 +160,7 @@ const UserHeader = ({ position = "static" }) => {
                   <NotificationsActiveIcon style={styles.icon} />
                   お知らせ
                 </MenuItem>
-                <MenuItem
-                  component={Link}
-                  to="/mypage/mycreate"
-                  onClick={handleMenuClose}
-                >
-                  <HistoryIcon style={styles.icon} />
-                  作成履歴
-                </MenuItem>
-                <MenuItem
-                  component={Link}
-                  to="/mypage/mysolve"
-                  onClick={handleMenuClose}
-                >
-                  <HistoryIcon style={styles.icon} />
-                  解答履歴
-                </MenuItem>
+
                 <MenuItem onClick={handleLogout}>
                   <LogoutIcon style={styles.icon} />
                   ログアウト
@@ -204,15 +190,31 @@ const UserHeader = ({ position = "static" }) => {
                   onClick={handleMenuClose}
                 >
                   <BorderColorIcon style={styles.icon} />
-                  問題一覧
+                  解答する
                 </MenuItem>
                 <MenuItem
                   component={Link}
                   to="/editor"
                   onClick={handleMenuClose}
                 >
-                  <BookIcon style={styles.icon} />
-                  問題作成
+                  <NoteAddIcon style={styles.icon} />
+                  作成する
+                </MenuItem>
+                <MenuItem
+                  component={Link}
+                  to="/mypage/mycreate"
+                  onClick={handleMenuClose}
+                >
+                  <RestorePageIcon style={styles.icon} />
+                  編集する
+                </MenuItem>
+                <MenuItem
+                  component={Link}
+                  to="/mypage/mysolve"
+                  onClick={handleMenuClose}
+                >
+                  <HistoryIcon style={styles.icon} />
+                  解答履歴
                 </MenuItem>
               </Menu>
               {isOwnCompanyUser && (

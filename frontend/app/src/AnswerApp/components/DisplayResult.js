@@ -96,7 +96,6 @@ export function DisplayResult({
       </Box>
     );
   } else if (questionTree[questionId].questionType === "textarea") {
-    console.log("AIComments", AiComments);
     return (
       <Box marginBottom={6}>
         {isNested ? (
@@ -131,7 +130,13 @@ export function DisplayResult({
               fontStyle={"italic"}
               style={{ opacity: 0.4, fontStyle: "oblique" }}
             >
-              AIコメント
+              AIコメント：
+            </Typography>
+            <Typography>
+              結果：
+              <Box component="span" color={color + ".main"}>
+                {isCorrect ? "正解" : "不正解"}
+              </Box>
             </Typography>
             {format(AiComments[questionId])}
           </Box>
