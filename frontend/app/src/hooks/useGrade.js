@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useParams } from "react-router-dom";
 
 import { useAPI } from "./useAPI";
 
@@ -6,6 +7,8 @@ export function useGrade({ questionTree, questionIds, answers }) {
   const [correctIds, setCorrectIds] = useState([]);
   const [isFinished, setIsFinished] = useState(false);
   const [questionCount, setQuestionCount] = useState(0);
+
+  const { workbookId } = useParams();
 
   const [isAIScoringFinished, setIsAIScoringFinished] = useState(null);
 
@@ -28,11 +31,14 @@ export function useGrade({ questionTree, questionIds, answers }) {
 
   // ここでAI採点を行う。
   useEffect(() => {
+    console.log("workbookId", workbookId);
+    console.log(typeof workbookId);
     if (AIAPI.isLoading === null) {
       AIAPI.sendAPI({
         body: JSON.stringify({
           question_tree: questionTree,
           answers: answers,
+          workbookId: workbookId,
           target_answer: aIScoringQuestionIds,
         }),
       });

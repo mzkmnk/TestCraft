@@ -122,6 +122,7 @@ class PassChangeSchema(Schema):
 class AiScore(BaseModel):
     question_tree:Dict[str,Question]
     answers:Dict[str,Union[str,int]]
+    workbookId:str
     target_answer:List[str]
 
 # APIz
@@ -737,12 +738,18 @@ def solve_detail(request,workbookId:int,solved_count:int):
         workbook = Workbook.objects.get(id = workbookId)
         user_answer = UserAnswer.objects.get(user = request.user, workbook = workbook, solved_count = solved_count)
         problem = Problem.objects.get(workbook_id = workbookId).problem_json
+        ai_comment = AiComment.objects.get(
+            workbook = workbook,
+            user = request.user,
+            solved_count = solved_count,
+        )
         return JsonResponse(
             {
                 "success":True,
                 "workbook":problem,
                 "correctIds":user_answer.correctIds,
                 "user_answer":user_answer.answer_json,
+                "ai_comment":ai_comment.comment_json,
                 "error":None,
             },
             status = 200,
@@ -935,10 +942,18 @@ def ai_score(request,payload:AiScore):
         question_trees = payload.question_tree
         target_answers = payload.target_answer
         answers = payload.answers
+        workbook_id = int(payload.workbookId)
         question_keys = list(question_trees.keys())
 
         debug = True#ここ変更するとデバックデータを返す。
 
+        workbook = Workbook.objects.get(id = workbook_id)
+        user = request.user
+        user_count_answer,_created = UserCountAnswer.objects.get_or_create(
+            workbook = workbook,
+            user = user,
+        )
+        comment = []
         if(debug):
             from random import choice
             debug_results = []
@@ -953,6 +968,17 @@ def ai_score(request,payload:AiScore):
                     }
                 )
             print(debug_results)
+            ai_comment = AiComment.objects.create(
+                workbook = workbook,
+                user = user,
+                solved_count = user_count_answer.count,
+                comment_json = [
+                    {
+                        data["id"]:data["explanation"]
+                    }
+                    for data in debug_results
+                ],
+            )
             return JsonResponse(
                 {
                     "success":True,
@@ -1002,6 +1028,19 @@ def ai_score(request,payload:AiScore):
                     print("No childIds child")
         else:
             print("No childIds parent")
+        
+        aicomment = AiComment.objects.create(
+            workbook = Workbook.objects.get(id = workbook_id),
+            user = request.user,
+            solved_count = user_count_answer.count,
+            comment_json = [
+                {
+                    data["id"]:data["explanation"]
+                }
+                for data in results
+            ]
+        )
+        aicomment.save()
         return JsonResponse(
             {
                 "success":True,

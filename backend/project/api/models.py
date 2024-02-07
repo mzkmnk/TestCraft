@@ -110,6 +110,16 @@ class UserAnswer(models.Model):
     correctIds = JSONField(default=list)
     answer_json = JSONField()
     created_at = models.DateField(auto_now_add=True)
+
+class AiComment(models.Model):
+    workbook = models.ForeignKey(Workbook, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    solved_count = models.IntegerField(default=0)
+    comment_json = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.workbook.workbook_name}"
     
 
 class Category(models.Model):

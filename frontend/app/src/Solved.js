@@ -29,6 +29,7 @@ function Solved() {
       navigate("/error");
     } else if (API.isSuccess === true && API.data.success === true) {
       const data = API.data;
+      console.log("data",data);
       setAnswers(data.user_answer);
       setWorkbook(JSON.parse(data.workbook));
       setCorrectIds(data.correctIds);

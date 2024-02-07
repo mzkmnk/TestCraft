@@ -51,3 +51,8 @@ class CustomCertification(admin.ModelAdmin):
     list_display = ('username','key')
     search_fields = ('id',)
 admin.site.register(Certification,CustomCertification)
+
+class CumstomAiComment(admin.ModelAdmin):
+    list_display = ('user','workbook',)
+    search_fields = ('id',)
+admin.site.register(AiComment,CumstomAiComment)
