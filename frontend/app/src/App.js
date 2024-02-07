@@ -21,6 +21,7 @@ import ChangePassSend from "./change_pass_send";
 import ChangePass from "./change_pass";
 import ChangeProfilePage from "./ChangeProfile.tsx";
 import ProfilePage from "./profile.tsx";
+import Sns from "./Sns.js";
 
 import Error from "./Error.js";
 
@@ -58,6 +59,7 @@ function App() {
           element={<ReadWorkbook nextAppName={"AnswerApp"} />}
         />
         <Route path="/solved/:workbookId/:solved_count" element={<Solved />} />
+        <Route path="/sns" element={<Sns />} />
         <Route path="/error" element={<Error />} />
       </Routes>
     </Router>
