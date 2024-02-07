@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'api',
     'ninja',
+    'django_ses',
 ]
 
 NINJA_DOCS_VIEW = 'redoc'
@@ -150,6 +151,9 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+AWS_SES_REGION_NAME=os.getenv('AWS_SES_REGION_NAME')
+AWS_SES_REGION_ENDPOINT=os.getenv('AWS_SES_REGION_ENDPOINT')
 
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS')
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET')
