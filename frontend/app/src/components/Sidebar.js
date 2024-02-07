@@ -6,8 +6,8 @@ const { Header, Content, Sider } = Layout;
 
 const siderStyle = {
     position: 'fixed',
-    top: '64px', // ヘッダーの高さに応じて調整
-    height: 'calc(100vh - 64px)', // ヘッダーの高さ分を引く
+    top: '64px',
+    height: 'calc(100vh - 64px)',
     overflowY: 'auto'
 };
 
