@@ -1,17 +1,28 @@
 import React from 'react';
-import { Layout, Menu, Breadcrumb } from 'antd';
+import { Layout, Menu } from 'antd';
 import 'antd/dist/reset.css';
 
-const { Header, Content, Sider } = Layout;
+const { Content, Sider } = Layout;
 
-const siderStyle = {
-    position: 'fixed',
-    top: '64px',
-    height: 'calc(100vh - 64px)',
-    overflowY: 'auto'
+interface MenuItem {
+  label: string;
+  key: string;
+}
+
+const siderStyle: React.CSSProperties = {
+  position: 'fixed',
+  top: '64px',
+  height: 'calc(100vh - 64px)',
+  overflowY: 'auto'
 };
+const menuItems: MenuItem[] = [
+  { label: 'option1', key: '1' },
+  { label: 'option2', key: '2' },
+  { label: 'option3', key: '3' },
+  { label: 'option4', key: '4' },
+];
 
-const Sidebar = () => (
+const Sidebar: React.FC = () => (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider style={siderStyle} width={200} className="site-layout-background">
         <Menu
@@ -19,12 +30,8 @@ const Sidebar = () => (
           defaultSelectedKeys={['1']}
           defaultOpenKeys={['sub1']}
           style={{ height: '100%', borderRight: 0 }}
-        >
-          <Menu.Item key="1">option1</Menu.Item>
-          <Menu.Item key="2">option2</Menu.Item>
-          <Menu.Item key="3">option3</Menu.Item>
-          <Menu.Item key="4">option4</Menu.Item>
-        </Menu>
+          items={menuItems}
+        />
       </Sider>
       <Layout style={{ flex: 1 }}>
         <Content style={{ marginTop: '64px', marginLeft: '200px', overflow: 'auto' }}>
@@ -34,6 +41,6 @@ const Sidebar = () => (
         </Content>
       </Layout>
     </Layout>
-  );
-  
-  export default Sidebar;
+);
+
+export default Sidebar;

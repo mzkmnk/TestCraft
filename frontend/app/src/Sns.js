@@ -1,7 +1,7 @@
 import React from "react";
 
 import UserHeader from "./UserHeader";
-import Sidebar from "./components/Sidebar.js";
+import Sidebar from "./components/Sidebar.tsx";
 
 function Sns() {
   return (
