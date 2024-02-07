@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     'corsheaders',
     'api',
     'ninja',
-    'django_ses',
 ]
 
 NINJA_DOCS_VIEW = 'redoc'
@@ -152,18 +151,9 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-AWS_SES_REGION_NAME=os.getenv('AWS_SES_REGION_NAME')
-AWS_SES_REGION_ENDPOINT=os.getenv('AWS_SES_REGION_ENDPOINT')
-
-AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS')
-AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET')
 EMAIL_BACKEND = os.getenv('EMAIL_BACKEND')
-SERVER_EMAIL = os.getenv('EMAIL_HOST_USER')
-# SERVER_EMAIL = os.getenv('SERVER_EMAIL')
-
-# EMAIL_BACKEND = os.getenv('EMAIL_BACKEND')
-# EMAIL_HOST = os.getenv('EMAIL_HOST')
-# EMAIL_PORT = os.getenv('EMAIL_PORT')
-# EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-# EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-# EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS') == 'True'
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_PORT = os.getenv('EMAIL_PORT')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS') == 'True'
