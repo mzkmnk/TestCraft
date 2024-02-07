@@ -146,7 +146,7 @@ const UserHeader = ({ position = "static" }) => {
                 )}
                 <MenuItem
                   component={Link}
-                  to="/user_change"
+                  to="/change_profile"
                   onClick={handleMenuClose}
                 >
                   <ManageAccountsIcon style={styles.icon} />

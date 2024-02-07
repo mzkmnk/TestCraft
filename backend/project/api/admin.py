@@ -52,6 +52,11 @@ class CustomCertification(admin.ModelAdmin):
     search_fields = ('id',)
 admin.site.register(Certification,CustomCertification)
 
+class CustomFollow(admin.ModelAdmin):
+    list_display = ('follower','following')
+    search_fields = ('id',)
+admin.site.register(Follow,CustomFollow)
+
 class CumstomAiComment(admin.ModelAdmin):
     list_display = ('user','workbook',)
     search_fields = ('id',)

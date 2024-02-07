@@ -1,13 +1,27 @@
 import React, { useEffect, useState } from "react";
 import UserHeader from "./UserHeader";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useLocation } from "react-router-dom";
 import { useAPI } from "./hooks/useAPI";
+import Pagination from "@mui/material/Pagination";
+import Alert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
 import { Typography } from "@mui/material";
+import { FaHeart } from "react-icons/fa";
 
 // Exportしなくても使えてる？
 function Mysolve() {
   const [workbooks, setWorkbooks] = useState([]);
   const navigate = useNavigate();
+  const location = useLocation();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const questionsPerPage = 6;
+  const indexOfLastQuestions = currentPage * questionsPerPage;
+  const indexOfFirstQuestions = indexOfLastQuestions - questionsPerPage;
+  const currentQuestions = workbooks.slice(
+    indexOfFirstQuestions,
+    indexOfLastQuestions
+  );
 
   const API = useAPI({
     APIName: "solve_workbook",
@@ -24,7 +38,14 @@ function Mysolve() {
     }
   }, [API.data.success, API.data.workbook, API.isSuccess, navigate]);
 
-  //ここ変更
+  const handleChangePage = (event, value) => {
+    setCurrentPage(value);
+  }
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
+  };
+
   const handleQuestionClick = (workbookId,solved_count) => {
     navigate(`/solved/${workbookId}/${solved_count}`);
   };
@@ -70,23 +91,23 @@ function Mysolve() {
 
   const workbookLists = (
     <>
-      {workbooks.map((workbook) => (
+      {currentQuestions.map((workbook,index) => (
         <div
           style={styles.question}
-          key={workbook.solved_count}
-          onClick={() => handleQuestionClick(workbook.workbook__id,workbook.solved_count)}
+          key={index}
+          onClick={() => handleQuestionClick(workbook.id,workbook.solved_count)}
         >
           <div style={styles.questionHeader}>
-            <h3>{workbook.workbook__workbook_name}</h3>
+            <h3>{workbook.workbook_name}</h3>
             <span style={styles.createdBy}>
-              created by {workbook.workbook_create_id__username} (
-              {workbook.workbook__created_at})
+              created by {workbook.create_id__username} (
+              {workbook.created_at})
             </span>
           </div>
-          <p>{workbook.workbook__description}</p>
+          <p>{workbook.description}</p>
           <div style={likeStyle}>
-            <span style={likeIconStyle}>♥</span>
-            <span>{workbook.workbook__like_count}</span>
+            <FaHeart style={likeIconStyle} />
+            <span>{workbook.like_count}</span>
           </div>
         </div>
       ))}
@@ -103,6 +124,27 @@ function Mysolve() {
           <Typography>まだ解答履歴はありません。</Typography>
         )}
       </div>
+      <Pagination
+        count={Math.ceil(workbooks.length / questionsPerPage)}
+        page={currentPage}
+        onChange={handleChangePage}
+      />
+      {openSnackbar && (
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={4000}
+          onClose={handleCloseSnackbar}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        >
+          <Alert
+            onClose={handleCloseSnackbar}
+            severity="success"
+            sx={{ width: "100%" }}
+          >
+            {location.state.message}
+          </Alert>
+        </Snackbar>
+      )}
     </>
   );
 }

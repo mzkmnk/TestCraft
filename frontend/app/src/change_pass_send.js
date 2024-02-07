@@ -33,9 +33,6 @@ function ChangePassSend() {
     useEffect(() => {
         console.log(sendEmailAPI);
         if(sendEmailAPI.isSuccess === true && sendEmailAPI.data.success === true){
-            console.log('Send succeeded');
-            console.log(sendEmailAPI.data);
-            console.log("hhhhhhh")
             navigate('/login',{
                 state: {
                     message: 'メールを送信しました。メールを確認してください。',

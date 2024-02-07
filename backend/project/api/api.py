@@ -110,6 +110,7 @@ class MessageSchema(Schema):
     
 class UserChangeSchema(Schema):
     password : str
+    school : str
     
 class EmailVerificationSchema(Schema):
     username : str
@@ -125,7 +126,11 @@ class AiScore(BaseModel):
     workbookId:str
     target_answer:List[str]
 
-# APIz
+class FollowSchema(Schema):
+    isFollow:bool
+    userId:str
+
+# API
 # ユーザー登録するAPI
 @api.post("/signup")
 def signup(request, payload: SignUpSchema):
@@ -139,7 +144,6 @@ def signup(request, payload: SignUpSchema):
             )
         user.set_password(payload.password)
         user.save()
-        
         if payload.is_own_company:
             company = Company.objects.create(
                 name = payload.username,
@@ -339,26 +343,173 @@ def change_pass(request,payload :LoginSchema):
             status=400
         )
 
+# ユーザ詳細画面
+@api.get("/profile/{userId}")
+def profile(request,userId:int):
+    try:
+        user = User.objects.get(id=userId)
+        isFollow = Follow.objects.filter(follower=request.user,following=user).exists()
+        user_answers = UserAnswer.objects.filter(user = user).values(
+            'workbook__id',
+            'workbook__workbook_name',
+            'workbook__description',
+            'workbook__create_id__username',
+            'workbook__created_at',
+            'workbook__updated_at',
+            'workbook__like_count',
+            'answer_json',
+            'solved_count',
+        )
+        user_answers_with_categories = []
+        for user_answer in user_answers:
+            categories = WorkbookCategory.objects.filter(id=user_answer['workbook__id']).values_list('category__category_name', flat=True)
+            user_answers_with_categories.append({
+                **user_answer,
+                'categories': list(categories)
+            })
+        solved_workbook = [
+            {
+                "id":user_answer['workbook__id'],
+                "workbook_name":user_answer['workbook__workbook_name'],
+                "description":user_answer['workbook__description'],
+                "create_id__username":user_answer['workbook__create_id__username'],
+                "created_at":user_answer['workbook__created_at'],
+                "updated_at":user_answer['workbook__updated_at'],
+                "like_count":user_answer['workbook__like_count'],
+                "answer_json":user_answer['answer_json'],
+                "solved_count":user_answer['solved_count'],
+            }
+            for user_answer in user_answers
+        ]
+
+        workbooks = Workbook.objects.filter(create_id__id = user.id).order_by('-created_at').values(
+            'id',
+            'workbook_name',
+            'description',
+            'create_id__username',
+            'created_at',
+            'updated_at',
+            'like_count',   
+        )
+        created_workbook = []
+        for workbook in workbooks:
+            categories = WorkbookCategory.objects.filter(id=workbook['id']).values_list('category__category_name', flat=True)
+            created_workbook.append({
+                **workbook,
+                'categories': list(categories)
+            })
+        return JsonResponse(
+            {
+                "success":True,
+                "username":user.username,
+                "email":user.email,
+                "school":user.school,
+                "isFollow":isFollow,
+                "solved_workbook":solved_workbook,
+                "created_workbook":created_workbook,
+                "followCount":user.count_following(),
+                "followerCount":user.count_followers(),
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "user":None,
+                "email":None,
+                "error":str(e),
+            },
+            status = 400,
+        )
+
+#フォロー、アンフォローするAPI
+@api.post("/follow")
+def follow(request,payload:FollowSchema):
+    try:
+        isFollow = payload.isFollow
+        userId = int(payload.userId)
+        if isFollow==False:#フォローする
+            Follow.objects.get_or_create(follower=request.user,following=User.objects.get(id=userId))
+            isFollow = True
+        else:#アンフォローする
+            Follow.objects.filter(follower=request.user, following=User.objects.get(id=userId)).delete()
+            isFollow = False
+        print(f"{isFollow=}")
+        return JsonResponse(
+            {
+                "success":True,
+                "isFollow":isFollow,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "error":str(e),
+            },
+            status = 400,
+        )
+
+#　ログインユーザ情報取得API
+@api.get("/get_user_info_change")
+def get_user_info(request):
+    try:
+        user = request.user
+        return JsonResponse(
+            {
+                "success":True,
+                "username":user.username,
+                "email":user.email,
+                "school":user.school,
+                "followCount":user.count_following(),
+                "followerCount":user.count_followers(),
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "user":None,
+                "email":None,
+                "error":str(e),
+            },
+            status = 400,
+        )
+    
 #登録情報を変更するAPI
 @api.post("/user_change")
 def user_change(request,payload: UserChangeSchema):
     try:
+        print(payload)
         user = User.objects.get(
             pk=request.user.id,
         )
-        # user.username = payload.username
-        user.set_password(payload.password)
+        print(payload)
+        password = payload.password
+        if(password != ""):
+            user.set_password(payload.password)
+        user.school = payload.school
         user.save()
         django_login(request,user)
         return JsonResponse({
             "success":True,
-            "id" : user.id,
             "username":user.username,
             },
                 status = 200
         )
     except Exception as e:
-        return JsonResponse({"success":False, "message" : str(e) },status = 400)
+        return JsonResponse(
+            {
+                "success":False,
+                "message" : str(e)
+            },
+            status = 400
+        )
         
 # 会社登録するAPI
 @api.post("/company_signup")
@@ -429,7 +580,7 @@ def get_create_user_workbook(request):
                 **workbook,
                 'categories': list(categories)
             })
-        User = request.user
+        print(workbooks_with_categories)
         return JsonResponse(
             {
                 'success' : True,
@@ -716,10 +867,25 @@ def solve_workbook(request):
                 **user_answer,
                 'categories': list(categories)
             })
+        print(user_answers_with_categories)
+        workbook = [
+            {
+                "id":user_answer['workbook__id'],
+                "workbook_name":user_answer['workbook__workbook_name'],
+                "description":user_answer['workbook__description'],
+                "create_id__username":user_answer['workbook__create_id__username'],
+                "created_at":user_answer['workbook__created_at'],
+                "updated_at":user_answer['workbook__updated_at'],
+                "like_count":user_answer['workbook__like_count'],
+                "answer_json":user_answer['answer_json'],
+                "solved_count":user_answer['solved_count'],
+            }
+            for user_answer in user_answers
+        ]
         return JsonResponse(
             {
                 'success' : True,
-                'workbook' : user_answers_with_categories,
+                'workbook' : workbook,
             },
             status = 200
         )
