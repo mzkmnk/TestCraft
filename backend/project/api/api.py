@@ -1111,7 +1111,7 @@ def ai_score(request,payload:AiScore):
         workbook_id = int(payload.workbookId)
         question_keys = list(question_trees.keys())
 
-        debug = True#ここ変更するとデバックデータを返す。
+        debug = False#ここ変更するとデバックデータを返す。
 
         workbook = Workbook.objects.get(id = workbook_id)
         user = request.user
