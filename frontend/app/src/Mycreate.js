@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import UserHeader from "./UserHeader";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import Pagination from "@mui/material/Pagination";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
@@ -53,11 +53,18 @@ function Mycreate() {
     navigate(`/editor/${workbookId}`);
   };
 
+  const gridTemplateColumns =
+    window.innerWidth > 800
+      ? "repeat(2, 1fr)"
+      : "repeat(auto-fit, minmax(300px, 1fr))";
+
   const styles = {
     questionsContainer: {
       display: "grid",
-      gridTemplateColumns: "repeat(2, 1fr)",
-      gridGap: "20px",
+      gridTemplateColumns,
+      gridGap: "35px",
+      maxWidth: "75rem",
+      margin: "0 auto",
       maxHeight: "calc(100vh - 70px)",
       overflowY: "auto",
       padding: "20px",
@@ -95,49 +102,68 @@ function Mycreate() {
   return (
     <>
       <UserHeader />
-      <div style={styles.questionsContainer}>
-        {currentQuestions.map((question,index) => (
+      <div style={{ margin: "1rem" }}>
+        {currentQuestions.length ? (
+          <>
+            <div style={styles.questionsContainer}>
+              {currentQuestions.map((question, index) => (
+                <div
+                  style={styles.question}
+                  key={index}
+                  onClick={() => handleQuestionClick(question.id)}
+                >
+                  <div style={styles.questionHeader}>
+                    <h3>{question.workbook_name}</h3>
+                    <span style={styles.createdBy}>
+                      created by {question.create_id__username} (
+                      {question.created_at})
+                    </span>
+                  </div>
+                  <p>{question.description}</p>
+                  <div style={likeStyle}>
+                    <FaHeart style={likeIconStyle} />
+                    <span>{question.like_count}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <Pagination
+              count={Math.ceil(questions.length / questionsPerPage)}
+              page={currentPage}
+              onChange={handleChangePage}
+              style={{ display: "flex", justifyContent: "flex-end" }}
+            />
+          </>
+        ) : (
           <div
-            style={styles.question}
-            key={index}
-            onClick={() => handleQuestionClick(question.id)}
+            style={{
+              textAlign: "center",
+            }}
           >
-            <div style={styles.questionHeader}>
-              <h3>{question.workbook_name}</h3>
-              <span style={styles.createdBy}>
-                created by {question.create_id__username} ({question.created_at}
-                )
-              </span>
-            </div>
-            <p>{question.description}</p>
-            <div style={likeStyle}>
-              <FaHeart style={likeIconStyle} />
-              <span>{question.like_count}</span>
-            </div>
+            <p style={{ fontSize: "1.5rem" }}>まだ問題はありません</p>
+            <p>
+              <Link to="/editor">作成ページ</Link>から、問題を作成してください。
+            </p>
           </div>
-        ))}
-      </div>
-      <Pagination
-        count={Math.ceil(questions.length / questionsPerPage)}
-        page={currentPage}
-        onChange={handleChangePage}
-      />
-      {openSnackbar && (
-        <Snackbar
-          open={openSnackbar}
-          autoHideDuration={4000}
-          onClose={handleCloseSnackbar}
-          anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        >
-          <Alert
+        )}
+
+        {openSnackbar && (
+          <Snackbar
+            open={openSnackbar}
+            autoHideDuration={4000}
             onClose={handleCloseSnackbar}
-            severity="success"
-            sx={{ width: "100%" }}
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
           >
-            {location.state.message}
-          </Alert>
-        </Snackbar>
-      )}
+            <Alert
+              onClose={handleCloseSnackbar}
+              severity="success"
+              sx={{ width: "100%" }}
+            >
+              {location.state.message}
+            </Alert>
+          </Snackbar>
+        )}
+      </div>
     </>
   );
 }
