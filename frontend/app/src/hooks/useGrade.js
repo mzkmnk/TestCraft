@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useParams } from "react-router-dom";
 
 import { useAPI } from "./useAPI";
 
@@ -7,14 +8,15 @@ export function useGrade({ questionTree, questionIds, answers }) {
   const [isFinished, setIsFinished] = useState(false);
   const [questionCount, setQuestionCount] = useState(0);
 
-  const [isAIScoringFinished, setIsAIScoringFinished] = useState(null);
-  const [correctIdsByAI, setCorrectIdsByAI] = useState([]);
+  const { workbookId } = useParams();
 
-  const AIAPI = useAPI(
-    {
-      APIName: "ai_scoring",
-    }
-  );
+  const [isAIScoringFinished, setIsAIScoringFinished] = useState(null);
+
+  const [AiComments, setAiComments] = useState(null);
+
+  const AIAPI = useAPI({
+    APIName: "ai_scoring",
+  });
 
   // AI採点を行う問題のIDを取得する。
   const aIScoringQuestionIds = useMemo(() => {
@@ -29,24 +31,38 @@ export function useGrade({ questionTree, questionIds, answers }) {
 
   // ここでAI採点を行う。
   useEffect(() => {
-    console.log("aIScoringQuestionIds", aIScoringQuestionIds);
-    console.log("answers", answers);
-    console.log(typeof answers);
-    AIAPI.sendAPI({
-      body: JSON.stringify(
-        {
-          question_tree : questionTree,
-          answers : answers,
-          target_answer : aIScoringQuestionIds,
-        }
-      )
-    })
-    setCorrectIdsByAI([]);
-    setIsAIScoringFinished(true);
-  }, [aIScoringQuestionIds]);
+    console.log("workbookId", workbookId);
+    console.log(typeof workbookId);
+    if (AIAPI.isLoading === null) {
+      AIAPI.sendAPI({
+        body: JSON.stringify({
+          question_tree: questionTree,
+          answers: answers,
+          workbookId: workbookId,
+          target_answer: aIScoringQuestionIds,
+        }),
+      });
+    }
+  }, [AIAPI, aIScoringQuestionIds, answers, questionTree]);
 
   useEffect(() => {
-    if (isAIScoringFinished === true && isFinished === false) {
+    if (
+      AIAPI.isSuccess === true &&
+      isFinished === false &&
+      AIAPI.data.success
+    ) {
+      const AIResults = AIAPI.data.results;
+      let AIcorrectIds = [];
+      let newAIComments = {};
+      for (const result of AIResults) {
+        if (result.is_correct) {
+          AIcorrectIds.push(result.id);
+        }
+        newAIComments[result.id] = result.explanation;
+      }
+      console.log("AIcorrectIds", AIcorrectIds);
+      console.log("newAIComments", newAIComments);
+
       let newQuestionCount = 0;
       let newCorrectIds = [];
 
@@ -82,33 +98,19 @@ export function useGrade({ questionTree, questionIds, answers }) {
       grade(questionIds);
 
       setQuestionCount(newQuestionCount);
-      setCorrectIds(...correctIdsByAI, newCorrectIds);
+      setCorrectIds([...AIcorrectIds, ...newCorrectIds]);
+      setAiComments(newAIComments);
       setIsFinished(true);
     }
   }, [
-    questionTree,
-    questionIds,
+    AIAPI.data.results,
+    AIAPI.data.success,
+    AIAPI.isSuccess,
     answers,
-    questionCount,
-    isAIScoringFinished,
     isFinished,
-    correctIdsByAI,
+    questionIds,
+    questionTree,
   ]);
 
-  return { isFinished, correctIds, questionCount };
-}
-
-// ネスト問題のすべての問題文を取得。
-function getAllQuestion(questionTree, id) {
-  let questions = [questionTree[id].question];
-  let currentId = questionTree[id].parentId;
-  while (true) {
-    if (questionTree[currentId].questionType === "nested") {
-      questions.push(questionTree[currentId].question);
-      currentId = questionTree[currentId].parentId;
-    } else {
-      break;
-    }
-  }
-  return questions.reverse().join(" ");
+  return { isFinished, correctIds, questionCount, AiComments };
 }

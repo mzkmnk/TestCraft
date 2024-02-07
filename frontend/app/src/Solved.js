@@ -5,7 +5,6 @@ import { useAPI } from "./hooks/useAPI";
 import Error from "./Error";
 import Loading from "./Loading";
 import { AnswerForms } from "./AnswerApp/components/AnswerForms";
-import { useGrade } from "./hooks/useGrade";
 
 function Solved() {
   const [workbook, setWorkbook] = useState(undefined);
@@ -13,6 +12,7 @@ function Solved() {
   const [correctIds, setCorrectIds] = useState([]);
   const navigate = useNavigate();
   const { workbookId, solved_count } = useParams();
+  const [aiComment, setAiComment] = useState("");
   const params = useMemo(
     () => [workbookId, solved_count],
     [workbookId, solved_count]
@@ -29,10 +29,18 @@ function Solved() {
       navigate("/error");
     } else if (API.isSuccess === true && API.data.success === true) {
       const data = API.data;
+      let aiComments = {};
+      for (const aiComment of data.ai_comment) {
+        for (const key of Object.keys(aiComment)) {
+          aiComments[key] = aiComment[key];
+        }
+      }
+      console.log(aiComments);
+
+      setAiComment(aiComments);
       setAnswers(data.user_answer);
       setWorkbook(JSON.parse(data.workbook));
       setCorrectIds(data.correctIds);
-      console.log("data.correctIds", data.correctIds);
     }
   }, [API.data, API.isSuccess, navigate]);
 
@@ -70,6 +78,7 @@ function Solved() {
         questionTree={questionTree}
         rootId={rootId}
         answers={answers}
+        AiComments={aiComment}
       />
     </>
   );

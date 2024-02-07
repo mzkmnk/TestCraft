@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { useTimer } from "../hooks/useTimer";
+
 import Result from "./Pages/Result";
-import UserHeader from "../UserHeader";
 import { SettingsModal } from "./components/SettingsModal";
 import { QuestionsProvider } from "./context/QuestionsContext";
 import { AnswersProvider } from "./context/AnswersContext";
-import { InputAnswers } from "./Pages/InputAnswers";
+import { AnswerForms } from "./components/AnswerForms";
 import { useNavigate } from "react-router-dom";
+import { InfoHeader } from "./components/InfoHeader";
+import { AnswerSettingsProvider } from "./context/AnswerSettingsContext";
+import Box from "@mui/material/Box";
 
 const defaultAnswerSettings = {
   /**単位は秒 */
@@ -26,64 +28,54 @@ const defaultAnswerSettings = {
  */
 
 export default function AnswersApp({ workbook }) {
-  const [answerSettings, setAnswerSettings] = useState(defaultAnswerSettings);
   // 画面のstate
   const [isSettingsOpen, setIsSettingsOpen] = useState(true);
   const [isInputOpen, setIsInputOpen] = useState(false);
   const [isResultOpen, setIsResultOpen] = useState(false);
+  const [isTimerActive, setIsTimerActive] = useState(false);
   const navigate = useNavigate();
-
-  const Timer = useTimer();
 
   const startInputAnswers = () => {
     setIsSettingsOpen(false);
-
-    if (answerSettings.time === 0) {
-      setIsResultOpen(true);
-      return;
-    }
-
     setIsResultOpen(false);
     setIsInputOpen(true);
-
-    Timer.set(answerSettings.time);
-    Timer.start();
+    setIsTimerActive(true);
   };
 
   const finishInputAnswers = () => {
     setIsInputOpen(false);
     setIsResultOpen(true);
-    Timer.stop();
+    setIsTimerActive(false);
   };
-
-  if (Timer.isFinished) {
-    finishInputAnswers();
-  }
 
   return (
     <>
-      <UserHeader />
-      {isSettingsOpen ? (
-        <SettingsModal
-          exitFunc={startInputAnswers}
-          answerSettings={answerSettings}
-          setAnswerSettings={setAnswerSettings}
-        />
-      ) : null}
-      <QuestionsProvider workbook={workbook}>
-        <AnswersProvider>
-          {isInputOpen ? (
-            <InputAnswers exitFunc={finishInputAnswers} time={Timer.time} />
+      <Box sx={{ height: "100vh" }}>
+        <AnswerSettingsProvider>
+          {isSettingsOpen ? (
+            <SettingsModal exitFunc={startInputAnswers} />
           ) : null}
-          {isResultOpen ? (
-            <Result
-              exitFunc={() => {
-                navigate("/mypage");
-              }}
-            />
-          ) : null}
-        </AnswersProvider>
-      </QuestionsProvider>
+          <QuestionsProvider workbook={workbook}>
+            <AnswersProvider>
+              <InfoHeader
+                isTimerActive={isTimerActive}
+                TimerFinishedFunc={finishInputAnswers}
+              />
+
+              {isInputOpen ? (
+                <AnswerForms exitFunc={finishInputAnswers} />
+              ) : null}
+              {isResultOpen ? (
+                <Result
+                  exitFunc={() => {
+                    navigate("/mypage");
+                  }}
+                />
+              ) : null}
+            </AnswersProvider>
+          </QuestionsProvider>
+        </AnswerSettingsProvider>
+      </Box>
     </>
   );
 }

@@ -5,6 +5,8 @@ import { useQuestions } from "../context/QuestionsContext";
 import { useAnswers } from "../context/AnswersContext";
 import { useAPI } from "../../hooks/useAPI";
 import { useGrade } from "../../hooks/useGrade";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 
 export default function Result({ exitFunc }) {
   const { questionTree, rootId } = useQuestions();
@@ -13,7 +15,7 @@ export default function Result({ exitFunc }) {
   const saveAPI = useAPI({ APIName: "save_answer" });
 
   const { workbookId } = useParams();
-  const { correctIds, questionCount, isFinished } = useGrade({
+  const { correctIds, questionCount, isFinished, AiComments } = useGrade({
     questionTree,
     questionIds,
     answers,
@@ -40,9 +42,19 @@ export default function Result({ exitFunc }) {
           resultMode={true}
           correctIds={correctIds}
           questionCount={questionCount}
+          AiComments={AiComments}
         />
       ) : (
-        <div style={{ marginTop: 100, fontSize: 30 }}>採点中</div>
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          height="calc(100vh - 180px)"
+        >
+          <Typography variant="h3" align="center">
+            採点中
+          </Typography>
+        </Box>
       )}
     </>
   );

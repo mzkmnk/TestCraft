@@ -18,6 +18,7 @@ class Company(models.Model):
 class User(AbstractUser):
     user_public_name = models.CharField(max_length = 48, null = True, blank = True)
     email = models.EmailField(_('email address'))
+    school = models.CharField(max_length = 255, null = True, blank = True)
     company = models.ForeignKey(Company, on_delete = models.CASCADE, null = True, blank = True)
     company_user_id = models.CharField(max_length = 255, null = True, blank = True) # いる？
     is_company_user = models.BooleanField(default = False)
@@ -27,7 +28,10 @@ class User(AbstractUser):
     problem_slv_cnt = models.IntegerField(default = 0)
     is_email_certification= models.BooleanField(default = False)
     key = models.CharField(max_length = 48, null = True, blank = True)
+    following = models.ManyToManyField('self', through='Follow', symmetrical=False, related_name='followers')
     
+    def count_following(self):return self.following.count()
+    def count_followers(self):return self.followers.count()
     USERNAME_FIELD = 'username'
     
     groups = models.ManyToManyField(
@@ -50,6 +54,17 @@ class User(AbstractUser):
     
     def __str__(self):
         return self.username
+
+class Follow(models.Model):
+    follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following_user')
+    following = models.ForeignKey(User, on_delete=models.CASCADE, related_name='followers_user')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = (('follower', 'following'),)
+
+    def __str__(self):
+        return f"{self.follower.username} - {self.following.username}"
 
 class Certification(models.Model):
     username=models.CharField(max_length = 48, primary_key=True, default='')
@@ -110,6 +125,16 @@ class UserAnswer(models.Model):
     correctIds = JSONField(default=list)
     answer_json = JSONField()
     created_at = models.DateField(auto_now_add=True)
+
+class AiComment(models.Model):
+    workbook = models.ForeignKey(Workbook, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    solved_count = models.IntegerField(default=0)
+    comment_json = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.workbook.workbook_name}"
     
 
 class Category(models.Model):
