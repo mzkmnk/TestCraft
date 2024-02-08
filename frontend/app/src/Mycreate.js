@@ -4,13 +4,14 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 import Pagination from "@mui/material/Pagination";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
-import { FaHeart } from "react-icons/fa";
 import { useAPI } from "./hooks/useAPI";
+import "./workbookList.css";
+import Loading from "./Loading";
 
 function Mycreate() {
   const [questions, setQuestions] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const questionsPerPage = 6;
+  const questionsPerPage = 8;
   const indexOfLastQuestions = currentPage * questionsPerPage;
   const indexOfFirstQuestions = indexOfLastQuestions - questionsPerPage;
   const currentQuestions = questions.slice(
@@ -53,88 +54,51 @@ function Mycreate() {
     navigate(`/editor/${workbookId}`);
   };
 
-  const gridTemplateColumns =
-    window.innerWidth > 800
-      ? "repeat(2, 1fr)"
-      : "repeat(auto-fit, minmax(300px, 1fr))";
-
-  const styles = {
-    questionsContainer: {
-      display: "grid",
-      gridTemplateColumns,
-      gridGap: "35px",
-      maxWidth: "75rem",
-      margin: "0 auto",
-      maxHeight: "calc(100vh - 70px)",
-      overflowY: "auto",
-      padding: "20px",
-    },
-    question: {
-      border: "1px solid #ccc",
-      padding: "20px",
-      borderRadius: "8px",
-      cursor: "pointer",
-    },
-    questionHeader: {
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-    },
-    createdBy: {
-      fontSize: "0.8em",
-      color: "#666",
-      marginLeft: "10px",
-    },
-  };
-
-  const likeStyle = {
-    display: "flex",
-    alignItems: "center",
-    marginTop: "10px",
-    color: "#1DA1F2",
-    cursor: "pointer",
-  };
-
-  const likeIconStyle = {
-    marginRight: "5px",
-  };
-
   return (
     <>
       <UserHeader />
-      <div style={{ margin: "1rem" }}>
-        {currentQuestions.length ? (
+      <div className="body">
+        {API.isLoading && <Loading />}
+        {currentQuestions.length !== 0 && (
           <>
-            <div style={styles.questionsContainer}>
+            <h2
+              style={{
+                marginLeft: 1,
+              }}
+            >
+              作成した問題
+            </h2>
+            <div className="questionsContainer">
               {currentQuestions.map((question, index) => (
                 <div
-                  style={styles.question}
+                  className="question"
                   key={index}
                   onClick={() => handleQuestionClick(question.id)}
                 >
-                  <div style={styles.questionHeader}>
+                  <div className="questionHeader">
                     <h3>{question.workbook_name}</h3>
-                    <span style={styles.createdBy}>
-                      created by {question.create_id__username} (
-                      {question.created_at})
+                    <span className="createdBy">
+                      作成日：{question.created_at}
                     </span>
                   </div>
-                  <p>{question.description}</p>
-                  <div style={likeStyle}>
-                    <FaHeart style={likeIconStyle} />
-                    <span>{question.like_count}</span>
-                  </div>
+                  <p style={{ margin: "auto" }}>{question.description}</p>
                 </div>
               ))}
             </div>
-            <Pagination
-              count={Math.ceil(questions.length / questionsPerPage)}
-              page={currentPage}
-              onChange={handleChangePage}
-              style={{ display: "flex", justifyContent: "flex-end" }}
-            />
+            {questions.length > questionsPerPage && (
+              <Pagination
+                count={Math.ceil(questions.length / questionsPerPage)}
+                page={currentPage}
+                onChange={handleChangePage}
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              />
+            )}
           </>
-        ) : (
+        )}
+        {currentQuestions.length === 0 && API.isSuccess && (
           <div
             style={{
               textAlign: "center",
@@ -142,11 +106,11 @@ function Mycreate() {
           >
             <p style={{ fontSize: "1.5rem" }}>まだ問題はありません</p>
             <p>
-              <Link to="/editor">作成ページ</Link>から、問題を作成してください。
+              <Link to="/editor">作成ページ</Link>
+              から、問題を作成してください。
             </p>
           </div>
         )}
-
         {openSnackbar && (
           <Snackbar
             open={openSnackbar}
