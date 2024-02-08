@@ -69,6 +69,11 @@ export function useAPI({
     setError(undefined);
     setIsSuccess(undefined);
   };
+  const statusInit = () => {
+    setIsLoading(null);
+    setIsSuccess(null);
+    setError(null);
+  };
 
   // useEffectでも、外部からも呼び出せるようにするには、useCallbackを使う必要がある。
   // コンポーネント内で関数が再宣言 & 定義されると、参照が変わり、関数が変化したとみなされる。
@@ -157,5 +162,5 @@ export function useAPI({
     }
   }, [body, isLoginRequired, loadOnStart, params, sendAPI]);
 
-  return { sendAPI, data, isLoading, isSuccess, error };
+  return { sendAPI, data, isLoading, isSuccess, error, statusInit };
 }

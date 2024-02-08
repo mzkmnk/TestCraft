@@ -8,7 +8,7 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
 import { useNavigate, useParams } from "react-router-dom";
-import UserHeader from "../UserHeader";
+import { EditorHeader } from "./EditorHeader";
 import Paper from "@mui/material/Paper";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -90,7 +90,9 @@ export default function EditorApp({ workBook }) {
   const [title, setTitle] = useState(workBook.info.title);
   const navigate = useNavigate();
   const saveAPI = useAPI({ APIName: "save_data" });
+  const saveAPIForUpdate = useAPI({ APIName: "save_data" });
   const { workbookId } = useParams();
+  const [isLatest, setIsLatest] = useState(false);
 
   useEffect(() => {
     if (saveAPI.isSuccess === true) {
@@ -118,9 +120,22 @@ export default function EditorApp({ workBook }) {
     saveAPI.sendAPI({ body: data });
   }
 
+  function updateDataInDB() {
+    workBook = {
+      info: {
+        title: title,
+        workbook_id: workbookId,
+      },
+      questions: questionTree,
+    };
+    const data = JSON.stringify(workBook);
+    saveAPIForUpdate.sendAPI({ body: data });
+  }
+
   // state更新関数群 React Reducerを使うべきではある（コードが分かりにくくなる && 面倒）
   // optionsとanswersの追加と削除などは、分岐を複雑にして共通化できるが、可読性が下がるのでやらない。
   function handleAddNewOption(updateQuestionId: Id) {
+    setIsLatest(false);
     const updatedQuestion = questionTree[updateQuestionId];
     if (updatedQuestion.questionType === "radio") {
       setQuestionTree({
@@ -134,6 +149,7 @@ export default function EditorApp({ workBook }) {
   }
 
   function handleAddNewAnswer(updateQuestionId: Id) {
+    setIsLatest(false);
     const updatedQuestion = questionTree[updateQuestionId];
     if (
       updatedQuestion.questionType === "radio" ||
@@ -150,6 +166,7 @@ export default function EditorApp({ workBook }) {
   }
 
   function handleAddNewQuestion(parentQuestionId: Id) {
+    setIsLatest(false);
     const parentQuestion = questionTree[parentQuestionId];
     if (
       parentQuestion.questionType === "root" ||
@@ -177,6 +194,7 @@ export default function EditorApp({ workBook }) {
   }
 
   function handleRemoveOption(updateQuestionId: Id, removedOptionId: Id) {
+    setIsLatest(false);
     const updatedQuestion = questionTree[updateQuestionId];
     if (updatedQuestion.questionType === "radio") {
       setQuestionTree({
@@ -194,6 +212,7 @@ export default function EditorApp({ workBook }) {
   }
 
   function handleRemoveAnswer(updateQuestionId: Id, removedOptionId: Id) {
+    setIsLatest(false);
     const updatedQuestion = questionTree[updateQuestionId];
     if (
       updatedQuestion.questionType === "radio" ||
@@ -214,6 +233,7 @@ export default function EditorApp({ workBook }) {
   }
 
   function handleRemoveQuestion(removedQuestionId: Id) {
+    setIsLatest(false);
     const removedQuestion = questionTree[removedQuestionId];
 
     if (removedQuestion.questionType === "root") {
@@ -252,6 +272,7 @@ export default function EditorApp({ workBook }) {
     changedPropertyName: string,
     changedId: string | undefined = undefined
   ) {
+    setIsLatest(false);
     const changedQuestion = questionTree[changedQuestionId];
 
     if (
@@ -309,6 +330,7 @@ export default function EditorApp({ workBook }) {
     changedId: string | undefined = undefined
   ) {
     const changedQuestion = questionTree[changedQuestionId];
+    setIsLatest(false);
 
     if (
       changedId !== undefined &&
@@ -364,6 +386,7 @@ export default function EditorApp({ workBook }) {
     updateQuestionId: Id,
     parentId: Id
   ) {
+    setIsLatest(false);
     const updatedQuestion = questionTree[updateQuestionId];
     // 同じtypeが選択された場合、終了する
     if (updatedQuestion.questionType === selectedType) {
@@ -467,7 +490,12 @@ export default function EditorApp({ workBook }) {
     <>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <UserHeader />
+        <EditorHeader
+          saveFunc={updateDataInDB}
+          saveAPI={saveAPIForUpdate}
+          isLatest={isLatest}
+          setIsLatest={setIsLatest}
+        />
         <Box
           sx={{
             display: "flex",
@@ -481,9 +509,11 @@ export default function EditorApp({ workBook }) {
             elevation={4}
             sx={{
               margin: 2,
+              marginTop: 3,
               padding: 2,
+
               borderTop: 12,
-              borderColor: "primary.main",
+              borderColor: "secondary.main",
             }}
           >
             <TextField
@@ -504,7 +534,7 @@ export default function EditorApp({ workBook }) {
                 margin: 2,
                 padding: 2,
                 borderLeft: 8,
-                borderColor: "primary.main",
+                borderColor: "secondary.main",
               }}
             >
               <QuestionEditor
@@ -526,7 +556,7 @@ export default function EditorApp({ workBook }) {
           ))}
 
           <Button onClick={() => handleAddNewQuestion(rootId)}>新規問題</Button>
-          <Button onClick={() => save()}>保存</Button>
+          <Button onClick={() => save()}>保存して終了</Button>
         </Box>
       </ThemeProvider>
     </>
