@@ -26,14 +26,18 @@ import { useAPI } from "./hooks/useAPI";
 const UserHeader = ({ position = "static" }) => {
   const navigate = useNavigate();
   const username = localStorage.getItem("username");
-  const isLoggedIn = !!username;
-  // const isOwnCompany = localStorage.getItem("is_own_company") === "true";
+  const [isLoggedIn,setIsLoggedIn] = React.useState(false);
   const [isOwnCompanyUser, setIsOwnCompanyUser] = React.useState(false);
   const [isCompanyUser, setIsCompanyUser] = React.useState(false);
   const [userMenuAnchorEl, setUserMenuAnchorEl] = React.useState(null);
   const [questionsMenuAnchorEl, setQuestionsMenuAnchorEl] =
     React.useState(null);
   const [companyMenuAnchorEl, setCompanyMenuAnchorEl] = React.useState(null);
+
+  const isLoggedInAPI = useAPI({
+    APIName: "check_auth",
+    loadOnStart: true,
+  });
 
   const isCompanyUserAPI = useAPI({
     APIName: "is_company_user",
@@ -43,6 +47,16 @@ const UserHeader = ({ position = "static" }) => {
   const logoutAPI = useAPI({
     APIName: "logout",
   });
+
+  useEffect(() => {
+    if(isLoggedInAPI.isSuccess){
+      if(isLoggedInAPI.data.success){
+        setIsLoggedIn(true);
+      }else{
+        setIsLoggedIn(false);
+      }
+    }
+  },[isLoggedInAPI.isSuccess])
 
   useEffect(() => {
     if (isCompanyUserAPI.isSuccess === false) {

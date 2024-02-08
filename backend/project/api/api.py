@@ -176,9 +176,19 @@ def login(request, payload: LoginSchema):
 @api.get("/check_auth")
 def check_auth(request):
     if(request.user.is_authenticated):
-        return JsonResponse({"authenticated": True}, status=200)
+        return JsonResponse({
+            "success":True,
+            "authenticated": True
+            },
+            status=200
+        )
     else:
-        return JsonResponse({"authenticated": False})
+        return JsonResponse(
+            {
+                "success":False,
+                "authenticated": False
+            }
+            )
     
 # ログアウトするAPI
 @api.post("/logout")

@@ -61,3 +61,12 @@ class CumstomAiComment(admin.ModelAdmin):
     list_display = ('user','workbook',)
     search_fields = ('id',)
 admin.site.register(AiComment,CumstomAiComment)
+
+class CumstomPost(admin.ModelAdmin):
+    list_display = ('user','created_at')
+    search_fields = ('id',)
+admin.site.register(Post,CumstomPost)
+
+class CumstomComment(admin.ModelAdmin):
+    list_display = ('user','post','created_at')
+    search_fields = ('id',)
