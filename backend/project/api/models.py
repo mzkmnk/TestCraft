@@ -87,8 +87,8 @@ class Workbook(models.Model):
     workbook_name = models.CharField(max_length=48)
     description = models.TextField(blank=True, null=True)
     create_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    created_at = models.DateField(auto_now_add=True)
-    updated_at = models.DateField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     is_public = models.BooleanField(default=True)
     like_count = models.IntegerField(default=0)
     categories = models.ManyToManyField('Category', through='WorkbookCategory')
@@ -124,7 +124,7 @@ class UserAnswer(models.Model):
     solved_count = models.IntegerField(default=0)
     correctIds = JSONField(default=list)
     answer_json = JSONField()
-    created_at = models.DateField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 class AiComment(models.Model):
     workbook = models.ForeignKey(Workbook, on_delete=models.CASCADE)
@@ -156,8 +156,8 @@ class WorkbookCategory(models.Model):
 class Contract(models.Model):
     contract_id = models.IntegerField(primary_key=True, unique=True)
     company_id = models.CharField(max_length=4, null=True, blank=True)
-    start_date = models.DateField()
-    end_date = models.DateField()
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
 
     def __str__(self):
         return str(self.contract_id)
