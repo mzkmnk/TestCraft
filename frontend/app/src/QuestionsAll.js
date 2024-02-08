@@ -26,7 +26,12 @@ function QuestionsAll() {
   }, [API.data.workbooks, API.isSuccess]);
 
   if (API.isLoading === true || workbooks === null) {
-    return <Loading />;
+    return (
+      <>
+        <UserHeader />
+        <Loading />
+      </>
+    );
   } else if (API.error || API.data.success === false) {
     return <Error />;
   }

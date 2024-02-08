@@ -1,67 +1,9 @@
 import { FaHeart, FaRegHeart } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import Pagination from "@mui/material/Pagination";
 import { useAPI } from "../hooks/useAPI";
-
-const styles = {
-  questionsContainer: {
-    display: "grid",
-    gridTemplateColumns: "repeat(2, 1fr)",
-    gridGap: "20px",
-    maxHeight: "calc(100vh - 70px)",
-    overflowY: "auto",
-    padding: "20px",
-  },
-  question: {
-    border: "1px solid #ccc",
-    padding: "20px",
-    borderRadius: "8px",
-    position: "relative",
-    cursor: "pointer",
-  },
-  questionHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  createdBy: {
-    fontSize: "0.8em",
-    color: "#666",
-    marginLeft: "10px",
-  },
-  likeStyle: {
-    display: "flex",
-    alignItems: "center",
-    marginTop: "10px",
-    color: "#1DA1F2",
-    cursor: "pointer",
-  },
-  likeIconStyle: {
-    marginRight: "5px",
-  },
-  likeButton: {
-    position: "relative",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "flex-start",
-    cursor: "pointer",
-    height: "24px",
-  },
-  likeCount: {
-    // marginLeft: '10px',
-    userSelect: "none",
-  },
-};
-const likeStyle = {
-  display: "flex",
-  alignItems: "center",
-  marginTop: "10px",
-  color: "#1DA1F2",
-  cursor: "pointer",
-};
-
-const likeIconStyle = {
-  marginRight: "5px",
-};
+import "../workbookList.css";
 
 export function DisplayWorkbookList({ workbooks, setWorkbooks }) {
   const API = useAPI({ APIName: "questionsall_like" });
@@ -69,6 +11,20 @@ export function DisplayWorkbookList({ workbooks, setWorkbooks }) {
   const handleQuestionClick = (workbookId) => {
     navigate(`/solve/${workbookId}`);
   };
+
+  // pagenation
+  const [currentPage, setCurrentPage] = useState(1);
+  const questionsPerPage = 6;
+  const indexOfLastQuestions = currentPage * questionsPerPage;
+  const indexOfFirstQuestions = indexOfLastQuestions - questionsPerPage;
+  const currentQuestions = workbooks.slice(
+    indexOfFirstQuestions,
+    indexOfLastQuestions
+  );
+  const handleChangePage = (event, value) => {
+    setCurrentPage(value);
+  };
+
   // いいねボタン
   const handleLikeClick = (e, workbookId) => {
     e.stopPropagation();
@@ -95,33 +51,73 @@ export function DisplayWorkbookList({ workbooks, setWorkbooks }) {
   };
 
   return (
-    <div style={styles.questionsContainer}>
-      {workbooks.map((question,index) => (
-        <div
-          style={styles.question}
-          key={index}
-          onClick={() => handleQuestionClick(question.id)}
-        >
-          <div style={styles.questionHeader}>
-            <h3>{question.workbook_name}</h3>
-            <span style={styles.createdBy}>
-              created by {question.create_id__username} ({question.created_at})
-            </span>
-          </div>
-          <p>{question.description}</p>
-          <div
-            style={likeStyle}
-            onClick={(e) => handleLikeClick(e, question.id)}
+    <div className="body">
+      {workbooks.length !== 0 ? (
+        <>
+          <h2
+            style={{
+              marginLeft: 1,
+            }}
           >
-            {question.liked ? (
-              <FaHeart style={likeIconStyle} />
-            ) : (
-              <FaRegHeart style={likeIconStyle} />
-            )}
-            <span style={styles.likeCount}>{question.like_count}</span>
+            問題一覧
+          </h2>
+          <div className="questionsContainer">
+            {currentQuestions.map((question, index) => (
+              <div
+                className="question"
+                key={index}
+                onClick={() => handleQuestionClick(question.id)}
+              >
+                <div className="questionHeader">
+                  <h3>{question.workbook_name}</h3>
+                  <span className="createdBy">
+                    created by {question.create_id__username} (
+                    {question.created_at})
+                  </span>
+                </div>
+                <p>{question.description}</p>
+                <div
+                  className="likeStyle"
+                  onClick={(e) => handleLikeClick(e, question.id)}
+                >
+                  {question.liked ? (
+                    <FaHeart className="likeIconStyle" />
+                  ) : (
+                    <FaRegHeart className="likeIconStyle" />
+                  )}
+                  <span className="likeCount">{question.like_count}</span>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
-      ))}
+          {workbooks.length > questionsPerPage && (
+            <Pagination
+              count={Math.ceil(workbooks.length / questionsPerPage)}
+              page={currentPage}
+              onChange={handleChangePage}
+              style={{
+                display: "flex",
+                justifyContent: "center",
+              }}
+            />
+          )}
+        </>
+      ) : (
+        <>
+          {" "}
+          <div
+            style={{
+              textAlign: "center",
+            }}
+          >
+            <p style={{ fontSize: "1.5rem" }}>まだ問題はありません</p>
+            <p>
+              <Link to="/editor">作成ページ</Link>
+              から、問題を作成してください。
+            </p>
+          </div>
+        </>
+      )}
     </div>
   );
 }
