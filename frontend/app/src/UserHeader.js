@@ -34,10 +34,6 @@ const UserHeader = ({ position = "static" }) => {
     React.useState(null);
   const [companyMenuAnchorEl, setCompanyMenuAnchorEl] = React.useState(null);
 
-  const isLoggedInAPI = useAPI({
-    APIName: "check_auth",
-    loadOnStart: true,
-  });
 
   const isCompanyUserAPI = useAPI({
     APIName: "is_company_user",
@@ -47,16 +43,6 @@ const UserHeader = ({ position = "static" }) => {
   const logoutAPI = useAPI({
     APIName: "logout",
   });
-
-  useEffect(() => {
-    if(isLoggedInAPI.isSuccess){
-      if(isLoggedInAPI.data.success){
-        setIsLoggedIn(true);
-      }else{
-        setIsLoggedIn(false);
-      }
-    }
-  },[isLoggedInAPI.isSuccess])
 
   useEffect(() => {
     if (isCompanyUserAPI.isSuccess === false) {
@@ -84,6 +70,22 @@ const UserHeader = ({ position = "static" }) => {
     }
   }, [logoutAPI.data.success, logoutAPI.isSuccess, navigate]);
 
+
+  const isLoggedInAPI = useAPI({
+    APIName: "check_auth",
+  });
+
+  useEffect(() => {
+    if(isLoggedInAPI.isSuccess){
+      console.log(isLoggedInAPI.data);
+      if(isLoggedInAPI.data.success){
+        setIsLoggedIn(true);
+      }else{
+        setIsLoggedIn(false);
+      }
+    }
+  },[isLoggedInAPI.isSuccess]);
+  
   const handleUserMenuClick = (event) => {
     setUserMenuAnchorEl(event.currentTarget);
   };
