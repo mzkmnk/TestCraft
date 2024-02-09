@@ -9,7 +9,7 @@ import { useAnswers } from "../context/AnswersContext";
 import { useTimer } from "../../hooks/useTimer";
 import { useAnswerSettings } from "../context/AnswerSettingsContext";
 
-const mainAppBarColor = "#33ab9f";
+const mainAppBarColor = "#4caf50";
 export function InfoHeader({ isTimerActive, TimerFinishedFunc }) {
   const { answerSettings } = useAnswerSettings();
   const Timer = useTimer({ notificationTime: answerSettings.notificationTime });
