@@ -12,7 +12,13 @@ import ExitButton from "@mui/icons-material/LogoutOutlined";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 
-export function EditorHeader({ saveFunc, saveAPI, isLatest, setIsLatest }) {
+export function EditorHeader({
+  saveFunc,
+  saveAPI,
+  isLatest,
+  setIsLatest,
+  exitFunc,
+}) {
   const [message, setMessage] = useState("");
   const [isMessageOpen, setIsMessageOpen] = useState(false);
   const [isSuccess, setIsSuccess] = useState(null);
@@ -80,12 +86,7 @@ export function EditorHeader({ saveFunc, saveAPI, isLatest, setIsLatest }) {
               <InfoOutlinedIcon />
             </IconButton>
             {saveStatusIcon}
-            <IconButton
-              color="inherit"
-              onClick={() => {
-                console.log("Exit");
-              }}
-            >
+            <IconButton color="inherit" onClick={exitFunc}>
               <ExitButton />
             </IconButton>
           </Toolbar>

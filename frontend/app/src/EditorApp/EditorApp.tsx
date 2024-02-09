@@ -495,6 +495,7 @@ export default function EditorApp({ workBook }) {
           saveAPI={saveAPIForUpdate}
           isLatest={isLatest}
           setIsLatest={setIsLatest}
+          exitFunc={save}
         />
         <Box
           sx={{
