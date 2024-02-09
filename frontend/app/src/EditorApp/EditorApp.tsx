@@ -140,6 +140,15 @@ const validationQuestionTree = (questionTree: QuestionTree) => {
           ],
         };
       }
+      if (question.childIds.length === 0) {
+        returnValue = {
+          status: false,
+          messages: [
+            ...returnValue.messages,
+            `大問式に小問がありません。(問題${questionNumber.join("-")})`,
+          ],
+        };
+      }
       question.childIds.map((id, index) =>
         checkQuestion(id, [...questionNumber, index + 1])
       );
@@ -286,6 +295,7 @@ export default function EditorApp({ workBook }) {
   // state更新関数群 React Reducerを使うべきではある（コードが分かりにくくなる && 面倒）
   // optionsとanswersの追加と削除などは、分岐を複雑にして共通化できるが、可読性が下がるのでやらない。
   function handleAddNewOption(updateQuestionId: Id) {
+    setIsEdit(true);
     setIsLatest(false);
     const updatedQuestion = questionTree[updateQuestionId];
     if (updatedQuestion.questionType === "radio") {
@@ -300,6 +310,7 @@ export default function EditorApp({ workBook }) {
   }
 
   function handleAddNewAnswer(updateQuestionId: Id) {
+    setIsEdit(true);
     setIsLatest(false);
     const updatedQuestion = questionTree[updateQuestionId];
     if (
@@ -317,6 +328,7 @@ export default function EditorApp({ workBook }) {
   }
 
   function handleAddNewQuestion(parentQuestionId: Id) {
+    setIsEdit(true);
     setIsLatest(false);
     const parentQuestion = questionTree[parentQuestionId];
     if (
@@ -345,6 +357,7 @@ export default function EditorApp({ workBook }) {
   }
 
   function handleRemoveOption(updateQuestionId: Id, removedOptionId: Id) {
+    setIsEdit(true);
     setIsLatest(false);
     const updatedQuestion = questionTree[updateQuestionId];
     if (updatedQuestion.questionType === "radio") {
@@ -363,6 +376,7 @@ export default function EditorApp({ workBook }) {
   }
 
   function handleRemoveAnswer(updateQuestionId: Id, removedOptionId: Id) {
+    setIsEdit(true);
     setIsLatest(false);
     const updatedQuestion = questionTree[updateQuestionId];
     if (
@@ -384,6 +398,7 @@ export default function EditorApp({ workBook }) {
   }
 
   function handleRemoveQuestion(removedQuestionId: Id) {
+    setIsEdit(true);
     setIsLatest(false);
     const removedQuestion = questionTree[removedQuestionId];
 
@@ -423,6 +438,7 @@ export default function EditorApp({ workBook }) {
     changedPropertyName: string,
     changedId: string | undefined = undefined
   ) {
+    setIsEdit(true);
     setIsLatest(false);
     const changedQuestion = questionTree[changedQuestionId];
 
@@ -481,6 +497,7 @@ export default function EditorApp({ workBook }) {
     changedId: string | undefined = undefined
   ) {
     const changedQuestion = questionTree[changedQuestionId];
+    setIsEdit(true);
     setIsLatest(false);
 
     if (
@@ -537,6 +554,7 @@ export default function EditorApp({ workBook }) {
     updateQuestionId: Id,
     parentId: Id
   ) {
+    setIsEdit(true);
     setIsLatest(false);
     const updatedQuestion = questionTree[updateQuestionId];
     // 同じtypeが選択された場合、終了する
