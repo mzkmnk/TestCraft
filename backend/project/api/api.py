@@ -130,6 +130,9 @@ class FollowSchema(Schema):
     isFollow:bool
     userId:str
 
+class DeleteWorkBookSchema(Schema):
+    workbookId:int
+
 # API
 # ユーザー登録するAPI
 @api.post("/signup")
@@ -709,6 +712,29 @@ def save_data(request,data:JsonFormat):
                 'error':e.errors()
             },
             status = 400
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                'success':False,
+                'error':str(e)
+            },
+            status = 400
+        )
+
+#問題を削除するAPI
+@api.post("/delete_workbook")
+def delete_workbook(request,payload:DeleteWorkBookSchema):
+    try:
+        workbook_id = payload.workbookId
+        workbook = Workbook.objects.get(id = workbook_id)
+        workbook.delete()
+        return JsonResponse(
+            {
+                'success':True,
+                'error':None,
+            },
+            status = 200
         )
     except Exception as e:
         return JsonResponse(
