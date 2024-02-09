@@ -253,7 +253,7 @@ export default function EditorApp({ workBook }) {
 
   useEffect(() => {
     if (saveAPI.isSuccess === true) {
-      navigate("/mypage/mycreate", {
+      navigate("/mypage", {
         state: {
           message: `${title}を保存しました`,
           severity: "success",
