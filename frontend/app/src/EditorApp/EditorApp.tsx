@@ -713,7 +713,7 @@ export default function EditorApp({ workBook }) {
                 <FormControlLabel
                   control={
                     <Switch
-                      checked={!isEdit}
+                      checked={isEdit}
                       onChange={() => {
                         // 編集中が真かつバリデーションが通っている場合、編集中を無効にする。
                         if (
