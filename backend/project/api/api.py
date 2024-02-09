@@ -131,6 +131,9 @@ class FollowSchema(Schema):
     userId:str
 
 # API
+    
+#ログイン中のユーザー情報を取得するAPI
+
 # ユーザー登録するAPI
 @api.post("/signup")
 def signup(request, payload: SignUpSchema):
@@ -188,7 +191,7 @@ def check_auth(request):
                 "success":False,
                 "authenticated": False
             }
-            )
+        )
     
 # ログアウトするAPI
 @api.post("/logout")
@@ -471,6 +474,7 @@ def get_user_info(request):
         return JsonResponse(
             {
                 "success":True,
+                "user_id":user.id,
                 "username":user.username,
                 "email":user.email,
                 "school":user.school,
