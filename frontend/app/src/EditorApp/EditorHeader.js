@@ -101,7 +101,6 @@ export function EditorHeader({
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
         <Alert
-          onClose={handleClose}
           severity={isSuccess ? "success" : "error"}
           variant="filled"
           sx={{ width: "100%" }}

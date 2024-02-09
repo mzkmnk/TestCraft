@@ -86,11 +86,11 @@ export function SwitchableTextField({ value, setValue, args = [] }) {
 
   const onBlur = (e) => {
     const value = e.target.value;
+    setValue(e.target.value, ...args);
     if (value === "") {
       return;
     }
     setDisplayValue(format(e.target.value));
-    setValue(e.target.value, ...args);
     toggleState();
   };
 
