@@ -664,7 +664,7 @@ def get_graph_data(request):
 def save_data(request,data:JsonFormat):
     try:
         workbook_id = None
-        is_edit = JsonFormat.isEdit
+        is_edit = data.isEdit
         if(data.info.get('workbook_id') is not None):
             workbook_id = data.info['workbook_id']
         if(Workbook.objects.filter(id = workbook_id).exists()):
