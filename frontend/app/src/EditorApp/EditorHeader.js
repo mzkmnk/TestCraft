@@ -11,6 +11,7 @@ import DoneOutlinedIcon from "@mui/icons-material/DoneOutlined";
 import ExitButton from "@mui/icons-material/LogoutOutlined";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
+import { InfoModal } from "./InfoModal";
 
 export function EditorHeader({
   saveFunc,
@@ -22,6 +23,7 @@ export function EditorHeader({
   const [message, setMessage] = useState("");
   const [isMessageOpen, setIsMessageOpen] = useState(false);
   const [isSuccess, setIsSuccess] = useState(null);
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
   const handleClose = (event, reason) => {
     setIsMessageOpen(false);
   };
@@ -80,7 +82,7 @@ export function EditorHeader({
             <IconButton
               color="inherit"
               onClick={() => {
-                console.log("info");
+                setIsInfoOpen(true);
               }}
             >
               <InfoOutlinedIcon />
@@ -107,6 +109,7 @@ export function EditorHeader({
           {message}
         </Alert>
       </Snackbar>
+      <InfoModal open={isInfoOpen} setOpen={setIsInfoOpen} />
     </>
   );
 }
