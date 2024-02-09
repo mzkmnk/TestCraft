@@ -85,6 +85,7 @@ Question = Union[Root, NestedQuestion, RadioQuestion, TextareaQuestion]
 class JsonFormat(BaseModel):
     info: Dict
     questions: Dict[str, Question]
+    isEdit:bool
 
 class EditorSchema(Schema):
     workbook_id:int
@@ -532,7 +533,7 @@ def company_signup(request,payload: CompanySignUpSchema):
 @api.get("/questionsall")
 def questionsall(request):
     try:
-        workbooks = Workbook.objects.filter(is_public = True).order_by('-created_at').values(
+        workbooks = Workbook.objects.filter(is_public = True,is_edit = False).order_by('-created_at').values(
             'id',
             'workbook_name',
             'description',
@@ -663,11 +664,13 @@ def get_graph_data(request):
 def save_data(request,data:JsonFormat):
     try:
         workbook_id = None
+        is_edit = JsonFormat.isEdit
         if(data.info.get('workbook_id') is not None):
             workbook_id = data.info['workbook_id']
         if(Workbook.objects.filter(id = workbook_id).exists()):
             workbook = Workbook.objects.get(id = workbook_id)
             workbook.workbook_name = data.info['title']
+            workbook.is_edit = is_edit
             workbook.save()
             problem = Problem.objects.get(workbook_id = workbook_id)
             problem.problem_json = data.json()
@@ -682,7 +685,7 @@ def save_data(request,data:JsonFormat):
         workbook = Workbook.objects.create(
             workbook_name = data.info['title'],
             create_id = request.user,
-            is_edit = True,
+            is_edit = is_edit,
         )
         Problem.objects.create(
             workbook_id = Workbook.objects.get(id = workbook.id),
