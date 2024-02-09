@@ -130,7 +130,6 @@ const validationQuestionTree = (questionTree: QuestionTree) => {
         messages: [...returnValue.messages, "ファイルが破損しています。"],
       };
     } else if (question.questionType === "nested") {
-      console.log(question);
       if (question.question === "") {
         returnValue = {
           status: false,
