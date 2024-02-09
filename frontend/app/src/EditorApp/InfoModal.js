@@ -84,13 +84,23 @@ export function InfoModal({ open, setOpen }) {
           <strong>問題文</strong>では、以下の記法を使うことができます。
           <List>
             <ListItem>
-              バッククォート三つ（```）で囲むことによる
-              <strong>コードブロック</strong>
+              <ListItemText>
+                <strong>バッククォート三つ（```）</strong>
+                で囲むことによるコードブロック
+              </ListItemText>
             </ListItem>
             <ListItem>
-              \(TeX記法\)を用いた<strong>数式</strong>
+              <ListItemText>
+                <strong>\(TeX記法\)</strong>を用いた<strong>数式</strong>
+              </ListItemText>
             </ListItem>
           </List>
+        </ListItemText>
+      </ListItem>
+      <ListItem>
+        <ListItemText>
+          <strong>編集を完了</strong>
+          することで、問題を解くことが可能になります。
         </ListItemText>
       </ListItem>
     </List>,
