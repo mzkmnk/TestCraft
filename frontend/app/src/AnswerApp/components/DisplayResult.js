@@ -27,6 +27,13 @@ export function DisplayResult({
     answers = answersContext.answers;
   }
 
+  let answerTextList = [];
+  if (questionTree[questionId].answers !== undefined) {
+    answerTextList = questionTree[questionId].answers.map(
+      (answer) => answer.value
+    );
+  }
+
   const question = questionTree[questionId];
   let color;
   const isCorrect = correctIds.includes(questionId);
@@ -93,7 +100,14 @@ export function DisplayResult({
                   key={option.id}
                   value={option.value}
                   control={
-                    <Checkbox inputProps={{ readOnly: true }} color={color} />
+                    <Checkbox
+                      inputProps={{ readOnly: true }}
+                      color={
+                        answerTextList.includes(option.value)
+                          ? "success"
+                          : "error"
+                      }
+                    />
                   }
                   label={format(option.value)}
                   checked={
@@ -121,6 +135,31 @@ export function DisplayResult({
                 />
               ))}
             </RadioGroup>
+          </>
+        )}
+        {!isCorrect && (
+          <>
+            <Box
+              sx={{
+                borderLeft: "double 7px",
+                borderRight: "double 7px",
+                borderColor: "#33ab9f",
+                marginTop: 2,
+                marginBottom: 2,
+                padding: 2,
+                backgroundColor: "whitesmoke",
+              }}
+            >
+              <Typography
+                variant="h6"
+                fontStyle={"italic"}
+                style={{ opacity: 0.4, fontStyle: "oblique" }}
+              >
+                解答：
+              </Typography>
+
+              {format(answerTextList.join("\n"))}
+            </Box>
           </>
         )}
       </Box>
@@ -170,7 +209,33 @@ export function DisplayResult({
             </Typography>
             {format(AiComments[questionId])}
           </Box>
-        ) : null}
+        ) : (
+          !isCorrect && (
+            <>
+              <Box
+                sx={{
+                  borderLeft: "double 7px",
+                  borderRight: "double 7px",
+                  borderColor: "#33ab9f",
+                  marginTop: 2,
+                  marginBottom: 2,
+                  padding: 2,
+                  backgroundColor: "whitesmoke",
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  fontStyle={"italic"}
+                  style={{ opacity: 0.4, fontStyle: "oblique" }}
+                >
+                  解答：
+                </Typography>
+
+                {format(answerTextList.join("\n"))}
+              </Box>
+            </>
+          )
+        )}
       </Box>
     );
   }
