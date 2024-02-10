@@ -13,4 +13,7 @@ const config = {
 
 const content = `const config = ${JSON.stringify(config)};\n\nexport default config;`;
 
+console.log('generate_aws_exports.jsログ確認');
+console.log(content);
+
 fs.writeFileSync('src/aws-exports.js', content);
