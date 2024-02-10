@@ -6,6 +6,7 @@ phases:
       nodejs: 16
   pre_build:
     commands:
+      - npm install -g npm@latest
       - node generate_aws_exports.js
       - cd frontend/app
       - npm install
