@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate,useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -70,8 +70,8 @@ function LoginForm() {
     handleLogin();
   };
 
-  const handleChange = ()=>{
-    navigate('/change_pass_send')
+  const handleChange = () => {
+    navigate("/change_pass_send");
   };
 
   useEffect(() => {
@@ -88,14 +88,20 @@ function LoginForm() {
     <>
       <UserHeader />
       <ThemeProvider theme={theme}>
-        <Container component="main" maxWidth="xs">
+        <Container
+          component="main"
+          maxWidth="xs"
+          sx={{ height: "calc(100vh - 80px)" }}
+        >
           <CssBaseline />
           <Box
             sx={{
-              marginTop: 20,
+              height: "100%",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
+              margin: "0 auto",
+              justifyContent: "center",
             }}
           >
             <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
@@ -148,14 +154,13 @@ function LoginForm() {
                 Sign In
               </Button>
             </Box>
-                <Button
-                type="submit"
-                variant="contained"
-                sx={{ mt: 3, mb: 2 ,width:'200px'}}
-                onClick={handleChange}
-                >
-                パスワードを忘れた場合はこちら
-                </Button>
+            <Button
+              type="submit"
+              sx={{ mt: 1, mb: 2, width: "200px" }}
+              onClick={handleChange}
+            >
+              パスワードを忘れた場合
+            </Button>
           </Box>
         </Container>
       </ThemeProvider>

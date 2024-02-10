@@ -25,9 +25,9 @@ function Signup() {
   const [is_company_user, setIsCompanyUser] = useState(false);
   const [is_own_company, setIsOwnCompany] = useState(false);
   const [error, setError] = useState("");
-  const [send_email, setSendEmail] = useState('');
+  const [send_email, setSendEmail] = useState("");
 
-  const url = 'http://localhost:3000/email_verification';//随時変更
+  const url = "http://localhost:3000/email_verification"; //随時変更
 
   // はじめに、ログインしているかどうかの確認を行う。
   const checkAuthAPI = useAPI({ APIName: "check_auth", loadOnStart: true });
@@ -36,7 +36,7 @@ function Signup() {
   // signupAPIが成功したら、loginAPIを送信する。
   const loginAPI = useAPI({ APIName: "login" });
   // signupAPIが成功したら、メールを送信する。
-  const sendEmailAPI = useAPI({APIName: "send_email",});
+  const sendEmailAPI = useAPI({ APIName: "send_email" });
 
   // checkAuthAPIの終了に反応するuseEffect。
   useEffect(() => {
@@ -77,14 +77,12 @@ function Signup() {
         },
       });
       sendEmailAPI.sendAPI({
-        body: JSON.stringify(
-          {
-          'username' : username,
-          'url' : url ,
-          'email' : user_email,
-          }
-        ),
-      })
+        body: JSON.stringify({
+          username: username,
+          url: url,
+          email: user_email,
+        }),
+      });
     } else if (loginAPI.isSuccess === false) {
       navigate("/error");
     }
@@ -123,14 +121,20 @@ function Signup() {
     <>
       <UserHeader />
       <ThemeProvider theme={theme}>
-        <Container component="main" maxWidth="xs">
+        <Container
+          component="main"
+          maxWidth="xs"
+          sx={{ height: "calc(100vh - 90px)" }}
+        >
           <CssBaseline />
           <Box
             sx={{
-              marginTop: 20,
+              height: "100%",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
+              margin: "0 auto",
+              justifyContent: "center",
             }}
           >
             <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
@@ -190,21 +194,31 @@ function Signup() {
                 control={
                   <Checkbox
                     checked={is_own_company}
-                    onChange={(e) => setIsOwnCompany(e.target.checked)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setIsCompanyUser(false);
+                      }
+                      setIsOwnCompany(e.target.checked);
+                    }}
                     color="primary"
                   />
                 }
-                label="企業の代表の方はチェックを入れてください"
+                label="企業の代表の方"
               />
               <FormControlLabel
                 control={
                   <Checkbox
                     checked={is_company_user}
-                    onChange={(e) => setIsCompanyUser(e.target.checked)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setIsOwnCompany(false);
+                      }
+                      setIsCompanyUser(e.target.checked);
+                    }}
                     color="primary"
                   />
                 }
-                label="企業の代表ではないが、企業のメンバーの方はチェックを入れてください"
+                label="企業のメンバーの方"
               />
               <Button
                 type="submit"
@@ -214,7 +228,6 @@ function Signup() {
               >
                 Sign Up
               </Button>
-              
             </Box>
           </Box>
         </Container>
