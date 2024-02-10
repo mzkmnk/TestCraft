@@ -3,10 +3,10 @@ const fs = require('fs');
 const config = {
   API: {
     GraphQL: {
-      endpoint: process.env.REACT_APP_GRAPHQL_ENDPOINT,
-      region: process.env.REACT_APP_REGION,
+      endpoint: process.env.ENDPOINT,
+      region: process.env.REGION,
       defaultAuthMode: 'apiKey',
-      apiKey: process.env.REACT_APP_API_KEY,
+      apiKey: process.env.APIKEY,
     }
   }
 };
