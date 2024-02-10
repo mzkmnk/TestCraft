@@ -61,7 +61,7 @@ export function InfoModal({ open, setOpen }) {
         <ListItem>
           <ListItemText>
             <strong>選択式</strong>
-            では、複数の選択肢のうち、一つのみ選択可能な問題です。現在、複数解答には対応していません。
+            では、複数の選択肢のうち、単一選択または複数選択が可能です。
           </ListItemText>
         </ListItem>
         <ListItem>
@@ -76,7 +76,8 @@ export function InfoModal({ open, setOpen }) {
       <ListItem>
         <ListItemText>
           <strong>解答</strong>
-          は複数設定することが可能です。いずれかに一致した場合、正解とみなされます。
+          は複数設定することが可能です。複数選択を許可する場合、すべての解答に一致する場合のみが正解になります。
+          それ以外では、いずれかに一致した場合に正解になります。
         </ListItemText>
       </ListItem>
       <ListItem>

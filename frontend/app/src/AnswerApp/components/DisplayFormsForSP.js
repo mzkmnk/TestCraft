@@ -7,6 +7,8 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import TextField from "@mui/material/TextField";
 import { useAnswers } from "../context/AnswersContext";
 import { format } from "../../EditorApp/SwitchableTextField";
+import Checkbox from "@mui/material/Checkbox";
+import FormGroup from "@mui/material/FormGroup";
 import { useMemo } from "react";
 
 // 再帰的に問題を表示する関数
@@ -18,6 +20,32 @@ export function DisplayFormsForSP({
   isNested = false,
 }) {
   const { answers, setAnswers } = useAnswers();
+
+  const handleCheckBoxAnswers = (event, questionId) => {
+    let updateValue = {};
+
+    if (event.target.checked) {
+      if (answers[questionId] === undefined) {
+        updateValue = {
+          ...answers,
+          [questionId]: [event.target.value],
+        };
+      } else {
+        updateValue = {
+          ...answers,
+          [questionId]: [...answers[questionId], event.target.value],
+        };
+      }
+    } else {
+      updateValue = {
+        ...answers,
+        [questionId]: answers[questionId].filter(
+          (value) => value !== event.target.value
+        ),
+      };
+    }
+    setAnswers(updateValue);
+  };
   // 今回表示する問題
   const question = questionTree[questionId];
 
@@ -66,20 +94,40 @@ export function DisplayFormsForSP({
           <Typography fontSize={"1.1rem"}>{"問題" + (index + 1)}</Typography>
         ) : null}
         {questionJsx}
-        <RadioGroup
-          name={questionId}
-          onChange={(event) => handleSetAnswers(event)}
-          value={answers[questionId] || ""}
-        >
-          {question.options.map((option) => (
-            <FormControlLabel
-              key={option.id}
-              value={option.value}
-              control={<Radio />}
-              label={option.value}
-            />
-          ))}
-        </RadioGroup>
+        {question.canMultiple ? (
+          <FormGroup>
+            {question.options.map((option) => (
+              <FormControlLabel
+                key={option.id}
+                value={option.value}
+                control={<Checkbox />}
+                label={option.value}
+                checked={
+                  answers[questionId] !== undefined &&
+                  answers[questionId].includes(option.value)
+                }
+                onChange={(e) => {
+                  handleCheckBoxAnswers(e, questionId);
+                }}
+              />
+            ))}
+          </FormGroup>
+        ) : (
+          <RadioGroup
+            name={questionId}
+            onChange={(event) => handleSetAnswers(event, questionId)}
+            value={answers[questionId] || ""}
+          >
+            {question.options.map((option) => (
+              <FormControlLabel
+                key={option.id}
+                value={option.value}
+                control={<Radio />}
+                label={option.value}
+              />
+            ))}
+          </RadioGroup>
+        )}
       </Box>
     );
   } else if (questionTree[questionId].questionType === "textarea") {

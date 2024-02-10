@@ -985,6 +985,23 @@ function QuestionEditor({
         <Button onClick={() => handleAddNewOption(questionId)}>
           選択肢を追加
         </Button>
+        <FormGroup>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={displayQuestion.canMultiple}
+                onChange={() => {
+                  handleChangeBool(
+                    !displayQuestion.canMultiple,
+                    questionId,
+                    "canMultiple"
+                  );
+                }}
+              />
+            }
+            label="複数選択を許可"
+          />
+        </FormGroup>
       </>
     );
     return (

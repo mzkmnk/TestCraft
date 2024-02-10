@@ -10,8 +10,6 @@ export function useGrade({ questionTree, questionIds, answers }) {
 
   const { workbookId } = useParams();
 
-  const [isAIScoringFinished, setIsAIScoringFinished] = useState(null);
-
   const [AiComments, setAiComments] = useState(null);
 
   const AIAPI = useAPI({
@@ -31,9 +29,12 @@ export function useGrade({ questionTree, questionIds, answers }) {
 
   // ここでAI採点を行う。
   useEffect(() => {
-    console.log("workbookId", workbookId);
-    console.log(typeof workbookId);
     if (AIAPI.isLoading === null) {
+      for (const keys of Object.keys(answers)) {
+        if (typeof answers[keys] === "object") {
+          answers[keys] = answers[keys].join(",,,");
+        }
+      }
       AIAPI.sendAPI({
         body: JSON.stringify({
           question_tree: questionTree,
@@ -43,7 +44,7 @@ export function useGrade({ questionTree, questionIds, answers }) {
         }),
       });
     }
-  }, [AIAPI, aIScoringQuestionIds, answers, questionTree]);
+  }, [AIAPI, aIScoringQuestionIds, answers, questionTree, workbookId]);
 
   useEffect(() => {
     if (
@@ -86,10 +87,31 @@ export function useGrade({ questionTree, questionIds, answers }) {
           }
 
           const correctObjArray = questionTree[id].answers;
-          for (const correctObj of correctObjArray) {
-            if (correctObj.value === answer) {
-              newCorrectIds.push(id);
-              break;
+          if (
+            questionTree[id].questionType === "radio" &&
+            questionTree[id].canMultiple === true
+          ) {
+            let answerArray = answer.split(",,,");
+            // 正解の数と解答の数が同じかつ、すべての解答が正解に含まれている場合正解
+            if (answerArray.length === correctObjArray.length) {
+              let isCorrect = true;
+              for (const correctObj of correctObjArray) {
+                let index = answerArray.indexOf(correctObj.value);
+                if (index === -1) {
+                  isCorrect = false;
+                  break;
+                }
+              }
+              if (isCorrect) {
+                newCorrectIds.push(id);
+              }
+            }
+          } else {
+            for (const correctObj of correctObjArray) {
+              if (correctObj.value === answer) {
+                newCorrectIds.push(id);
+                break;
+              }
             }
           }
         }

@@ -9,6 +9,8 @@ import TextField from "@mui/material/TextField";
 import { useAnswers } from "../context/AnswersContext";
 import { format } from "../../EditorApp/SwitchableTextField";
 import { useMemo } from "react";
+import FormGroup from "@mui/material/FormGroup";
+import Checkbox from "@mui/material/Checkbox";
 
 export function DisplayResult({
   questionTree,
@@ -83,16 +85,44 @@ export function DisplayResult({
         <Typography color={color + ".main"}>
           {isCorrect ? "正解" : "不正解"}
         </Typography>
-        <RadioGroup name={questionId} value={answers[questionId] || "未回答"}>
-          {question.options.map((option) => (
-            <FormControlLabel
-              key={option.id}
-              value={option.value}
-              control={<Radio inputProps={{ readOnly: true }} color={color} />}
-              label={option.value}
-            />
-          ))}
-        </RadioGroup>
+        {question.canMultiple ? (
+          <>
+            <FormGroup value={answers[questionId] || "未回答"}>
+              {question.options.map((option) => (
+                <FormControlLabel
+                  key={option.id}
+                  value={option.value}
+                  control={
+                    <Checkbox inputProps={{ readOnly: true }} color={color} />
+                  }
+                  label={option.value}
+                  checked={
+                    answers[questionId] !== undefined &&
+                    answers[questionId].includes(option.value)
+                  }
+                />
+              ))}
+            </FormGroup>
+          </>
+        ) : (
+          <>
+            <RadioGroup
+              name={questionId}
+              value={answers[questionId] || "未回答"}
+            >
+              {question.options.map((option) => (
+                <FormControlLabel
+                  key={option.id}
+                  value={option.value}
+                  control={
+                    <Radio inputProps={{ readOnly: true }} color={color} />
+                  }
+                  label={option.value}
+                />
+              ))}
+            </RadioGroup>
+          </>
+        )}
       </Box>
     );
   } else if (questionTree[questionId].questionType === "textarea") {
