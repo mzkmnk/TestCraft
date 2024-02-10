@@ -101,7 +101,7 @@ export function DisplayFormsForSP({
                 key={option.id}
                 value={option.value}
                 control={<Checkbox />}
-                label={option.value}
+                label={format(option.value)}
                 checked={
                   answers[questionId] !== undefined &&
                   answers[questionId].includes(option.value)
@@ -123,7 +123,7 @@ export function DisplayFormsForSP({
                 key={option.id}
                 value={option.value}
                 control={<Radio />}
-                label={option.value}
+                label={format(option.value)}
               />
             ))}
           </RadioGroup>

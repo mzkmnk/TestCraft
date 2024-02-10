@@ -487,6 +487,7 @@ export default function EditorApp({ workBook }) {
         },
       });
     }
+    console.log(questionTree);
   }
 
   function handleChangeBool(
@@ -962,17 +963,11 @@ function QuestionEditor({
         <List>
           {displayQuestion.options.map((option) => (
             <ListItem key={option.id}>
-              <TextField
-                defaultValue={option.value}
-                onChange={(event) => {
-                  handleChangeText(
-                    event.target.value,
-                    questionId,
-                    "options",
-                    option.id
-                  );
-                }}
-              ></TextField>
+              <SwitchableTextField
+                value={option.value}
+                setValue={handleChangeText}
+                args={[questionId, "options", option.id]}
+              ></SwitchableTextField>
               <Button
                 onClick={() => handleRemoveOption(questionId, option.id)}
                 color="error"

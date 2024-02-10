@@ -95,7 +95,7 @@ export function DisplayResult({
                   control={
                     <Checkbox inputProps={{ readOnly: true }} color={color} />
                   }
-                  label={option.value}
+                  label={format(option.value)}
                   checked={
                     answers[questionId] !== undefined &&
                     answers[questionId].includes(option.value)
@@ -117,7 +117,7 @@ export function DisplayResult({
                   control={
                     <Radio inputProps={{ readOnly: true }} color={color} />
                   }
-                  label={option.value}
+                  label={format(option.value)}
                 />
               ))}
             </RadioGroup>
