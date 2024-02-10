@@ -653,6 +653,30 @@ export default function EditorApp({ workBook }) {
       </>
     );
   }
+  const handleIsEdit = () => {
+    // 編集中が真かつバリデーションが通っている場合、編集中を無効にする。
+    if (isEdit && validationQuestionTree(questionTree).status) {
+      setIsEdit(false);
+    } else if (isEdit && !validationQuestionTree(questionTree).status) {
+      setIsEdit(true);
+      setIsMessageOpen(true);
+      let messages = validationQuestionTree(questionTree).messages;
+
+      let messageJSX = <></>;
+      for (const message of messages) {
+        messageJSX = (
+          <>
+            {messageJSX}
+            <Typography>{message}</Typography>
+          </>
+        );
+      }
+
+      setMessage(messageJSX);
+    } else {
+      setIsEdit(!isEdit);
+    }
+  };
 
   const questionIds = root.childIds;
   return (
@@ -665,6 +689,8 @@ export default function EditorApp({ workBook }) {
           isLatest={isLatest}
           setIsLatest={setIsLatest}
           exitFunc={save}
+          isEdit={isEdit}
+          handleIsEdit={handleIsEdit}
         />
         <Snackbar
           open={isMessageOpen}
@@ -711,42 +737,7 @@ export default function EditorApp({ workBook }) {
               />
               <FormGroup>
                 <FormControlLabel
-                  control={
-                    <Switch
-                      checked={!isEdit}
-                      onChange={() => {
-                        // 編集中が真かつバリデーションが通っている場合、編集中を無効にする。
-                        if (
-                          isEdit &&
-                          validationQuestionTree(questionTree).status
-                        ) {
-                          setIsEdit(false);
-                        } else if (
-                          isEdit &&
-                          !validationQuestionTree(questionTree).status
-                        ) {
-                          setIsEdit(true);
-                          setIsMessageOpen(true);
-                          let messages =
-                            validationQuestionTree(questionTree).messages;
-
-                          let messageJSX = <></>;
-                          for (const message of messages) {
-                            messageJSX = (
-                              <>
-                                {messageJSX}
-                                <Typography>{message}</Typography>
-                              </>
-                            );
-                          }
-
-                          setMessage(messageJSX);
-                        } else {
-                          setIsEdit(!isEdit);
-                        }
-                      }}
-                    />
-                  }
+                  control={<Switch checked={!isEdit} onChange={handleIsEdit} />}
                   label="編集を終了"
                 />
               </FormGroup>

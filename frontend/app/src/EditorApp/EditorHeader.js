@@ -11,6 +11,8 @@ import DoneOutlinedIcon from "@mui/icons-material/DoneOutlined";
 import ExitButton from "@mui/icons-material/LogoutOutlined";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
+import LockIcon from "@mui/icons-material/Lock";
+import LockOpenIcon from "@mui/icons-material/LockOpen";
 import { InfoModal } from "./InfoModal";
 
 export function EditorHeader({
@@ -19,6 +21,8 @@ export function EditorHeader({
   isLatest,
   setIsLatest,
   exitFunc,
+  isEdit,
+  handleIsEdit,
 }) {
   const [message, setMessage] = useState("");
   const [isMessageOpen, setIsMessageOpen] = useState(false);
@@ -86,6 +90,9 @@ export function EditorHeader({
               }}
             >
               <InfoOutlinedIcon />
+            </IconButton>
+            <IconButton color="inherit" onClick={handleIsEdit}>
+              {isEdit ? <LockIcon /> : <LockOpenIcon />}
             </IconButton>
             {saveStatusIcon}
             <IconButton color="inherit" onClick={exitFunc}>
