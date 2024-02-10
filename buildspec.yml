@@ -7,6 +7,9 @@ phases:
   pre_build:
     commands:
       - npm install -g npm@latest
+      - echo Checking for REACT_APP_API_KEY: $REACT_APP_API_KEY
+      - echo Checking for REACT_APP_GRAPHQL_ENDPOINT: $REACT_APP_GRAPHQL_ENDPOINT
+      - echo Checking for REACT_APP_REGION: $REACT_APP_REGION
       - node generate_aws_exports.js
       - cd frontend/app
       - npm install
