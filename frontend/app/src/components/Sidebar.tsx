@@ -89,6 +89,7 @@ const Sidebar: React.FC = () => {
     if(loginInfoAPI.isSuccess){
       const data = loginInfoAPI.data;
       if(data.success){
+        console.log("data",data);
         setUserId(data.user_id);
       }else{
         console.log(data.error);
@@ -104,13 +105,9 @@ const Sidebar: React.FC = () => {
   const handleMenuClick = (path) => {navigate(path);}
 
 
-  const handleOpenModal = () => {
-    setIsModalOpen(true);
-  };
+  const handleOpenModal = () => {setIsModalOpen(true);};
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
+  const handleCloseModal = () => {setIsModalOpen(false);};
 
   const handleSendMessage =  async (message: string) => {
     try{
