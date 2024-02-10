@@ -13,4 +13,4 @@ const config = {
 
 const content = `const config = ${JSON.stringify(config)};\n\nexport default config;`;
 
-fs.writeFileSync('frontend/app/src/components/aws-exports.js', content);
+fs.writeFileSync('frontend/app/src/aws-exports.js', content);

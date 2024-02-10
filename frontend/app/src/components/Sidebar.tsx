@@ -24,7 +24,7 @@ import { Amplify } from 'aws-amplify';
 import { generateClient } from 'aws-amplify/api';
 import { createPost } from '../graphql/mutations';
 import { postCreated } from '../graphql/subscriptions';
-import config from './aws-exports.js';
+import config from '../aws-exports.js';
 
 import { useAPI } from '../hooks/useAPI';
 
