@@ -35,6 +35,7 @@ const APIs = {
   get_user_info_change: `${urlBase}/get_user_info_change`,
   profile: (userId) => `${urlBase}/profile/${userId}`,
   follow: `${urlBase}/follow`,
+  get_post: `${urlBase}/get_post`,
 };
 
 /**
