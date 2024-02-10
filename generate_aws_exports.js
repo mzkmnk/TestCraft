@@ -3,14 +3,14 @@ const fs = require('fs');
 const config = {
   API: {
     GraphQL: {
-      endpoint: process.env.ENDPOINT,
-      region: process.env.REGION,
+      endpoint: process.env.REACT_APP_GRAPHQL_ENDPOINT,
+      region: process.env.REACT_APP_REGION,
       defaultAuthMode: 'apiKey',
-      apiKey: process.env.APIKEY,
+      apiKey: process.env.REACT_APP_API_KEY,
     }
   }
 };
 
 const content = `const config = ${JSON.stringify(config)};\n\nexport default config;`;
 
-fs.writeFileSync('frontend/app/src/aws-exports.js', content);
+fs.writeFileSync('src/aws-exports.js', content);
