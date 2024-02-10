@@ -8,6 +8,7 @@ phases:
     commands:
       - cd frontend/app
       - npm install
+      - node generate_aws_exports.js
   build:
     commands:
       - npm run build

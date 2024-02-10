@@ -15,3 +15,5 @@ mac_env.sh
 key.env
 
 lambdaFuncPackage
+
+/frontend/app/src/components/aws-exports.js
