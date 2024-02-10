@@ -1,7 +1,19 @@
+import UserHeader from "./UserHeader";
+import { Link } from "react-router-dom";
 export default function Error() {
   return (
-    <div>
-      <h1>エラーが発生しました。</h1>
-    </div>
+    <>
+      <UserHeader />
+      <div
+        style={{
+          textAlign: "center",
+        }}
+      >
+        <p style={{ fontSize: "1.5rem" }}>エラーが発生しました。</p>
+        <p>
+          <Link to="/mypage">マイページに戻る</Link>
+        </p>
+      </div>
+    </>
   );
 }
