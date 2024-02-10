@@ -98,9 +98,8 @@ const Sidebar: React.FC = () => {
       console.log("useAPI loginInfoAPI error");
     }
   },[loginInfoAPI.isSuccess]);
-  useEffect(() => {
-    console.log("userId:", userId);
-  }, [userId]);
+  
+  useEffect(() => {console.log("userId:", userId);}, [userId]);
 
   const handleMenuClick = (path) => {navigate(path);}
 
