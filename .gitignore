@@ -15,5 +15,3 @@ key.env
 lambdaFuncPackage
 
 /frontend/app/src/components/aws-exports.js
-
-/frontend/app/src/graphql
