@@ -57,16 +57,22 @@ class CustomFollow(admin.ModelAdmin):
     search_fields = ('id',)
 admin.site.register(Follow,CustomFollow)
 
-class CumstomAiComment(admin.ModelAdmin):
+class CustomAiComment(admin.ModelAdmin):
     list_display = ('user','workbook',)
     search_fields = ('id',)
-admin.site.register(AiComment,CumstomAiComment)
+admin.site.register(AiComment,CustomAiComment)
 
-class CumstomPost(admin.ModelAdmin):
+class CustomPost(admin.ModelAdmin):
     list_display = ('user','created_at')
     search_fields = ('id',)
-admin.site.register(Post,CumstomPost)
+admin.site.register(Post,CustomPost)
 
-class CumstomComment(admin.ModelAdmin):
+class CustomComment(admin.ModelAdmin):
     list_display = ('user','post','created_at')
     search_fields = ('id',)
+admin.site.register(Comment,CustomComment)
+
+class CustomPostLike(admin.ModelAdmin):
+    list_display = ('user','post')
+    search_fields = ('id',)
+admin.site.register(postLike,CustomPostLike)

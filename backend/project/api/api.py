@@ -1022,6 +1022,8 @@ def send_messsage(request,payload:MessageSchema):
         workbooks = payload.workbooks.split(',')
         workbook_dict = {}
         for workbook in workbooks:
+            if(workbook == ""):
+                break
             workbook_id,workbook_name = workbook.split(':')
             workbook_dict[workbook_id] = workbook_name
         for user in users:
@@ -1234,6 +1236,75 @@ def ai_score(request,payload:AiScore):
         return JsonResponse(
             {
                 "success":False,
+                "error":str(e),
+            },
+            status = 400,
+        )
+
+#投稿内容を10件取得するAPI
+@api.get("/get_post")
+def get_post(request):
+    try:
+        posts = Post.objects.all().order_by('-created_at')[:10]
+
+        data = [
+            {
+                "id":post.id,
+                "user":{
+                    "id":post.user.id,
+                    "username":post.user.username,
+                    "email":post.user.email,
+                    "isCompanyUser":post.user.is_company_user,
+                    "isOwnCompany":post.user.is_own_company,
+                    "createdAt":post.user.created_at.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                    "problemCreateCnt":post.user.problem_create_cnt,
+                    "problemSlvCnt":post.user.problem_slv_cnt,
+                    "isEmailCertification":post.user.is_email_certification,
+                },
+                "content":post.content,
+                "createdAt":post.created_at.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                "updatedAt":post.updated_at.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                "comments":[
+                    {
+                        "id":comment.id,
+                        "user":{
+                            "id":comment.user.id,
+                        },
+                        "post":{
+                            "id":comment.post.id,
+                        },
+                        "content":comment.content,
+                        "createdAt":comment.created_at.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                    }
+                    for comment in post.comments.all()
+                ],
+                "likes":[
+                    {
+                        "id":like.id,
+                        "user":{
+                            "id":like.user.id,
+                        },
+                        "createdAt":like.created_at.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                    }
+                    for like in post.likes.all()
+                ]
+            }
+            for post in posts
+        ]
+        print(data)
+        return JsonResponse(
+            {
+                "success":True,
+                "data":data,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "data":None,
                 "error":str(e),
             },
             status = 400,
