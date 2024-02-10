@@ -21,6 +21,7 @@ import { red } from '@mui/material/colors';
 
 //aws設定
 import { Amplify } from 'aws-amplify';
+import { Auth } from 'aws-amplify';
 import { generateClient } from 'aws-amplify/api';
 import { createPost } from '../graphql/mutations';
 import { postCreated } from '../graphql/subscriptions';
@@ -84,7 +85,6 @@ const Sidebar: React.FC = () => {
     APIName: 'get_user_info_change',
     loadOnStart: true,
   });
-
   useEffect(() => {
     if(loginInfoAPI.isSuccess){
       const data = loginInfoAPI.data;
@@ -96,9 +96,7 @@ const Sidebar: React.FC = () => {
     }else{
       console.log("useAPI loginInfoAPI error");
     }
-  },[loginInfoAPI.isSuccess,loginInfoAPI.data]);
-
-
+  },[loginInfoAPI.isSuccess]);
   useEffect(() => {
     console.log("userId:", userId);
   }, [userId]);
