@@ -29,6 +29,7 @@ import { postCreated } from '../graphql/subscriptions';
 import config from '../aws-exports.js';
 
 import { useAPI } from '../hooks/useAPI';
+import LoadingScreen from '../LoadingScreen.tsx';
 
 Amplify.configure(config);
 
@@ -79,6 +80,7 @@ const Sidebar: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [userId, setUserId] = useState('');
+  const [loading, setLoading] = useState(true);
 
    const navigate = useNavigate();
 
@@ -90,6 +92,7 @@ const Sidebar: React.FC = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try{
+        setLoading(true);
         const postData = await client.graphql({
           query: listPosts,
         });
@@ -98,8 +101,16 @@ const Sidebar: React.FC = () => {
         const reversedFirstPosts = [...firstPosts].reverse()
         console.log("firstPosts",firstPosts);
         setPosts(reversedFirstPosts);
+        setLoading(false);
       }catch(error){
         console.log("listposts",error);
+        setLoading(false);
+        navigate('/mypage',{
+          state:{
+            message: '投稿の取得に失敗しました',
+            severity: 'error',
+          }
+        })
       }
     };
     fetchPosts();
@@ -173,6 +184,8 @@ const Sidebar: React.FC = () => {
     { label: 'マイプロフィール', key: '/profile/'+ userId,onClick: () => handleMenuClick('/profile/'+ userId) },
     { label: 'いいねした投稿', key: '/like_post',onClick: () => handleMenuClick('/like_post') },
   ];
+
+  if(loading){return <LoadingScreen />;}
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
