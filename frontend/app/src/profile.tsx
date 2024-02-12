@@ -1,10 +1,8 @@
 import React, { useEffect } from 'react';
-import { useParams,useLocation } from 'react-router-dom';
+import { useParams,useNavigate } from 'react-router-dom';
 import { FaHeart } from "react-icons/fa";
 import Button from '@mui/material/Button';
 import Pagination from "@mui/material/Pagination";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
 import {
   MDBCol,
   MDBContainer,
@@ -18,6 +16,7 @@ import {
 import UserHeader from "./UserHeader";
 import { useAPI } from "./hooks/useAPI";
 import CustomTabs from "./components/CustomTabs";
+import LoadingScreen from './LoadingScreen.tsx';
 
 
 export default function ProfilePage() {
@@ -28,8 +27,10 @@ export default function ProfilePage() {
     const [createdWorkbook, setCreatedWorkbook] = React.useState([]);
     const [followCount, setFollowCount] = React.useState(0);
     const [followerCount, setFollowerCount] = React.useState(0);
+    const [loading, setLoading] = React.useState(true);
     const { userId } = useParams();
-    const location = useLocation();
+
+    const navigate = useNavigate();
 
     const tabsData = [
         {label:'投稿',content:'今後対応予定です'},
@@ -59,6 +60,7 @@ export default function ProfilePage() {
     );
 
     useEffect(() => {
+        setLoading(true);
         if(getProfileAPI.isSuccess){
             const data = getProfileAPI.data;
             console.log(data);
@@ -75,11 +77,11 @@ export default function ProfilePage() {
                 else{
                     setUserSchool(data.school);
                 }
+                setLoading(false);
             }else{
                 console.error(data.error);
+                setLoading(false);
             }
-        }else{
-            console.error("useAPI error");
         }
     },[getProfileAPI.isSuccess]);
 
@@ -225,6 +227,8 @@ export default function ProfilePage() {
         handleFollow();
     };
 
+
+    if(loading){ return <LoadingScreen /> };
 
     return (
         <>
