@@ -23,6 +23,7 @@ import { red } from '@mui/material/colors';
 import { Amplify } from 'aws-amplify';
 import { Auth } from 'aws-amplify';
 import { generateClient } from 'aws-amplify/api';
+import { listPosts } from '../graphql/queries';
 import { createPost } from '../graphql/mutations';
 import { postCreated } from '../graphql/subscriptions';
 import config from '../aws-exports.js';
@@ -85,6 +86,25 @@ const Sidebar: React.FC = () => {
     APIName: 'get_user_info_change',
     loadOnStart: true,
   });
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try{
+        const postData = await client.graphql({
+          query: listPosts,
+        });
+        console.log("postData",postData);
+        const firstPosts = postData.data.listPosts as Post[];
+        const reversedFirstPosts = [...firstPosts].reverse()
+        console.log("firstPosts",firstPosts);
+        setPosts(reversedFirstPosts);
+      }catch(error){
+        console.log("listposts",error);
+      }
+    };
+    fetchPosts();
+  },[]);
+
   useEffect(() => {
     if(loginInfoAPI.isSuccess){
       const data = loginInfoAPI.data;
@@ -101,12 +121,15 @@ const Sidebar: React.FC = () => {
   
   useEffect(() => {console.log("userId:", userId);}, [userId]);
 
+
   const handleMenuClick = (path) => {navigate(path);}
 
 
   const handleOpenModal = () => {setIsModalOpen(true);};
 
   const handleCloseModal = () => {setIsModalOpen(false);};
+
+  const userProfileClick = (userId:string) => {navigate(`/profile/${userId}`)};
 
   const handleSendMessage =  async (message: string) => {
     try{
@@ -182,8 +205,13 @@ const Sidebar: React.FC = () => {
           {posts.map((post) => (
             <Card sx={cardStyle} key={post.id}>
               <CardHeader
+                sx = {cardHeaderStyle}
                 avatar={
-                  <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
+                  <Avatar
+                    sx={ avatarStyle }
+                    aria-label="recipe"
+                    onClick={() => userProfileClick(post.user.id)}
+                  >
                     {post.user?.username[0]}
                   </Avatar>
                 }
@@ -192,21 +220,43 @@ const Sidebar: React.FC = () => {
                     <MoreVertIcon />
                   </IconButton>
                 }
-                title={<Typography variant="h6">{post.user?.username}</Typography>}
+                title={
+                  <Typography
+                    variant="h6"
+                    onClick={() => userProfileClick(post.user.id)}
+                    style={{ cursor:'Pointer' }}
+                  >
+                    {post.user?.username}
+                    </Typography>}
                 subheader={<Typography variant="caption" color="textSecondary">{moment(post.createdAt).fromNow()}</Typography>}
               />
-              <CardContent>
+              <CardContent sx={cardContentStyle}>
                 <Typography variant="body1" color="text.secondary">
                   {post.content}
                 </Typography>
               </CardContent>
-              <CardActions disableSpacing>
-                <IconButton aria-label="add to favorites" sx={{ '&:hover': { color: red[500] } }}>
-                  <FavoriteIcon />
-                </IconButton>
-                <IconButton aria-label="comment" sx={{ '&:hover': { color: 'primary.main' } }}>
-                  <CommentIcon />
-                </IconButton>
+              <CardActions sx = {cardActionsStyle}>
+                <Box display="flex" alignItems="center">
+                  <IconButton
+                    aria-label="postlike"
+                    sx={{
+                      '&:hover': { color: '#1876D1' }
+                    }}
+                  >
+                    <FavoriteIcon />
+                  </IconButton>
+                  <Typography variant="body2" color="text.secondary" sx={{ marginLeft: '8px' }}>
+                    {post.likes.length}
+                  </Typography>
+                </Box>
+                <Box display="flex" alignItems="center">
+                  <IconButton aria-label="comment" sx={{ '&:hover': { color: 'primary.main' } }}>
+                    <CommentIcon />
+                  </IconButton>
+                  <Typography variant="body2" color="text.secondary" sx={{ marginLeft: '8px' }}>
+                    {post.comments.length}
+                  </Typography>
+                </Box>
               </CardActions>
             </Card>
           ))}
@@ -234,7 +284,6 @@ const Sidebar: React.FC = () => {
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   variant="outlined"
-                  // margin="normal"
                 />
                 <Box display="flex" justifyContent="flex-end" mt={2}>
                   <Button
@@ -280,6 +329,29 @@ const cardStyle = {
   margin: 'auto',
   marginBottom: 5,
   height: 'auto',
+};
+
+const cardHeaderStyle = {
+  backgroundColor: "#f5f5f5",
+  borderBottom: "1px solid #e0e0e0",
+};
+
+const cardContentStyle = {
+  padding: "16px",
+  "&:last-child": {
+    paddingBottom: "16px",
+  },
+};
+
+const cardActionsStyle = {
+  justifyContent: "space-between",
+  padding: "0 16px 16px",
+};
+
+const avatarStyle = {
+  backgroundColor: red[500],
+  color: "#ffffff",
+  cursor:'Pointer',
 };
 
 const buttonStyle = {
