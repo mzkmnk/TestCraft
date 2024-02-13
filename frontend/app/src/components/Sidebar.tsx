@@ -132,7 +132,7 @@ const Sidebar: React.FC = () => {
         const newComment = data.comment;
         setPosts((prevPosts) => {
           return prevPosts.map((post) => {
-            if(post.id === newComment.post.id){
+            if(post.id === newComment.post.id.toString()){
               return {
                 ...post,
                 comments: [...post.comments, newComment]
@@ -146,6 +146,8 @@ const Sidebar: React.FC = () => {
       }
     }
   },[postCommentAPI.isSuccess,postCommentAPI.data]);
+
+  
 
   useEffect(() => {
     if(loginInfoAPI.isSuccess){
@@ -184,7 +186,7 @@ const Sidebar: React.FC = () => {
     });
     setSnackbarContent('コメントしました');
     handleOpenSnackbar();
-    setMessage('');
+    setComment('');
     setIsCommentModalOpen(false);
   }
 

@@ -28,6 +28,7 @@ import PersonIcon from '@mui/icons-material/Person';
 
 import UserHeader from './UserHeader';
 import { useAPI } from './hooks/useAPI';
+import LoadingScreen from './LoadingScreen.tsx';
 
 function PostDetail() {
     const [postData,setPostData] = useState(null);
@@ -38,6 +39,7 @@ function PostDetail() {
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [isPostLike, setIsPostLike] = useState(false);
     const [snackbarContent, setSnackbarContent] = useState('');
+    const [loading,setLoading] = useState(true);
 
     const { postId } = useParams();
     const navigate = useNavigate();
@@ -128,6 +130,7 @@ function PostDetail() {
     },[postCommentAPI.isSuccess,postCommentAPI.data]);
 
     useEffect(() => {
+        setLoading(true);
         if(getPostDetailAPI.isSuccess){
             const data = getPostDetailAPI.data;
             if(data.success){
@@ -140,8 +143,10 @@ function PostDetail() {
                 console.log(data.error);
             }
         }
+        setLoading(false);
     },[getPostDetailAPI.isSuccess,getPostDetailAPI.data]);
 
+    if(loading){return <LoadingScreen />;};
     return (
         <>
             <UserHeader />
