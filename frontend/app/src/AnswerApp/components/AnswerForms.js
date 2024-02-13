@@ -37,9 +37,11 @@ export function AnswerForms({
   const [isLastQuestion, setIsLastQuestion] = useState(false);
 
   // 問題遷移
-  // 最後の問題では、この関数を実行するボタンは無効化する。
-  // （つまり、最初の問題でこの関数が実行されることは想定しない。）
   const handlePrevQuestion = () => {
+    if (displayPageIndex === 0) {
+      setIsFirstQuestion(true);
+      return;
+    }
     const nextPageIndex = displayPageIndex - 1;
     setDisplayPageIndex(nextPageIndex);
     if (isLastQuestion) {
@@ -52,6 +54,10 @@ export function AnswerForms({
 
   // 最後の問題では、この関数を実行するボタンは表示しない。
   const handleNextQuestion = () => {
+    if (displayPageIndex === pages.length - 1) {
+      setIsLastQuestion(true);
+      return;
+    }
     const nextPageIndex = displayPageIndex + 1;
     setDisplayPageIndex(nextPageIndex);
     if (isFirstQuestion) {

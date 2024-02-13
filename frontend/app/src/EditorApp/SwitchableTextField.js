@@ -86,11 +86,11 @@ export function SwitchableTextField({ value, setValue, args = [] }) {
 
   const onBlur = (e) => {
     const value = e.target.value;
+    setValue(e.target.value, ...args);
     if (value === "") {
       return;
     }
     setDisplayValue(format(e.target.value));
-    setValue(e.target.value, ...args);
     toggleState();
   };
 
@@ -101,7 +101,6 @@ export function SwitchableTextField({ value, setValue, args = [] }) {
           defaultValue={value}
           onBlur={(e) => onBlur(e)}
           autoFocus
-          fullWidth
           multiline
           onKeyDown={(e) => {
             // tabを押したときの動作
@@ -119,7 +118,7 @@ export function SwitchableTextField({ value, setValue, args = [] }) {
                 start + tab.length;
             }
           }}
-          sx={{ marginLeft: 1 }}
+          sx={{ marginLeft: 1, width: "85%" }}
         />
       ) : (
         <Box
@@ -129,6 +128,7 @@ export function SwitchableTextField({ value, setValue, args = [] }) {
             border: 1.5,
             borderRadius: 2,
             borderColor: "#D2D2D2",
+            width: "85%",
           }}
           onClick={toggleState}
         >

@@ -8,7 +8,7 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
 import { useNavigate, useParams } from "react-router-dom";
-import UserHeader from "../UserHeader";
+import { EditorHeader } from "./EditorHeader";
 import Paper from "@mui/material/Paper";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -17,9 +17,14 @@ import { useAPI } from "../hooks/useAPI";
 import Switch from "@mui/material/Switch";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 
 const theme = createTheme({
   palette: {
+    secondary: {
+      main: "#3296A0",
+    },
     background: {
       default: "#fafafa",
     },
@@ -70,6 +75,150 @@ interface TextareaQuestion {
 const createId = () =>
   new Date().getTime().toString(32) + Math.random().toString(32);
 
+/**
+ * エラーケース
+ * 1. 問題が一つしかない場合（ルートのみ）
+ * 2. ルートがない場合
+ * 3. nestedの問題（子）がない場合
+ * 4. nestedの問題文がない場合
+ * 5. radioの選択肢がない場合
+ * 6. radioの選択肢が""の場合
+ * 7. radioの解答がない場合
+ * 8. radioの解答が""の場合
+ * 9. textareaの解答がない場合
+ *
+ * radioに問題がない場合、textareaに問題がない場合は、エラーではない。
+ *
+ */
+const validationQuestionTree = (questionTree: QuestionTree) => {
+  let returnValue: { status: boolean; messages: string[] } = {
+    status: true,
+    messages: [],
+  };
+  let keys = Object.keys(questionTree);
+  // 問題が一つしかない場合（ルートのみ）
+  if (keys.length <= 1) {
+    returnValue = {
+      status: false,
+      messages: [...returnValue.messages, "問題が存在しません"],
+    };
+  }
+
+  // ルート以下のId
+  let questionIds: Id[] = [];
+
+  // ルートがない場合
+  for (const key of keys) {
+    const question = questionTree[key];
+    if (question.questionType === "root") {
+      questionIds = question.childIds;
+      break;
+    } else {
+      returnValue = {
+        status: false,
+        messages: [...returnValue.messages, "ファイルが破損しています。"],
+      };
+      return returnValue;
+    }
+  }
+
+  const checkQuestion = (questionId: Id, questionNumber: number[]) => {
+    const question = questionTree[questionId];
+    if (question === undefined) {
+      returnValue = {
+        status: false,
+        messages: [...returnValue.messages, "ファイルが破損しています。"],
+      };
+    } else if (question.questionType === "nested") {
+      if (question.question === "") {
+        returnValue = {
+          status: false,
+          messages: [
+            ...returnValue.messages,
+            `問題文がありません。(問題${questionNumber.join("-")})`,
+          ],
+        };
+      }
+      if (question.childIds.length === 0) {
+        returnValue = {
+          status: false,
+          messages: [
+            ...returnValue.messages,
+            `大問式に小問がありません。(問題${questionNumber.join("-")})`,
+          ],
+        };
+      }
+      question.childIds.map((id, index) =>
+        checkQuestion(id, [...questionNumber, index + 1])
+      );
+    } else if (question.questionType === "radio") {
+      if (question.options.length === 0) {
+        returnValue = {
+          status: false,
+          messages: [
+            ...returnValue.messages,
+            `選択肢がありません。(問題${questionNumber.join("-")})`,
+          ],
+        };
+      }
+      question.options.map((option) => {
+        if (option.value === "") {
+          returnValue = {
+            status: false,
+            messages: [
+              ...returnValue.messages,
+              `選択肢が空です。(問題${questionNumber.join("-")})`,
+            ],
+          };
+        }
+      });
+      if (question.answers.length === 0) {
+        returnValue = {
+          status: false,
+          messages: [
+            ...returnValue.messages,
+            `解答がありません。(問題${questionNumber.join("-")})`,
+          ],
+        };
+      }
+      question.answers.map((answers, index) => {
+        if (answers.value === "") {
+          returnValue = {
+            status: false,
+            messages: [
+              ...returnValue.messages,
+              `解答が空です。(問題${questionNumber.join("-")})`,
+            ],
+          };
+        }
+      });
+    } else if (question.questionType === "textarea") {
+      if (question.answers.length === 0) {
+        returnValue = {
+          status: false,
+          messages: [
+            ...returnValue.messages,
+            `解答がありません。(問題${questionNumber.join("-")})`,
+          ],
+        };
+      }
+      question.answers.map((answers, index) => {
+        if (answers.value === "") {
+          returnValue = {
+            status: false,
+            messages: [
+              ...returnValue.messages,
+              `解答が空です。(問題${questionNumber.join("-")})`,
+            ],
+          };
+        }
+      });
+    }
+  };
+  questionIds.map((id, index) => checkQuestion(id, [index + 1]));
+  return returnValue;
+};
+
 export default function EditorApp({ workBook }) {
   if (!workBook) {
     workBook = {
@@ -81,6 +230,7 @@ export default function EditorApp({ workBook }) {
           childIds: [],
         },
       },
+      isEdit: true,
     };
   }
 
@@ -90,11 +240,20 @@ export default function EditorApp({ workBook }) {
   const [title, setTitle] = useState(workBook.info.title);
   const navigate = useNavigate();
   const saveAPI = useAPI({ APIName: "save_data" });
+  const saveAPIForUpdate = useAPI({ APIName: "save_data" });
   const { workbookId } = useParams();
+  const [isLatest, setIsLatest] = useState(false);
+  const [isEdit, setIsEdit] = useState(workBook.isEdit);
+  const [isMessageOpen, setIsMessageOpen] = useState(false);
+  const [message, setMessage] = useState(<></>);
+  const handleClose = (event, reason) => {
+    setIsMessageOpen(false);
+  };
+  const [isSuccess, setIsSuccess] = useState(null);
 
   useEffect(() => {
     if (saveAPI.isSuccess === true) {
-      navigate("/mypage/mycreate", {
+      navigate("/mypage", {
         state: {
           message: `${title}を保存しました`,
           severity: "success",
@@ -113,14 +272,30 @@ export default function EditorApp({ workBook }) {
         workbook_id: workbookId,
       },
       questions: questionTree,
+      isEdit: isEdit,
     };
     const data = JSON.stringify(workBook);
     saveAPI.sendAPI({ body: data });
   }
 
+  function updateDataInDB() {
+    workBook = {
+      info: {
+        title: title,
+        workbook_id: workbookId,
+      },
+      questions: questionTree,
+      isEdit: isEdit,
+    };
+    const data = JSON.stringify(workBook);
+    saveAPIForUpdate.sendAPI({ body: data });
+  }
+
   // state更新関数群 React Reducerを使うべきではある（コードが分かりにくくなる && 面倒）
   // optionsとanswersの追加と削除などは、分岐を複雑にして共通化できるが、可読性が下がるのでやらない。
   function handleAddNewOption(updateQuestionId: Id) {
+    setIsEdit(true);
+    setIsLatest(false);
     const updatedQuestion = questionTree[updateQuestionId];
     if (updatedQuestion.questionType === "radio") {
       setQuestionTree({
@@ -134,6 +309,8 @@ export default function EditorApp({ workBook }) {
   }
 
   function handleAddNewAnswer(updateQuestionId: Id) {
+    setIsEdit(true);
+    setIsLatest(false);
     const updatedQuestion = questionTree[updateQuestionId];
     if (
       updatedQuestion.questionType === "radio" ||
@@ -150,6 +327,8 @@ export default function EditorApp({ workBook }) {
   }
 
   function handleAddNewQuestion(parentQuestionId: Id) {
+    setIsEdit(true);
+    setIsLatest(false);
     const parentQuestion = questionTree[parentQuestionId];
     if (
       parentQuestion.questionType === "root" ||
@@ -177,6 +356,8 @@ export default function EditorApp({ workBook }) {
   }
 
   function handleRemoveOption(updateQuestionId: Id, removedOptionId: Id) {
+    setIsEdit(true);
+    setIsLatest(false);
     const updatedQuestion = questionTree[updateQuestionId];
     if (updatedQuestion.questionType === "radio") {
       setQuestionTree({
@@ -194,6 +375,8 @@ export default function EditorApp({ workBook }) {
   }
 
   function handleRemoveAnswer(updateQuestionId: Id, removedOptionId: Id) {
+    setIsEdit(true);
+    setIsLatest(false);
     const updatedQuestion = questionTree[updateQuestionId];
     if (
       updatedQuestion.questionType === "radio" ||
@@ -214,6 +397,8 @@ export default function EditorApp({ workBook }) {
   }
 
   function handleRemoveQuestion(removedQuestionId: Id) {
+    setIsEdit(true);
+    setIsLatest(false);
     const removedQuestion = questionTree[removedQuestionId];
 
     if (removedQuestion.questionType === "root") {
@@ -252,6 +437,8 @@ export default function EditorApp({ workBook }) {
     changedPropertyName: string,
     changedId: string | undefined = undefined
   ) {
+    setIsEdit(true);
+    setIsLatest(false);
     const changedQuestion = questionTree[changedQuestionId];
 
     if (
@@ -300,6 +487,7 @@ export default function EditorApp({ workBook }) {
         },
       });
     }
+    console.log(questionTree);
   }
 
   function handleChangeBool(
@@ -309,6 +497,8 @@ export default function EditorApp({ workBook }) {
     changedId: string | undefined = undefined
   ) {
     const changedQuestion = questionTree[changedQuestionId];
+    setIsEdit(true);
+    setIsLatest(false);
 
     if (
       changedId !== undefined &&
@@ -364,6 +554,8 @@ export default function EditorApp({ workBook }) {
     updateQuestionId: Id,
     parentId: Id
   ) {
+    setIsEdit(true);
+    setIsLatest(false);
     const updatedQuestion = questionTree[updateQuestionId];
     // 同じtypeが選択された場合、終了する
     if (updatedQuestion.questionType === selectedType) {
@@ -461,13 +653,59 @@ export default function EditorApp({ workBook }) {
       </>
     );
   }
+  const handleIsEdit = () => {
+    // 編集中が真かつバリデーションが通っている場合、編集中を無効にする。
+    if (isEdit && validationQuestionTree(questionTree).status) {
+      setIsEdit(false);
+    } else if (isEdit && !validationQuestionTree(questionTree).status) {
+      setIsEdit(true);
+      setIsMessageOpen(true);
+      let messages = validationQuestionTree(questionTree).messages;
+
+      let messageJSX = <></>;
+      for (const message of messages) {
+        messageJSX = (
+          <>
+            {messageJSX}
+            <Typography>{message}</Typography>
+          </>
+        );
+      }
+
+      setMessage(messageJSX);
+    } else {
+      setIsEdit(!isEdit);
+    }
+  };
 
   const questionIds = root.childIds;
   return (
     <>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <UserHeader />
+        <EditorHeader
+          saveFunc={updateDataInDB}
+          saveAPI={saveAPIForUpdate}
+          isLatest={isLatest}
+          setIsLatest={setIsLatest}
+          exitFunc={save}
+          isEdit={isEdit}
+          handleIsEdit={handleIsEdit}
+        />
+        <Snackbar
+          open={isMessageOpen}
+          autoHideDuration={6000}
+          onClose={handleClose}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        >
+          <Alert
+            severity={isSuccess ? "success" : "error"}
+            variant="filled"
+            sx={{ width: "100%" }}
+          >
+            {message}
+          </Alert>
+        </Snackbar>
         <Box
           sx={{
             display: "flex",
@@ -481,19 +719,29 @@ export default function EditorApp({ workBook }) {
             elevation={4}
             sx={{
               margin: 2,
+              marginTop: 3,
               padding: 2,
+
               borderTop: 12,
-              borderColor: "primary.main",
+              borderColor: "secondary.main",
             }}
           >
-            <TextField
-              variant="standard"
-              label="タイトル"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              margin="normal"
-              InputProps={{ style: { fontSize: "2rem" } }}
-            />
+            <>
+              <TextField
+                variant="standard"
+                label="タイトル"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                margin="normal"
+                InputProps={{ style: { fontSize: "2rem" } }}
+              />
+              <FormGroup>
+                <FormControlLabel
+                  control={<Switch checked={!isEdit} onChange={handleIsEdit} />}
+                  label="編集を終了"
+                />
+              </FormGroup>
+            </>
           </Paper>
 
           {questionIds.map((questionId, index) => (
@@ -504,7 +752,7 @@ export default function EditorApp({ workBook }) {
                 margin: 2,
                 padding: 2,
                 borderLeft: 8,
-                borderColor: "primary.main",
+                borderColor: "secondary.main",
               }}
             >
               <QuestionEditor
@@ -526,7 +774,7 @@ export default function EditorApp({ workBook }) {
           ))}
 
           <Button onClick={() => handleAddNewQuestion(rootId)}>新規問題</Button>
-          <Button onClick={() => save()}>保存</Button>
+          <Button onClick={() => save()}>保存して終了</Button>
         </Box>
       </ThemeProvider>
     </>
@@ -706,17 +954,11 @@ function QuestionEditor({
         <List>
           {displayQuestion.options.map((option) => (
             <ListItem key={option.id}>
-              <TextField
-                defaultValue={option.value}
-                onChange={(event) => {
-                  handleChangeText(
-                    event.target.value,
-                    questionId,
-                    "options",
-                    option.id
-                  );
-                }}
-              ></TextField>
+              <SwitchableTextField
+                value={option.value}
+                setValue={handleChangeText}
+                args={[questionId, "options", option.id]}
+              ></SwitchableTextField>
               <Button
                 onClick={() => handleRemoveOption(questionId, option.id)}
                 color="error"
@@ -729,6 +971,23 @@ function QuestionEditor({
         <Button onClick={() => handleAddNewOption(questionId)}>
           選択肢を追加
         </Button>
+        <FormGroup>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={displayQuestion.canMultiple}
+                onChange={() => {
+                  handleChangeBool(
+                    !displayQuestion.canMultiple,
+                    questionId,
+                    "canMultiple"
+                  );
+                }}
+              />
+            }
+            label="複数選択を許可"
+          />
+        </FormGroup>
       </>
     );
     return (
@@ -766,7 +1025,7 @@ function QuestionEditor({
             control={
               <Switch
                 checked={displayQuestion.useAIScoring}
-                onChange={(e) => {
+                onChange={() => {
                   handleChangeBool(
                     !displayQuestion.useAIScoring,
                     questionId,

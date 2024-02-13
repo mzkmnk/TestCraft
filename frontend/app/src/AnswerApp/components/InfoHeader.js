@@ -8,9 +8,8 @@ import { useQuestions } from "../context/QuestionsContext";
 import { useAnswers } from "../context/AnswersContext";
 import { useTimer } from "../../hooks/useTimer";
 import { useAnswerSettings } from "../context/AnswerSettingsContext";
-import { color } from "@mui/system";
 
-const mainAppBarColor = "#33ab9f";
+const mainAppBarColor = "#4caf50";
 export function InfoHeader({ isTimerActive, TimerFinishedFunc }) {
   const { answerSettings } = useAnswerSettings();
   const Timer = useTimer({ notificationTime: answerSettings.notificationTime });

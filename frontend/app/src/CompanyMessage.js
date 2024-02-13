@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Pagination from "@mui/material/Pagination";
 import UserHeader from "./UserHeader";
 import { useAPI } from "./hooks/useAPI";
+import Loading from "./Loading";
 
 function CompanyMessage() {
   const [companyMessages, setCompanyMessages] = useState([]);
@@ -44,8 +45,11 @@ function CompanyMessage() {
       display: "grid",
       gridTemplateColumns: "1fr",
       gridGap: "20px",
-      padding: "20px",
-      backgroundColor: "#f9f9f9",
+      padding: 20,
+      paddingLeft: "3rem",
+      paddingRight: "3rem",
+      maxWidth: "70rem",
+      margin: "0 auto",
     },
     message: {
       border: "1px solid #ddd",
@@ -77,46 +81,66 @@ function CompanyMessage() {
   return (
     <>
       <UserHeader />
+      {API.isLoading && <Loading />}
       <div style={styles.messagesContainer}>
         <div>
-          <h2>企業からのメッセージ</h2>
-          {currentMessages.map((message) => (
-            <div style={styles.message} key={message.id}>
-              <p>{message.message}</p>
-              <p>
-                {new Date(message.timestamp).toLocaleString("ja-JP", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </p>
-              <ul>
-                {message.workbooks &&
-                  Object.entries(message.workbooks).map(
-                    ([id, workbookName]) => (
-                      <li key={id}>
-                        {`ワークブック名: ${workbookName}`}
-                        <a
-                          href={`https://www.testcrafts.net/solve/${id}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          問題を解く
-                        </a>
-                      </li>
-                    )
-                  )}
-              </ul>
+          {companyMessages.length !== 0 && (
+            <>
+              <h2 style={{ marginBottom: 10 }}>企業からのメッセージ</h2>
+              {currentMessages.map((message) => (
+                <div style={styles.message} key={message.id}>
+                  <p>{message.message}</p>
+                  <p>
+                    {new Date(message.timestamp).toLocaleString("ja-JP", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                  <ul>
+                    {message.workbooks &&
+                      Object.entries(message.workbooks).map(
+                        ([id, workbookName]) => (
+                          <li key={id}>
+                            {`ワークブック名: ${workbookName}`}
+                            <a
+                              href={`http://localhost:3000/solve/${id}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              問題を解く
+                            </a>
+                          </li>
+                        )
+                      )}
+                  </ul>
+                </div>
+              ))}
+              {companyMessages.length > messagesPerPage && (
+                <Pagination
+                  count={Math.ceil(companyMessages.length / messagesPerPage)}
+                  page={currentPage}
+                  onChange={handleChangePage}
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                  }}
+                />
+              )}
+            </>
+          )}
+          {API.isSuccess && companyMessages.length === 0 && (
+            <div
+              style={{
+                textAlign: "center",
+              }}
+            >
+              <p style={{ fontSize: "1.5rem" }}>メッセージはありません。</p>
             </div>
-          ))}
+          )}
         </div>
-        <Pagination
-          count={Math.ceil(companyMessages.length / messagesPerPage)}
-          page={currentPage}
-          onChange={handleChangePage}
-        />
       </div>
     </>
   );

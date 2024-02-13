@@ -158,8 +158,8 @@ function MyPage() {
   return (
     <>
       <UserHeader />
-      <div style={{ height: "400px", width: "100%" }}>
-        <h2>ユーザアクティビティグラフ</h2>
+      <div style={{ height: "400px", width: "90%", margin: "0 auto" }}>
+        <h3 style={{ margin: 10 }}>ユーザアクティビティグラフ</h3>
         {chartData.labels ? (
           <Line data={chartData} options={options} />
         ) : (

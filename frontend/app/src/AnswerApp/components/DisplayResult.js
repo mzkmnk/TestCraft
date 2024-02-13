@@ -9,6 +9,8 @@ import TextField from "@mui/material/TextField";
 import { useAnswers } from "../context/AnswersContext";
 import { format } from "../../EditorApp/SwitchableTextField";
 import { useMemo } from "react";
+import FormGroup from "@mui/material/FormGroup";
+import Checkbox from "@mui/material/Checkbox";
 
 export function DisplayResult({
   questionTree,
@@ -23,6 +25,13 @@ export function DisplayResult({
   const answersContext = useAnswers();
   if (answers === null) {
     answers = answersContext.answers;
+  }
+
+  let answerTextList = [];
+  if (questionTree[questionId].answers !== undefined) {
+    answerTextList = questionTree[questionId].answers.map(
+      (answer) => answer.value
+    );
   }
 
   const question = questionTree[questionId];
@@ -83,16 +92,76 @@ export function DisplayResult({
         <Typography color={color + ".main"}>
           {isCorrect ? "正解" : "不正解"}
         </Typography>
-        <RadioGroup name={questionId} value={answers[questionId] || "未回答"}>
-          {question.options.map((option) => (
-            <FormControlLabel
-              key={option.id}
-              value={option.value}
-              control={<Radio inputProps={{ readOnly: true }} color={color} />}
-              label={option.value}
-            />
-          ))}
-        </RadioGroup>
+        {question.canMultiple ? (
+          <>
+            <FormGroup value={answers[questionId] || "未回答"}>
+              {question.options.map((option) => (
+                <FormControlLabel
+                  key={option.id}
+                  value={option.value}
+                  control={
+                    <Checkbox
+                      inputProps={{ readOnly: true }}
+                      color={
+                        answerTextList.includes(option.value)
+                          ? "success"
+                          : "error"
+                      }
+                    />
+                  }
+                  label={format(option.value)}
+                  checked={
+                    answers[questionId] !== undefined &&
+                    answers[questionId].includes(option.value)
+                  }
+                />
+              ))}
+            </FormGroup>
+          </>
+        ) : (
+          <>
+            <RadioGroup
+              name={questionId}
+              value={answers[questionId] || "未回答"}
+            >
+              {question.options.map((option) => (
+                <FormControlLabel
+                  key={option.id}
+                  value={option.value}
+                  control={
+                    <Radio inputProps={{ readOnly: true }} color={color} />
+                  }
+                  label={format(option.value)}
+                />
+              ))}
+            </RadioGroup>
+          </>
+        )}
+        {!isCorrect && (
+          <>
+            <Box
+              sx={{
+                borderLeft: "double 7px",
+                borderRight: "double 7px",
+                borderColor: "#33ab9f",
+                marginTop: 2,
+                marginBottom: 2,
+                padding: 2,
+                backgroundColor: "whitesmoke",
+              }}
+            >
+              <Typography
+                variant="h6"
+                fontStyle={"italic"}
+                style={{ opacity: 0.4, fontStyle: "oblique" }}
+              >
+                解答：
+              </Typography>
+
+              {format(answerTextList.join("\n"))}
+            </Box>
+          </>
+        )}
       </Box>
     );
   } else if (questionTree[questionId].questionType === "textarea") {
@@ -140,7 +209,33 @@ export function DisplayResult({
             </Typography>
             {format(AiComments[questionId])}
           </Box>
-        ) : null}
+        ) : (
+          !isCorrect && (
+            <>
+              <Box
+                sx={{
+                  borderLeft: "double 7px",
+                  borderRight: "double 7px",
+                  borderColor: "#33ab9f",
+                  marginTop: 2,
+                  marginBottom: 2,
+                  padding: 2,
+                  backgroundColor: "whitesmoke",
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  fontStyle={"italic"}
+                  style={{ opacity: 0.4, fontStyle: "oblique" }}
+                >
+                  解答：
+                </Typography>
+
+                {format(answerTextList.join("\n"))}
+              </Box>
+            </>
+          )
+        )}
       </Box>
     );
   }

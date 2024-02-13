@@ -35,11 +35,23 @@ function Solved() {
           aiComments[key] = aiComment[key];
         }
       }
-      console.log(aiComments);
+      const workbook = JSON.parse(data.workbook);
+      const questions = workbook.questions;
+      const answers = data.user_answer;
+      for (const keys of Object.keys(questions)) {
+        if (
+          questions[keys].questionType === "radio" &&
+          questions[keys].canMultiple === true &&
+          answers[keys] !== undefined
+        ) {
+          answers[keys] = answers[keys].split(",,,");
+        }
+      }
+      console.log(answers);
 
       setAiComment(aiComments);
-      setAnswers(data.user_answer);
-      setWorkbook(JSON.parse(data.workbook));
+      setAnswers(answers);
+      setWorkbook(workbook);
       setCorrectIds(data.correctIds);
     }
   }, [API.data, API.isSuccess, navigate]);

@@ -85,6 +85,7 @@ Question = Union[Root, NestedQuestion, RadioQuestion, TextareaQuestion]
 class JsonFormat(BaseModel):
     info: Dict
     questions: Dict[str, Question]
+    isEdit:bool
 
 class EditorSchema(Schema):
     workbook_id:int
@@ -129,6 +130,9 @@ class AiScore(BaseModel):
 class FollowSchema(Schema):
     isFollow:bool
     userId:str
+
+class DeleteWorkBookSchema(Schema):
+    workbookId:int
 
 # API
     
@@ -543,7 +547,7 @@ def company_signup(request,payload: CompanySignUpSchema):
 @api.get("/questionsall")
 def questionsall(request):
     try:
-        workbooks = Workbook.objects.filter(is_public = True).order_by('-created_at').values(
+        workbooks = Workbook.objects.filter(is_public = True,is_edit = False).order_by('-created_at').values(
             'id',
             'workbook_name',
             'description',
@@ -674,11 +678,13 @@ def get_graph_data(request):
 def save_data(request,data:JsonFormat):
     try:
         workbook_id = None
+        is_edit = data.isEdit
         if(data.info.get('workbook_id') is not None):
             workbook_id = data.info['workbook_id']
         if(Workbook.objects.filter(id = workbook_id).exists()):
             workbook = Workbook.objects.get(id = workbook_id)
             workbook.workbook_name = data.info['title']
+            workbook.is_edit = is_edit
             workbook.save()
             problem = Problem.objects.get(workbook_id = workbook_id)
             problem.problem_json = data.json()
@@ -693,7 +699,7 @@ def save_data(request,data:JsonFormat):
         workbook = Workbook.objects.create(
             workbook_name = data.info['title'],
             create_id = request.user,
-            is_edit = True,
+            is_edit = is_edit,
         )
         Problem.objects.create(
             workbook_id = Workbook.objects.get(id = workbook.id),
@@ -723,6 +729,29 @@ def save_data(request,data:JsonFormat):
                 'error':e.errors()
             },
             status = 400
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                'success':False,
+                'error':str(e)
+            },
+            status = 400
+        )
+
+#問題を削除するAPI
+@api.post("/delete_workbook")
+def delete_workbook(request,payload:DeleteWorkBookSchema):
+    try:
+        workbook_id = payload.workbookId
+        workbook = Workbook.objects.get(id = workbook_id)
+        workbook.delete()
+        return JsonResponse(
+            {
+                'success':True,
+                'error':None,
+            },
+            status = 200
         )
     except Exception as e:
         return JsonResponse(

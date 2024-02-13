@@ -35,6 +35,7 @@ const APIs = {
   get_user_info_change: `${urlBase}/get_user_info_change`,
   profile: (userId) => `${urlBase}/profile/${userId}`,
   follow: `${urlBase}/follow`,
+  delete_workbook: `${urlBase}/delete_workbook`,
   get_post: `${urlBase}/get_post`,
 };
 
@@ -71,6 +72,11 @@ export function useAPI({
     setIsLoading(true);
     setError(undefined);
     setIsSuccess(undefined);
+  };
+  const statusInit = () => {
+    setIsLoading(null);
+    setIsSuccess(null);
+    setError(null);
   };
 
   // useEffectでも、外部からも呼び出せるようにするには、useCallbackを使う必要がある。
@@ -160,5 +166,5 @@ export function useAPI({
     }
   }, [body, isLoginRequired, loadOnStart, params, sendAPI]);
 
-  return { sendAPI, data, isLoading, isSuccess, error };
+  return { sendAPI, data, isLoading, isSuccess, error, statusInit };
 }
