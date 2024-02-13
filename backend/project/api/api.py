@@ -548,12 +548,13 @@ def questionsall(request):
             'workbook_name',
             'description',
             'create_id__username',
+            'create_id',
             'created_at',
             'updated_at',
             'like_count',
         )
         workbooks_with_likes = []
-        for workbook in workbooks:
+        for workbook in workbooks:       
             liked_by_user = Like.objects.filter(user=request.user, workbook_id=workbook['id']).exists()
             workbook['liked_by_user'] = liked_by_user
             workbooks_with_likes.append(workbook)
