@@ -44,7 +44,6 @@
 .likeStyle {
   display: flex;
   align-items: center;
-  margin-top: 10px;
   color: #1da1f2;
   cursor: pointer;
 }

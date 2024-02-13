@@ -8,7 +8,6 @@ import Snackbar from "@mui/material/Snackbar";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import Loading from "./Loading";
 import "./workbookList.css";
-import IconButton from "@mui/material/IconButton";
 
 function Mysolve() {
   const [workbooks, setWorkbooks] = useState([]);
@@ -63,15 +62,22 @@ function Mysolve() {
             <span>
               <p style={{ fontSize: "1.5rem" }}>{workbook.workbook_name}</p>
               <p>{workbook.description}</p>
-              <p className="createdBy">
-                created by {workbook.create_id__username} ({workbook.created_at}
-                )
-              </p>
-            </span>
-
-            <span className="likeStyle">
-              <FavoriteIcon />
-              <span>{workbook.like_count}</span>
+              <span
+                className="createdBy"
+                style={{ display: "flex", alignItems: "center" }}
+              >
+                <p style={{ margin: "0 auto" }}>
+                  created by {workbook.create_id__username} (
+                  {workbook.created_at})
+                </p>
+                <span className="likeStyle">
+                  <FavoriteIcon
+                    color="primary"
+                    style={{ opacity: 0.6, marginLeft: 10, marginTop: 2 }}
+                  />
+                  <span>{workbook.like_count}</span>
+                </span>
+              </span>
             </span>
           </span>
         </div>
