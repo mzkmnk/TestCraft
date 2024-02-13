@@ -153,7 +153,7 @@ function Signup() {
       const ref = userNameRef.current;
       if (!ref.validity.valid) {
         setUserNameError(true);
-        setUserNameHelperText("1文字以上20文字以下で入力してください。");
+        setUserNameHelperText("4文字以上20文字以下で入力してください。");
         isError = true;
       } else {
         setUserNameError(false);
@@ -228,7 +228,7 @@ function Signup() {
                 required
                 fullWidth
                 id="username"
-                label="Username"
+                label="Username（4文字以上20文字以内）"
                 name="username"
                 autoComplete="username"
                 autoFocus
@@ -239,7 +239,7 @@ function Signup() {
                   setUserNameHelperText("");
                   setUsername(e.target.value);
                 }}
-                inputProps={{ maxLength: 20, minLength: 1 }}
+                inputProps={{ maxLength: 20, minLength: 2 }}
                 helperText={userNameHelperText}
               />
               <TextField
@@ -269,7 +269,7 @@ function Signup() {
                 required
                 fullWidth
                 name="password"
-                label="Password"
+                label="Password（8文字以上）"
                 type="password"
                 id="password"
                 autoComplete="current-password"
