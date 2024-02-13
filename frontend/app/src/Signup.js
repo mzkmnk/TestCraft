@@ -241,7 +241,7 @@ function Signup() {
                   }
                   setUsername(e.target.value);
                 }}
-                inputProps={{ maxLength: 20, minLength: 2 }}
+                inputProps={{ maxLength: 20, minLength: 4 }}
                 helperText={userNameHelperText}
               />
               <TextField
