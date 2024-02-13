@@ -67,8 +67,11 @@ function Mysolve() {
                 style={{ display: "flex", alignItems: "center" }}
               >
                 <p style={{ margin: "0 auto" }}>
-                  created by {workbook.create_id__username} (
-                  {workbook.created_at})
+                  created by{" "}
+                  <Link to={`/profile/${workbook.create_id}`}>
+                    {workbook.create_id__username}
+                  </Link>{" "}
+                  ({workbook.created_at})
                 </p>
                 <span className="likeStyle">
                   <FavoriteIcon

@@ -9,10 +9,6 @@ import IconButton from "@mui/material/IconButton";
 
 export function DisplayWorkbookList({ workbooks, setWorkbooks }) {
   const API = useAPI({ APIName: "questionsall_like" });
-  const navigate = useNavigate();
-  const handleQuestionClick = (workbookId) => {
-    navigate(`/solve/${workbookId}`);
-  };
 
   // pagenation
   const [currentPage, setCurrentPage] = useState(1);
@@ -66,6 +62,7 @@ export function DisplayWorkbookList({ workbooks, setWorkbooks }) {
           <div className="questionsContainer">
             {currentQuestions.map((question, index) => (
               <div className="question" key={index}>
+                {console.log(question)}
                 <Link
                   to={`/solve/${question.id}`}
                   style={{ position: "absolute", inset: 0 }}
@@ -77,8 +74,11 @@ export function DisplayWorkbookList({ workbooks, setWorkbooks }) {
                     </p>
                     <p>{question.description}</p>
                     <p className="createdBy">
-                      created by {question.create_id__username} (
-                      {question.created_at})
+                      created by{" "}
+                      <Link to={`/profile/${question.create_id}`}>
+                        {question.create_id__username}
+                      </Link>{" "}
+                      ({question.created_at})
                     </p>
                   </span>
                   <IconButton
