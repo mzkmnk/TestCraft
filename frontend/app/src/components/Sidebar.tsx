@@ -13,6 +13,7 @@ import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
 import IconButton from '@mui/material/IconButton';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import CommentIcon from '@mui/icons-material/Comment';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CardHeader from '@mui/material/CardHeader';
@@ -22,7 +23,7 @@ import { red } from '@mui/material/colors';
 
 //aws設定
 import { Amplify } from 'aws-amplify';
-import { generateClient, post } from 'aws-amplify/api';
+import { generateClient } from 'aws-amplify/api';
 import { listPosts } from '../graphql/queries';
 import { createPost } from '../graphql/mutations';
 import { postCreated } from '../graphql/subscriptions';
@@ -30,6 +31,7 @@ import config from '../aws-exports.js';
 
 import { useAPI } from '../hooks/useAPI';
 import LoadingScreen from '../LoadingScreen.tsx';
+import { set } from 'date-fns';
 
 Amplify.configure(config);
 
@@ -85,6 +87,7 @@ const Sidebar: React.FC = () => {
   const [userId, setUserId] = useState('');
   const [loading, setLoading] = useState(true);
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [isPostLike, setIsPostLike] = useState(false);
   const [snackbarContent, setSnackbarContent] = useState('');
 
    const navigate = useNavigate();
@@ -189,6 +192,65 @@ const Sidebar: React.FC = () => {
     setComment('');
     setIsCommentModalOpen(false);
   }
+
+  const postLikeAPI = useAPI({
+    APIName: 'post_like',
+  });
+
+  const handlePostLikeClick = async (postId: string) => {
+    // if(isPostLike){
+    //   setSnackbarContent('いいねを取り消しました');
+    // }else{
+    //   setSnackbarContent('いいねしました');
+    // }
+    postLikeAPI.sendAPI({
+      body:JSON.stringify({
+        postId: postId,
+      })
+    })
+  };
+
+  useEffect(() => {
+    if(postLikeAPI.isSuccess){
+      const data = postLikeAPI.data;
+      if(data.success){
+        setSnackbarContent('いいねを取り消しました');
+        if(data.data === null){
+          setSnackbarContent('いいねを取り消しました');
+          const newPostLike = data.data;
+          setPosts((prevPosts) => {
+            return prevPosts.map((post) => {
+              if(post.id === data.postId.toString()){
+                const updatedLikes = post.likes.filter((like) => like.user.id != userId);
+                return {
+                  ...post,
+                  likes: updatedLikes
+                };
+              }
+              return post;
+            })
+          });
+        }else{
+          setSnackbarContent('いいねしました');
+          const newPostLike = data.data;
+          setPosts((prevPosts) => {
+            return prevPosts.map((post) => {
+              if(post.id === data.postId.toString()){
+                return {
+                  ...post,
+                  likes: [...post.likes, newPostLike]
+                };
+              }
+              return post;
+            })
+          });
+        }
+        handleOpenSnackbar();
+      }else{
+        console.log(data.error);
+      }
+    }
+  },[postLikeAPI.isSuccess,postLikeAPI.data]);
 
   const userProfileClick = (userId:string) => {navigate(`/profile/${userId}`)};
 
@@ -322,9 +384,9 @@ const Sidebar: React.FC = () => {
                       sx={{
                         '&:hover': { color: '#1876D1' }
                       }}
-                      onClick={(e) => { e.stopPropagation();}}//いいね機能後日追加
+                      onClick={(e) => { e.stopPropagation(); handlePostLikeClick(post.id);}}
                     >
-                      <FavoriteIcon />
+                      {post.likes.some((like) => like.user.id === userId) ? <FavoriteIcon sx={{color : "#1876D1"}} /> : <FavoriteBorderIcon />}
                     </IconButton>
                     <Typography variant="body2" color="text.secondary" sx={{ marginLeft: '8px' }}>
                       {post.likes.length}

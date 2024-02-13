@@ -1338,11 +1338,24 @@ def post_like(request,payload:PostLikeSchema):
         user = request.user
         post = Post.objects.get(id = payload.postId)
         is_like_post = postLike.objects.filter(user = user,post = post).exists()
-        if(is_like_post):postLike.objects.filter(user = user,post = post).delete()
-        else:postLike.objects.create(user = user,post = post)
+        if(is_like_post):
+            postLike.objects.filter(user = user,post = post).delete()
+            data = None
+        else:
+            post_like = postLike.objects.create(user = user,post = post)
+            data = {
+                "id":post_like.id,
+                "user":{
+                    "id":post_like.user.id,
+                    "username":post_like.user.username,
+                },
+                "createdAt":post_like.created_at.strftime('%Y-%m-%dT%H:%M:%SZ'),
+            }
         return JsonResponse(
             {
                 "success":True,
+                "data":data,
+                "postId":payload.postId,
                 "error":None,
             },
             status = 200,
