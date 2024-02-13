@@ -256,6 +256,9 @@ export const listPosts = /* GraphQL */ `
       }
       likes {
         id
+        user {
+          id
+        }
         createdAt
         __typename
       }

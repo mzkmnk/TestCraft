@@ -49,7 +49,6 @@ export default function ProfilePage() {
 
     const handleQuestionClick = (workbookId) => {
         window.open(`/solve/${workbookId}`,"_blank",'noopener,noreferrer');
-        // navigate(`/solve/${workbookId}`);
     }
 
     const followAPI = useAPI(

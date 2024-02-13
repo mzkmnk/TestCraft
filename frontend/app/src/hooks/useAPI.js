@@ -37,6 +37,9 @@ const APIs = {
   follow: `${urlBase}/follow`,
   delete_workbook: `${urlBase}/delete_workbook`,
   get_post: `${urlBase}/get_post`,
+  post_like: `${urlBase}/post_like`,
+  get_post_detail: (postId) => `${urlBase}/get_post_detail/${postId}`,
+  post_comment: `${urlBase}/post_comment`,
 };
 
 /**
