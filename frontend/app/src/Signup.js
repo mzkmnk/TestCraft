@@ -235,8 +235,10 @@ function Signup() {
                 value={username}
                 error={isUserNameError}
                 onChange={(e) => {
-                  setUserNameError(false);
-                  setUserNameHelperText("");
+                  if (isUserNameError) {
+                    setUserNameError(false);
+                    setUserNameHelperText("");
+                  }
                   setUsername(e.target.value);
                 }}
                 inputProps={{ maxLength: 20, minLength: 2 }}
@@ -253,8 +255,10 @@ function Signup() {
                 autoComplete="email"
                 value={user_email}
                 onChange={(e) => {
-                  setEmailError(false);
-                  setEmailHelperText("");
+                  if (isEmailError) {
+                    setEmailError(false);
+                    setEmailHelperText("");
+                  }
                   setEmail(e.target.value);
                 }}
                 inputRef={emailInputRef}
@@ -276,8 +280,10 @@ function Signup() {
                 value={password}
                 error={isPasswordError}
                 onChange={(e) => {
-                  setPasswordError(false);
-                  setPasswordHelperText("");
+                  if (isPasswordError) {
+                    setPasswordError(false);
+                    setPasswordHelperText("");
+                  }
                   setPassword(e.target.value);
                 }}
                 inputProps={{ maxLength: 100, minLength: 8 }}
