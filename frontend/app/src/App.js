@@ -22,6 +22,7 @@ import ChangePass from "./change_pass";
 import ChangeProfilePage from "./ChangeProfile.tsx";
 import ProfilePage from "./profile.tsx";
 import Sns from "./Sns.js";
+import PostDetail from "./postDetail.js";
 
 import Error from "./Error.js";
 
@@ -60,6 +61,8 @@ function App() {
         />
         <Route path="/solved/:workbookId/:solved_count" element={<Solved />} />
         <Route path="/sns" element={<Sns />} />
+        <Route path="/post_detail/:postId" element={<PostDetail />} />
+
         <Route path="/error" element={<Error />} />
       </Routes>
     </Router>

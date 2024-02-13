@@ -34,6 +34,9 @@ const APIs = {
   profile: (userId) => `${urlBase}/profile/${userId}`,
   follow: `${urlBase}/follow`,
   get_post: `${urlBase}/get_post`,
+  post_like: `${urlBase}/post_like`,
+  get_post_detail: (postId) => `${urlBase}/get_post_detail/${postId}`,
+  post_comment: `${urlBase}/post_comment`,
 };
 
 /**

@@ -130,6 +130,13 @@ class FollowSchema(Schema):
     isFollow:bool
     userId:str
 
+class PostLikeSchema(Schema):
+    postId:int
+
+class PostCommentSchema(Schema):
+    postId:str
+    content:str
+
 # API
     
 #ログイン中のユーザー情報を取得するAPI
@@ -1256,6 +1263,7 @@ def ai_score(request,payload:AiScore):
         )
 
 #投稿内容を10件取得するAPI
+#これ使わないかも、というか多分使わないappsyncのクエリでやると思う
 @api.get("/get_post")
 def get_post(request):
     try:
@@ -1322,4 +1330,133 @@ def get_post(request):
                 "error":str(e),
             },
             status = 400,
+        )
+
+@api.post("/post_like")
+def post_like(request,payload:PostLikeSchema):
+    try:
+        user = request.user
+        post = Post.objects.get(id = payload.postId)
+        is_like_post = postLike.objects.filter(user = user,post = post).exists()
+        if(is_like_post):postLike.objects.filter(user = user,post = post).delete()
+        else:postLike.objects.create(user = user,post = post)
+        return JsonResponse(
+            {
+                "success":True,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "error":str(e),
+            },
+            status = 400,
+        )
+
+@api.get("/get_post_detail/{postId}")
+def get_post_detail(request,postId:int):
+    try:
+
+        # post = Post.objects.get(id = 1)
+
+        post = Post.objects.get(id = postId)
+
+        user = post.user
+        comments = [
+            {
+                "id":comment.id,
+                "content":comment.content,
+                "createdAt":comment.created_at.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                "user":{
+                    "id":comment.user.id,
+                    "username":comment.user.username,
+                },
+            }
+            for comment in Comment.objects.filter(post = post).order_by('-created_at')
+        ]
+        likes = [
+            {
+                "id":like.id,
+                "user":{
+                    "id":like.user.id,
+                    "username":like.user.username,
+                },
+            }
+            for like in postLike.objects.filter(post = post)
+        ]
+        data = {
+            "post":{
+                "id":post.id,
+                "content":post.content,
+                "createdAt":post.created_at.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                "updatedAt":post.updated_at.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                "user":{
+                    "id":user.id,
+                    "username":user.username,
+                },
+            },
+            "comments":comments,
+            "likes":likes,
+            "is_request_user_like":postLike.objects.filter(user=request.user,post = post).exists(),
+        }
+        print(data)
+        return JsonResponse(
+            {
+                "success":True,
+                "data":data,
+                "error":None,
+            },
+            status = 200
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "error":str(e),
+            },
+            status = 400
+        )
+
+@api.post("/post_comment")
+def post_comment(request,payload:PostCommentSchema):
+    try:
+        user = request.user
+
+        post = Post.objects.get(id = payload.postId)
+        
+        # post = Post.objects.get(id = 1)
+        comment = Comment.objects.create(
+            user = user,
+            post = post,
+            content = payload.content,
+        )
+        return JsonResponse(
+            {
+                "success":True,
+                "comment":{
+                    "id":comment.id,
+                    "content":comment.content,
+                    "createdAt":comment.created_at.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                    "user":{
+                        "id":comment.user.id,
+                        "username":comment.user.username,
+                    },
+                    "post":{
+                        "id":comment.post.id,
+                    }
+                },
+                "error":None,
+            },
+            status = 200
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "error":str(e),
+            },
+            status = 400
         )
