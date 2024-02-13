@@ -1359,11 +1359,7 @@ def post_like(request,payload:PostLikeSchema):
 @api.get("/get_post_detail/{postId}")
 def get_post_detail(request,postId:int):
     try:
-
-        # post = Post.objects.get(id = 1)
-
         post = Post.objects.get(id = postId)
-
         user = post.user
         comments = [
             {
@@ -1426,8 +1422,6 @@ def post_comment(request,payload:PostCommentSchema):
         user = request.user
 
         post = Post.objects.get(id = payload.postId)
-        
-        # post = Post.objects.get(id = 1)
         comment = Comment.objects.create(
             user = user,
             post = post,
