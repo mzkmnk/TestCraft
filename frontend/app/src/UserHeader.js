@@ -27,13 +27,13 @@ const UserHeader = ({ position = "static" }) => {
   const navigate = useNavigate();
   const username = localStorage.getItem("username");
   const isLoggedIn = !!username;
-  // const isOwnCompany = localStorage.getItem("is_own_company") === "true";
   const [isOwnCompanyUser, setIsOwnCompanyUser] = React.useState(false);
   const [isCompanyUser, setIsCompanyUser] = React.useState(false);
   const [userMenuAnchorEl, setUserMenuAnchorEl] = React.useState(null);
   const [questionsMenuAnchorEl, setQuestionsMenuAnchorEl] =
     React.useState(null);
   const [companyMenuAnchorEl, setCompanyMenuAnchorEl] = React.useState(null);
+
 
   const isCompanyUserAPI = useAPI({
     APIName: "is_company_user",
@@ -70,6 +70,22 @@ const UserHeader = ({ position = "static" }) => {
     }
   }, [logoutAPI.data.success, logoutAPI.isSuccess, navigate]);
 
+
+  // const isLoggedInAPI = useAPI({
+  //   APIName: "check_auth",
+  // });
+
+  // useEffect(() => {
+  //   if(isLoggedInAPI.isSuccess){
+  //     console.log(isLoggedInAPI.data);
+  //     if(isLoggedInAPI.data.success){
+  //       setIsLoggedIn(true);
+  //     }else{
+  //       setIsLoggedIn(false);
+  //     }
+  //   }
+  // },[isLoggedInAPI.isSuccess]);
+  
   const handleUserMenuClick = (event) => {
     setUserMenuAnchorEl(event.currentTarget);
   };
