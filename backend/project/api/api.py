@@ -139,6 +139,14 @@ class DeleteWorkBookSchema(Schema):
 @api.post("/signup")
 def signup(request, payload: SignUpSchema):
     try:
+        is_username_exist = User.objects.filter(username = payload.username).exists()
+        if(is_username_exist):
+            return JsonResponse(
+                {
+                    "message":"ユーザー名が既に存在しています。",
+                },
+                status = 422,
+            )
         user = User.objects.create_user(
             username = payload.username,
             email = payload.email,

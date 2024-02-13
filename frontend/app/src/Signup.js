@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { json, useNavigate } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
@@ -14,6 +14,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Alert from "@mui/material/Alert";
 import UserHeader from "./UserHeader";
 import { useAPI } from "./hooks/useAPI";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const theme = createTheme();
 
@@ -26,6 +27,16 @@ function Signup() {
   const [is_own_company, setIsOwnCompany] = useState(false);
   const [error, setError] = useState("");
   const [send_email, setSendEmail] = useState("");
+  // バリデーション用のRef
+  const userNameRef = useRef(null);
+  const emailInputRef = useRef(null);
+  const passwordInputRef = useRef(null);
+  const [isUserNameError, setUserNameError] = useState(false);
+  const [isEmailError, setEmailError] = useState(false);
+  const [isPasswordError, setPasswordError] = useState(false);
+  const [userNameHelperText, setUserNameHelperText] = useState("");
+  const [emailHelperText, setEmailHelperText] = useState("");
+  const [passwordHelperText, setPasswordHelperText] = useState("");
 
   const url = "http://localhost:3000/email_verification"; //随時変更
 
@@ -60,10 +71,13 @@ function Signup() {
           password: password,
         }),
       });
+    } else if (signupAPI.isSuccess === false && signupAPI.status === 422) {
+      setError("ユーザー名またはメールアドレスが既に登録されています。");
+      signupAPI.statusInit();
     } else if (signupAPI.isSuccess === false) {
       navigate("/error");
     }
-  }, [loginAPI, navigate, password, signupAPI.isSuccess, username]);
+  }, [loginAPI, navigate, password, signupAPI, username]);
 
   // loginAPIの終了に反応するuseEffect。
   useEffect(() => {
@@ -86,7 +100,14 @@ function Signup() {
     } else if (loginAPI.isSuccess === false) {
       navigate("/error");
     }
-  }, [is_own_company, loginAPI.isSuccess, navigate, username]);
+  }, [
+    is_own_company,
+    loginAPI.isSuccess,
+    navigate,
+    sendEmailAPI,
+    user_email,
+    username,
+  ]);
 
   const handleSignup = async () => {
     signupAPI.sendAPI({
@@ -99,22 +120,73 @@ function Signup() {
       }),
     });
   };
+  /*
+    const handleChange = () => {
+    if (inputRef.current) {
+      const ref = inputRef.current;
+      if (!ref.validity.valid) {
+        setInputError(true);
+      } else {
+        setInputError(false);
+      }
+    }
+  };
+  */
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (!username || !user_email || !password) {
-      setError(
-        "ユーザネーム、メールアドレス、パスワードを全て入力してください。"
-      );
-      return;
-    }
+
     if (is_company_user && is_own_company) {
       setError(
         "企業の代表者と企業のメンバーの両方にチェックすることはできません。"
       );
       return;
     }
-    handleSignup();
+    if (!username || !user_email || !password) {
+      setError(
+        "ユーザネーム、メールアドレス、パスワードを全て入力してください。"
+      );
+      return;
+    }
+    let isError = false;
+    if (userNameRef.current) {
+      const ref = userNameRef.current;
+      if (!ref.validity.valid) {
+        setUserNameError(true);
+        setUserNameHelperText("1文字以上20文字以下で入力してください。");
+        isError = true;
+      } else {
+        setUserNameError(false);
+        setUserNameHelperText("");
+      }
+    }
+    if (emailInputRef.current) {
+      const ref = emailInputRef.current;
+      if (!ref.validity.valid) {
+        setEmailError(true);
+        setEmailHelperText("不正なメールアドレスです。");
+        isError = true;
+      } else {
+        setEmailError(false);
+        setEmailHelperText("");
+      }
+    }
+    if (passwordInputRef.current) {
+      const ref = passwordInputRef.current;
+      if (!ref.validity.valid) {
+        setPasswordError(true);
+        setPasswordHelperText("8文字以上で入力してください。");
+        isError = true;
+      } else {
+        setPasswordError(false);
+        setPasswordHelperText("");
+      }
+    }
+    if (isError) {
+      return;
+    } else {
+      handleSignup();
+    }
   };
 
   return (
@@ -151,6 +223,7 @@ function Signup() {
               sx={{ mt: 1 }}
             >
               <TextField
+                inputRef={userNameRef}
                 margin="normal"
                 required
                 fullWidth
@@ -160,9 +233,17 @@ function Signup() {
                 autoComplete="username"
                 autoFocus
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                error={isUserNameError}
+                onChange={(e) => {
+                  setUserNameError(false);
+                  setUserNameHelperText("");
+                  setUsername(e.target.value);
+                }}
+                inputProps={{ maxLength: 20, minLength: 1 }}
+                helperText={userNameHelperText}
               />
               <TextField
+                type="email"
                 margin="normal"
                 required
                 fullWidth
@@ -171,7 +252,17 @@ function Signup() {
                 name="email"
                 autoComplete="email"
                 value={user_email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmailError(false);
+                  setEmailHelperText("");
+                  setEmail(e.target.value);
+                }}
+                inputRef={emailInputRef}
+                error={isEmailError}
+                inputProps={{
+                  maxLength: 254,
+                }}
+                helperText={emailHelperText}
               />
               <TextField
                 margin="normal"
@@ -183,7 +274,15 @@ function Signup() {
                 id="password"
                 autoComplete="current-password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                error={isPasswordError}
+                onChange={(e) => {
+                  setPasswordError(false);
+                  setPasswordHelperText("");
+                  setPassword(e.target.value);
+                }}
+                inputProps={{ maxLength: 100, minLength: 8 }}
+                inputRef={passwordInputRef}
+                helperText={passwordHelperText}
               />
               {error && (
                 <Alert severity="error" sx={{ mt: 1, mb: 1 }}>
@@ -225,8 +324,13 @@ function Signup() {
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
+                disabled={signupAPI.isLoading || loginAPI.isLoading}
               >
-                Sign Up
+                {signupAPI.isLoading || loginAPI.isLoading ? (
+                  <CircularProgress />
+                ) : (
+                  "Sign Up"
+                )}
               </Button>
             </Box>
           </Box>

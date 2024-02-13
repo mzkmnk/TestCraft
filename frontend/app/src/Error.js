@@ -10,9 +10,6 @@ export default function Error() {
         }}
       >
         <p style={{ fontSize: "1.5rem" }}>エラーが発生しました。</p>
-        <p>
-          <Link to="/mypage">マイページに戻る</Link>
-        </p>
       </div>
     </>
   );
