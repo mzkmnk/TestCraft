@@ -7,6 +7,10 @@ import Alert from "@mui/material/Alert";
 import { useAPI } from "./hooks/useAPI";
 import "./workbookList.css";
 import Loading from "./Loading";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import IconButton from "@mui/material/IconButton";
+import Popover from "@mui/material/Popover";
+import Button from "@mui/material/Button";
 
 function Mycreate() {
   const [questions, setQuestions] = useState([]);
@@ -21,6 +25,18 @@ function Mycreate() {
   const navigate = useNavigate();
   const location = useLocation();
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [displayLoding, setDisplayLoading] = useState(true);
+  const [selectedId, setSelectedId] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const handleClick = (event, questionId) => {
+    setAnchorEl(event.currentTarget);
+    setSelectedId(questionId);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+  const open = Boolean(anchorEl);
 
   const handleChangePage = (event, value) => {
     setCurrentPage(value);
@@ -32,13 +48,18 @@ function Mycreate() {
     loadOnStart: true,
   });
 
+  const deleteAPI = useAPI({
+    APIName: "delete_workbook",
+  });
+
   useEffect(() => {
     if (API.isSuccess === false) {
       navigate("/error");
     } else if (API.isSuccess === true && API.data.success === true) {
       setQuestions(API.data.workbook);
+      setDisplayLoading(false);
     }
-  }, [API.data.success, API.data.workbook, API.isSuccess, navigate]);
+  }, [API.data.success, API.data.workbook, API.isSuccess, deleteAPI, navigate]);
 
   useEffect(() => {
     if (location.state?.message) {
@@ -46,19 +67,28 @@ function Mycreate() {
     }
   }, [location]);
 
+  // 削除APIの処理
+  useEffect(() => {
+    if (deleteAPI.isSuccess === true) {
+      API.sendAPI({});
+      deleteAPI.statusInit();
+    }
+  }, [API, deleteAPI]);
+
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   };
 
-  const handleQuestionClick = (workbookId) => {
-    navigate(`/editor/${workbookId}`);
+  const handleDelete = () => {
+    deleteAPI.sendAPI({ body: JSON.stringify({ workbookId: selectedId }) });
+    handleClose();
   };
 
   return (
     <>
       <UserHeader />
       <div className="body">
-        {API.isLoading && <Loading />}
+        {displayLoding && <Loading />}
         {currentQuestions.length !== 0 && (
           <>
             <h2
@@ -70,17 +100,47 @@ function Mycreate() {
             </h2>
             <div className="questionsContainer">
               {currentQuestions.map((question, index) => (
-                <div
-                  className="question"
-                  key={index}
-                  onClick={() => handleQuestionClick(question.id)}
-                >
-                  <div className="questionHeader">
+                <div className="question" key={index}>
+                  <Link
+                    to={`/editor/${question.id}`}
+                    style={{ position: "absolute", inset: 0 }}
+                  />
+                  <span className="questionHeader">
                     <h3>{question.workbook_name}</h3>
                     <span className="createdBy">
                       作成日：{question.created_at}
                     </span>
-                  </div>
+                    <IconButton
+                      aria-describedby={index + "popover"}
+                      style={{ zIndex: 1, position: "relative" }}
+                      onClick={(event) => handleClick(event, question.id)}
+                    >
+                      <MoreVertIcon />
+                    </IconButton>
+                    <Popover
+                      id={index + "popover"}
+                      open={open}
+                      anchorEl={anchorEl}
+                      onClose={handleClose}
+                      anchorOrigin={{
+                        vertical: "top",
+                        horizontal: "center",
+                      }}
+                      transformOrigin={{
+                        vertical: "bottom",
+                        horizontal: "center",
+                      }}
+                      elevation={1}
+                    >
+                      <Button
+                        onClick={() => {
+                          handleDelete();
+                        }}
+                      >
+                        削除
+                      </Button>
+                    </Popover>
+                  </span>
                   <p style={{ margin: "auto" }}>{question.description}</p>
                 </div>
               ))}
