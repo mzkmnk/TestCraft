@@ -38,8 +38,7 @@
 
 .createdBy {
   font-size: 0.8em;
-  color: #666;
-  margin-left: 10px;
+  opacity: 0.7;
 }
 
 .likeStyle {

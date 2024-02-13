@@ -5,9 +5,10 @@ import { useAPI } from "./hooks/useAPI";
 import Pagination from "@mui/material/Pagination";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
-import { FaHeart } from "react-icons/fa";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import Loading from "./Loading";
 import "./workbookList.css";
+import IconButton from "@mui/material/IconButton";
 
 function Mysolve() {
   const [workbooks, setWorkbooks] = useState([]);
@@ -53,24 +54,26 @@ function Mysolve() {
   const workbookLists = (
     <>
       {currentQuestions.map((workbook, index) => (
-        <div
-          className="question"
-          key={index}
-          onClick={() =>
-            handleQuestionClick(workbook.id, workbook.solved_count)
-          }
-        >
-          <div className="questionHeader">
-            <h3>{workbook.workbook_name}</h3>
-            <span className="createdBy">
-              created by {workbook.create_id__username} ({workbook.created_at})
+        <div className="question" key={index}>
+          <Link
+            to={`/solved/${workbook.id}/${workbook.solved_count}`}
+            style={{ position: "absolute", inset: 0 }}
+          />
+          <span className="questionHeader">
+            <span>
+              <p style={{ fontSize: "1.5rem" }}>{workbook.workbook_name}</p>
+              <p>{workbook.description}</p>
+              <p className="createdBy">
+                created by {workbook.create_id__username} ({workbook.created_at}
+                )
+              </p>
             </span>
-          </div>
-          <p>{workbook.description}</p>
-          <div className="likeStyle">
-            <FaHeart className="likeIconStyle" />
-            <span>{workbook.like_count}</span>
-          </div>
+
+            <span className="likeStyle">
+              <FavoriteIcon />
+              <span>{workbook.like_count}</span>
+            </span>
+          </span>
         </div>
       ))}
     </>

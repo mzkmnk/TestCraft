@@ -106,9 +106,11 @@ function Mycreate() {
                     style={{ position: "absolute", inset: 0 }}
                   />
                   <span className="questionHeader">
-                    <h3>{question.workbook_name}</h3>
-                    <span className="createdBy">
-                      作成日：{question.created_at}
+                    <span>
+                      <p style={{ fontSize: "1.5rem" }}>
+                        {question.workbook_name}
+                      </p>
+                      <p className="createdBy">作成日：{question.created_at}</p>
                     </span>
                     <IconButton
                       aria-describedby={index + "popover"}
