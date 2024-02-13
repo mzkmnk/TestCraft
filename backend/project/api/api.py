@@ -411,6 +411,19 @@ def profile(request,userId:int):
                 **workbook,
                 'categories': list(categories)
             })
+        posts_data = Post.objects.filter(user = user).order_by('-created_at').values(
+            'id',
+            'content',
+            'created_at',
+        )
+        posts = [
+            {
+                "id":post['id'],
+                "content":post['content'],
+                "created_at":post['created_at'],
+            }
+            for post in posts_data
+        ]
         return JsonResponse(
             {
                 "success":True,
@@ -418,6 +431,7 @@ def profile(request,userId:int):
                 "email":user.email,
                 "school":user.school,
                 "isFollow":isFollow,
+                "post":posts,
                 "solved_workbook":solved_workbook,
                 "created_workbook":created_workbook,
                 "followCount":user.count_following(),
