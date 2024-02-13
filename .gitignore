@@ -17,3 +17,5 @@ lambdaFuncPackage
 /frontend/app/src/components/aws-exports.js
 
 /frontend/app/src/graphql
+
+/frontend/app/src/aws-exports.js
