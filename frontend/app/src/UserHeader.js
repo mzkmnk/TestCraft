@@ -34,7 +34,6 @@ const UserHeader = ({ position = "static" }) => {
     React.useState(null);
   const [companyMenuAnchorEl, setCompanyMenuAnchorEl] = React.useState(null);
 
-
   const isCompanyUserAPI = useAPI({
     APIName: "is_company_user",
     loadOnStart: true,
@@ -70,7 +69,6 @@ const UserHeader = ({ position = "static" }) => {
     }
   }, [logoutAPI.data.success, logoutAPI.isSuccess, navigate]);
 
-
   // const isLoggedInAPI = useAPI({
   //   APIName: "check_auth",
   // });
@@ -85,7 +83,7 @@ const UserHeader = ({ position = "static" }) => {
   //     }
   //   }
   // },[isLoggedInAPI.isSuccess]);
-  
+
   const handleUserMenuClick = (event) => {
     setUserMenuAnchorEl(event.currentTarget);
   };
@@ -287,17 +285,15 @@ const UserHeader = ({ position = "static" }) => {
             <>
               <Button
                 color="inherit"
-                component={Link}
-                to="/login"
                 style={{ cursor: "pointer" }}
+                onClick={() => navigate("/login")}
               >
                 ログイン
               </Button>
               <Button
                 color="inherit"
-                component={Link}
-                to="/signup"
                 style={{ cursor: "pointer" }}
+                onClick={() => navigate("/signup")}
               >
                 登録
               </Button>
