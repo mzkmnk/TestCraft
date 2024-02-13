@@ -56,7 +56,6 @@ function PostDetail() {
 
     const postLikeAPI = useAPI({
         APIName: 'post_like',
-        loadOnStart: true,
     });
 
     const postCommentAPI = useAPI({
