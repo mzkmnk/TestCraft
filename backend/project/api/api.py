@@ -1484,6 +1484,7 @@ def post_comment(request,payload:PostCommentSchema):
                     "user":{
                         "id":comment.user.id,
                         "username":comment.user.username,
+                        "icon":comment.user.icon.url,
                     },
                     "post":{
                         "id":comment.post.id,

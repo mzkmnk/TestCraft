@@ -222,28 +222,28 @@ function PostDetail() {
                     </CardActions>
                 </CardContent>
             </Card>
-            <List sx={{ maxWidth: '60%', margin: 'auto' }}>
-                <ListItem>
-                    <Stack direction="column" spacing={2} sx={{ width: '100%' }}>
-                        <TextField
-                            fullWidth
-                            variant="outlined"
-                            placeholder="コメントを入力..."
-                            multiline
-                            rows={4}
-                            value={newComment}
-                            onChange={(e) => setNewComment(e.target.value)}
-                        />
-                        <Button
-                            variant="contained"
-                            onClick={() => handlePostComment(newComment)}
-                        >
-                            コメントを投稿する
-                        </Button>
-                    </Stack>
-                </ListItem>
-            </List>
-            <List sx={{ maxWidth: '60%', margin: 'auto' }}>
+            <Box sx={{ maxWidth: '60%', margin: 'auto' }}>
+                <Stack direction="column" spacing={2} sx={{ width: '100%', mt: 2 }}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        placeholder="コメントを入力..."
+                        multiline
+                        rows={4}
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                    />
+                    <Button
+                        variant="contained"
+                        disabled={!newComment.trim()}
+                        onClick={() => handlePostComment(newComment)}
+                        sx={{
+                            opacity: !newComment.trim() ? 0.5 : 1,
+                        }}
+                    >
+                        コメントを投稿する
+                    </Button>
+                </Stack>
                 <Timeline
                     sx={{
                         [`& .${timelineItemClasses.root}:before`]: {
@@ -253,44 +253,38 @@ function PostDetail() {
                     }}
                 >
                     {comments.map((comment, index) => (
-                        <React.Fragment key={index}>
-                            <TimelineItem key={index}>
-                                <TimelineSeparator>
-                                    <TimelineDot color="primary" variant='outlined' />
-                                    <TimelineConnector />
-                                </TimelineSeparator>
-                                <TimelineContent>
-                                    {moment(comment.createdAt).fromNow()}
-                                    <ListItem
-                                        alignItems='flex-start'
-                                        sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', mb: 2 }}
-                                    >
-                                        <CardContent>
-                                            <Stack direction="row" spacing={2} alignItems="center">
-                                                <Avatar
-                                                    sx={{ width: 35, height: 35 }}
-                                                    src={comment.user.icon===null ? init_icon : comment.user.icon}
-                                                >
-                                                    
-                                                </Avatar>
-                                                <Typography
-                                                    variant='body2'
-                                                    color='text.secondary'
-                                                >
-                                                    {comment.user.username} · {formatDate(comment.createdAt)}
-                                                </Typography>
-                                            </Stack>
-                                            <Typography variant='body1' sx={{ mt: 1 }}>
-                                                {comment.content}
+                        <TimelineItem key={index}>
+                            <TimelineSeparator>
+                                <TimelineDot color="primary" variant='outlined' />
+                                <TimelineConnector />
+                            </TimelineSeparator>
+                            <TimelineContent>
+                                <Box
+                                    sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', mb: 2 }}
+                                >
+                                    <CardContent>
+                                        <Stack direction="row" spacing={2} alignItems="center">
+                                            <Avatar
+                                                sx={{ width: 35, height: 35 }}
+                                                src={comment.user.icon === null ? init_icon : comment.user.icon}
+                                            />
+                                            <Typography
+                                                variant='body2'
+                                                color='text.secondary'
+                                            >
+                                                {comment.user.username} · {formatDate(comment.createdAt)}
                                             </Typography>
-                                        </CardContent>
-                                    </ListItem>
-                                </TimelineContent>
-                            </TimelineItem>
-                        </React.Fragment>
+                                        </Stack>
+                                        <Typography variant='body1' sx={{ mt: 1 }}>
+                                            {comment.content}
+                                        </Typography>
+                                    </CardContent>
+                                </Box>
+                            </TimelineContent>
+                        </TimelineItem>
                     ))}
                 </Timeline>
-            </List>
+            </Box>
             <Snackbar
                 open={openSnackbar}
                 autoHideDuration={6000}
