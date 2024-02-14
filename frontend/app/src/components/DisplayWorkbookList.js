@@ -25,6 +25,10 @@ export function DisplayWorkbookList({ workbooks, setWorkbooks }) {
     setCurrentPage(value);
   };
 
+  const formatDate = (date) => {
+    return new Date(date).toLocaleString();
+  };
+
   // いいねボタン
   const handleLikeClick = (e, workbookId) => {
     e.stopPropagation();
@@ -72,7 +76,7 @@ export function DisplayWorkbookList({ workbooks, setWorkbooks }) {
                   <h3>{question.workbook_name}</h3>
                   <span className="createdBy">
                     created by {question.create_id__username} (
-                    {question.created_at})
+                    {formatDate(question.created_at)})
                   </span>
                 </div>
                 <p>{question.description}</p>

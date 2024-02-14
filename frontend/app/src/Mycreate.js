@@ -32,6 +32,10 @@ function Mycreate() {
     loadOnStart: true,
   });
 
+  const formatDate = (date) => {
+    return new Date(date).toLocaleString();
+  };
+
   useEffect(() => {
     if (API.isSuccess === false) {
       navigate("/error");
@@ -78,7 +82,7 @@ function Mycreate() {
                   <div className="questionHeader">
                     <h3>{question.workbook_name}</h3>
                     <span className="createdBy">
-                      作成日：{question.created_at}
+                      作成日：{formatDate(question.created_at)}
                     </span>
                   </div>
                   <p style={{ margin: "auto" }}>{question.description}</p>

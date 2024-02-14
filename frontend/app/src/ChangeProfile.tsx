@@ -108,6 +108,7 @@ export default function ChangeProfilePage() {
         });
     };
 
+
     useEffect(() => {
         if(changeIcon.isSuccess) {
             const data = changeIcon.data;

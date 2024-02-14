@@ -438,6 +438,7 @@ def profile(request,userId:int):
             {
                 "success":True,
                 "username":user.username,
+                "icon":user.icon.url,
                 "email":user.email,
                 "school":user.school,
                 "isFollow":isFollow,

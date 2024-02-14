@@ -22,12 +22,16 @@ import LoadingScreen from './LoadingScreen.tsx';
 export default function ProfilePage() {
     const [username, setUsername] = React.useState('');
     const [userSchool, setUserSchool] = React.useState('');
+    const [icon, setIcon] = React.useState();
     const [isFollow , setIsFollow] = React.useState(Boolean);
     const [solvedWorkbook, setSolvedWorkbook] = React.useState([]);
     const [createdWorkbook, setCreatedWorkbook] = React.useState([]);
     const [followCount, setFollowCount] = React.useState(0);
     const [followerCount, setFollowerCount] = React.useState(0);
     const [loading, setLoading] = React.useState(true);
+
+    const init_icon = "https://user-profile-icon.s3.ap-northeast-1.amazonaws.com/media/icon/init_user.jpg";
+
     const { userId } = useParams();
 
     const navigate = useNavigate();
@@ -75,6 +79,11 @@ export default function ProfilePage() {
                 }
                 else{
                     setUserSchool(data.school);
+                }
+                if(data.icon === "https://user-profile-icon.s3.ap-northeast-1.amazonaws.com/media/"){
+                    setIcon(undefined);
+                }else{
+                    setIcon(data.icon);
                 }
                 setLoading(false);
             }else{
@@ -127,6 +136,10 @@ export default function ProfilePage() {
         marginRight: "5px",
     };
 
+    const formatDate = (date) => {
+        return new Date(date).toLocaleString();
+    };
+
     function Wookbooks({ workbooks }){
         const [currentPage, setCurrentPage] = React.useState(1);
         const questionsPerPage = 6;
@@ -152,7 +165,7 @@ export default function ProfilePage() {
                             <div style={styles.questionHeader}>
                                 <h3>{ workbook.workbook_name }</h3>
                                 <span style={styles.createdBy}>
-                                    created by {workbook.create_id__username} ({workbook.created_at})
+                                    created by {workbook.create_id__username} ({formatDate(workbook.created_at)})
                                 </span>
                             </div>
                             <p>{workbook.description}</p>
@@ -239,13 +252,20 @@ export default function ProfilePage() {
                         <MDBCard className="mb-4">
                             <MDBCardBody className="text-center">
                                 <MDBCardImage
+                                    src={icon ? icon : init_icon}
                                     alt="avatar"
                                     className="rounded-circle"
-                                    style={{ width: '150px' }}
+                                    style={{
+                                        width: '100px',
+                                        height: '100px',
+                                        objectFit: 'cover',
+                                        objectPosition: 'center',
+                                        transition: 'opacity 0.3s',
+                                    }}
                                     fluid 
                                 />
-                                <p className="text-muted mb-1">今後対応予定です。</p>
-                                <p className="text-muted mb-4">今後対応予定です。</p>
+                                {/* <p className="text-muted mb-1">今後対応予定です。</p>
+                                <p className="text-muted mb-4">今後対応予定です。</p> */}
                                 <div style={followFollowerStyle}>
                                     <div className="d-flex flex-column align-items-center">
                                         <p className="font-weight-bold mb-0">follow</p>

@@ -29,6 +29,10 @@ function Mysolve() {
     loadOnStart: true,
   });
 
+  const formatDate = (date) => {
+    return new Date(date).toLocaleString();
+  };
+
   useEffect(() => {
     if (API.isSuccess === false) {
       navigate("/error");
@@ -63,7 +67,7 @@ function Mysolve() {
           <div className="questionHeader">
             <h3>{workbook.workbook_name}</h3>
             <span className="createdBy">
-              created by {workbook.create_id__username} ({workbook.created_at})
+              created by {workbook.create_id__username} ({formatDate(workbook.created_at)})
             </span>
           </div>
           <p>{workbook.description}</p>
