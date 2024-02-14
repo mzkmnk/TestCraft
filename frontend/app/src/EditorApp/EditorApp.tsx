@@ -731,7 +731,10 @@ export default function EditorApp({ workBook }) {
                 variant="standard"
                 label="タイトル"
                 value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                onChange={(e) => {
+                  setIsLatest(false);
+                  setTitle(e.target.value);
+                }}
                 margin="normal"
                 InputProps={{ style: { fontSize: "2rem" } }}
               />
