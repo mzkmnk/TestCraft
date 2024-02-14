@@ -1,7 +1,10 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import PersonIcon from '@mui/icons-material/Person'; 
+
 import UserHeader from "./UserHeader";
+import LoadingScreen from './LoadingScreen.tsx';
 import { useAPI } from "./hooks/useAPI";
 
 export default function ChangeProfilePage() {
@@ -10,6 +13,11 @@ export default function ChangeProfilePage() {
     const [userSchool, setUserSchool] = React.useState('');
     const [followCount, setFollowCount] = React.useState(0);
     const [followerCount, setFollowerCount] = React.useState(0);
+    const [icon, setIcon] = React.useState();
+    const [preview, setPreview] = React.useState();
+    const [loading, setLoading] = React.useState(true);
+
+    const init_icon = "https://user-profile-icon.s3.ap-northeast-1.amazonaws.com/media/icon/init_user.jpg";
 
     const navigate = useNavigate();
 
@@ -28,6 +36,12 @@ export default function ChangeProfilePage() {
             setUsername(getInfoAPI.data.username);
             setFollowCount(getInfoAPI.data.followCount);
             setFollowerCount(getInfoAPI.data.followerCount);
+            if(getInfoAPI.data.icon === "https://user-profile-icon.s3.ap-northeast-1.amazonaws.com/media/") {
+                setIcon(undefined);
+                setPreview(undefined);
+            }else{
+                setIcon(getInfoAPI.data.icon);
+            }
             if (getInfoAPI.data.school === null || getInfoAPI.data.school === '') {
                 setUserSchool('まだ情報がありません。');
             } else {
@@ -65,10 +79,35 @@ export default function ChangeProfilePage() {
         }
     }, [saveInfoAPI.isSuccess, navigate]);
 
+    const changeIcon = useAPI({
+        APIName: 'change_icon',
+        isLoginRequired: true,
+    });
+
+    const handleIconChange = (event) => {
+        const formData = new FormData();
+        formData.append('icon', event.target.files[0]);
+        changeIcon.sendAPI({
+            body:formData
+        });
+    };
+
+    useEffect(() => {
+        if(changeIcon.isSuccess) {
+            const data = changeIcon.data;
+            if(data.success) {
+                setIcon(data.icon);
+            } else {
+                console.error(data.error);
+            }
+        }
+    },[changeIcon.isSuccess, changeIcon.data]);
+
     const saveUserInfo = (event) => {
         event.preventDefault();
         handleSaveUserInfo();
     };
+
 
     return (
         <>
@@ -79,14 +118,34 @@ export default function ChangeProfilePage() {
                         <div className="col-lg-4">
                             <div className="card mb-4">
                                 <div className="card-body text-center">
-                                    <img
-                                        src="#" // 画像のパスを指定
-                                        alt="avatar"
-                                        className="rounded-circle"
-                                        style={{ width: '150px' }}
+                                    <input
+                                        type="file"
+                                        accept='image/*'
+                                        style={{ display: 'none' }}
+                                        id="icon-upload"
+                                        onChange={handleIconChange}
                                     />
-                                    <p className="text-muted mb-1">今後対応予定です。</p>
-                                    <p className="text-muted mb-4">今後対応予定です。</p>
+                                    <label
+                                        htmlFor = "icon-upload"
+                                        style={{ cursor: 'pointer' }}
+                                    >
+                                        <img
+                                            src={preview || icon || init_icon}
+                                            alt="avatar"
+                                            className="rounded-circle"
+                                            style={{
+                                                width: '100px',
+                                                height: '100px',
+                                                objectFit: 'cover',
+                                                objectPosition: 'center',
+                                                transition: 'opacity 0.3s',
+                                            }}
+                                            onMouseOver={(e) => e.target.style.opacity = 0.7}
+                                            onMouseOut={(e) => e.target.style.opacity = 1}
+                                        />
+                                    </label>
+                                    {/* <p className="text-muted mb-1">今後対応予定です。</p>
+                                    <p className="text-muted mb-4">今後対応予定です。</p> */}
                                     <div style={{
                                         display: "flex",
                                         justifyContent: "space-around",

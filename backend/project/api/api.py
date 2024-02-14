@@ -2,6 +2,9 @@ from django.contrib.auth.hashers import make_password
 from ninja import NinjaAPI,Schema
 from ninja.files import UploadedFile
 
+from django.conf import settings
+from urllib.parse import urljoin
+
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as django_login
 from django.contrib.auth import logout as django_logout
@@ -492,6 +495,7 @@ def follow(request,payload:FollowSchema):
 def get_user_info(request):
     try:
         user = request.user
+        icon_url = urljoin(f'https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.{settings.AWS_S3_REGION_NAME}.amazonaws.com/media/', user.icon.name)
         return JsonResponse(
             {
                 "success":True,
@@ -499,6 +503,7 @@ def get_user_info(request):
                 "username":user.username,
                 "email":user.email,
                 "school":user.school,
+                "icon":icon_url,
                 "followCount":user.count_following(),
                 "followerCount":user.count_followers(),
                 "error":None,
@@ -515,6 +520,31 @@ def get_user_info(request):
             },
             status = 400,
         )
+
+#ユーザのアイコンを変更するAPI
+@api.post("/change_icon")
+def change_icon(request,icon:UploadedFile):
+    try:
+        user = request.user
+        user.icon = icon
+        user.save()
+        return JsonResponse(
+            {
+                "success":True,
+                "icon":user.icon.url,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "error":str(e),
+            },
+            status = 400,
+        )
+
     
 #登録情報を変更するAPI
 @api.post("/user_change")
