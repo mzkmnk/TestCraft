@@ -1413,6 +1413,7 @@ def get_post_detail(request,postId:int):
                 "user":{
                     "id":comment.user.id,
                     "username":comment.user.username,
+                    "icon":comment.user.icon.url,
                 },
             }
             for comment in Comment.objects.filter(post = post).order_by('-created_at')
@@ -1423,6 +1424,7 @@ def get_post_detail(request,postId:int):
                 "user":{
                     "id":like.user.id,
                     "username":like.user.username,
+                    "icon":like.user.icon.url,
                 },
             }
             for like in postLike.objects.filter(post = post)
@@ -1436,6 +1438,7 @@ def get_post_detail(request,postId:int):
                 "user":{
                     "id":user.id,
                     "username":user.username,
+                    "icon":user.icon.url,
                 },
             },
             "comments":comments,

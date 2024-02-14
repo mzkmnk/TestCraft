@@ -6,6 +6,7 @@ export const getUser = /* GraphQL */ `
     getUser(id: $id) {
       id
       username
+      icon
       userPublicName
       email
       school
@@ -25,6 +26,7 @@ export const getUser = /* GraphQL */ `
       followers {
         id
         username
+        icon
         userPublicName
         email
         school
@@ -41,6 +43,7 @@ export const getUser = /* GraphQL */ `
       following {
         id
         username
+        icon
         userPublicName
         email
         school
@@ -99,6 +102,7 @@ export const listUsers = /* GraphQL */ `
     listUsers {
       id
       username
+      icon
       userPublicName
       email
       school
@@ -118,6 +122,7 @@ export const listUsers = /* GraphQL */ `
       followers {
         id
         username
+        icon
         userPublicName
         email
         school
@@ -134,6 +139,7 @@ export const listUsers = /* GraphQL */ `
       following {
         id
         username
+        icon
         userPublicName
         email
         school
@@ -194,6 +200,7 @@ export const getPost = /* GraphQL */ `
       user {
         id
         username
+        icon
         userPublicName
         email
         school
@@ -232,6 +239,7 @@ export const listPosts = /* GraphQL */ `
       user {
         id
         username
+        icon
         userPublicName
         email
         school
@@ -273,6 +281,7 @@ export const getComment = /* GraphQL */ `
       user {
         id
         username
+        icon
         userPublicName
         email
         school
@@ -306,6 +315,7 @@ export const listComments = /* GraphQL */ `
       user {
         id
         username
+        icon
         userPublicName
         email
         school
@@ -339,6 +349,7 @@ export const getFollow = /* GraphQL */ `
       follower {
         id
         username
+        icon
         userPublicName
         email
         school
@@ -355,6 +366,7 @@ export const getFollow = /* GraphQL */ `
       following {
         id
         username
+        icon
         userPublicName
         email
         school
@@ -380,6 +392,7 @@ export const listFollows = /* GraphQL */ `
       follower {
         id
         username
+        icon
         userPublicName
         email
         school
@@ -396,6 +409,7 @@ export const listFollows = /* GraphQL */ `
       following {
         id
         username
+        icon
         userPublicName
         email
         school
@@ -421,6 +435,7 @@ export const getMessage = /* GraphQL */ `
       sender {
         id
         username
+        icon
         userPublicName
         email
         school
@@ -437,6 +452,7 @@ export const getMessage = /* GraphQL */ `
       receiver {
         id
         username
+        icon
         userPublicName
         email
         school
@@ -466,6 +482,7 @@ export const listMessages = /* GraphQL */ `
       sender {
         id
         username
+        icon
         userPublicName
         email
         school
@@ -482,6 +499,7 @@ export const listMessages = /* GraphQL */ `
       receiver {
         id
         username
+        icon
         userPublicName
         email
         school
@@ -513,6 +531,7 @@ export const getWorkbook = /* GraphQL */ `
       createId {
         id
         username
+        icon
         userPublicName
         email
         school
@@ -549,6 +568,7 @@ export const listWorkbooks = /* GraphQL */ `
       createId {
         id
         username
+        icon
         userPublicName
         email
         school

@@ -6,6 +6,7 @@ export const createUser = /* GraphQL */ `
     createUser(input: $input) {
       id
       username
+      icon
       userPublicName
       email
       school
@@ -25,6 +26,7 @@ export const createUser = /* GraphQL */ `
       followers {
         id
         username
+        icon
         userPublicName
         email
         school
@@ -41,6 +43,7 @@ export const createUser = /* GraphQL */ `
       following {
         id
         username
+        icon
         userPublicName
         email
         school
@@ -101,6 +104,7 @@ export const createPost = /* GraphQL */ `
       user {
         id
         username
+        icon
         userPublicName
         email
         school
@@ -139,6 +143,7 @@ export const createComment = /* GraphQL */ `
       user {
         id
         username
+        icon
         userPublicName
         email
         school
@@ -172,6 +177,7 @@ export const createPostLike = /* GraphQL */ `
       user {
         id
         username
+        icon
         userPublicName
         email
         school
@@ -204,6 +210,7 @@ export const followUser = /* GraphQL */ `
       follower {
         id
         username
+        icon
         userPublicName
         email
         school
@@ -220,6 +227,7 @@ export const followUser = /* GraphQL */ `
       following {
         id
         username
+        icon
         userPublicName
         email
         school
@@ -249,6 +257,7 @@ export const sendMessage = /* GraphQL */ `
       sender {
         id
         username
+        icon
         userPublicName
         email
         school
@@ -265,6 +274,7 @@ export const sendMessage = /* GraphQL */ `
       receiver {
         id
         username
+        icon
         userPublicName
         email
         school

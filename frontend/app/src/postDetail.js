@@ -43,12 +43,17 @@ function PostDetail() {
     const [postData,setPostData] = useState(null);
     const [comments,setComments] = useState([]);
     const [likes,setLikes] = useState([]);
+    const [icon,setIcon] = useState();
     const [likesCount,setLikesCount] = useState([]);
     const [newComment,setNewComment] = useState('');
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [isPostLike, setIsPostLike] = useState(false);
     const [snackbarContent, setSnackbarContent] = useState('');
     const [loading,setLoading] = useState(true);
+
+    const baseS3Url = "https://user-profile-icon.s3.ap-northeast-1.amazonaws.com/media/";
+
+    const init_icon = "https://user-profile-icon.s3.ap-northeast-1.amazonaws.com/media/icon/init_user.jpg";
 
     const { postId } = useParams();
     const navigate = useNavigate();
@@ -148,6 +153,12 @@ function PostDetail() {
                 setLikes(data.data.likes);
                 setLikesCount(data.data.likes.length);
                 setIsPostLike(data.data.is_request_user_like);
+                console.log(data.data);
+                if(data.data.post.user.icon === null){
+                    setIcon(undefined);
+                }else{
+                    setIcon(data.data.post.user.icon);
+                }
             }else{
                 console.log(data.error);
             }
@@ -172,8 +183,10 @@ function PostDetail() {
                         {postData?.content}
                     </Typography>
                     <Stack direction="row" spacing={2} alignItems="center" mt={1} mb={2}>
-                        <Avatar>
-                            <PersonIcon />
+                        <Avatar
+                            src={icon===undefined ? init_icon : icon}
+                            aria-label="recipe"
+                        >
                         </Avatar>
                         <Typography color="text.secondary" variant="body2">
                             {postData?.user.username} · {formatDate(postData?.createdAt)}
@@ -254,8 +267,11 @@ function PostDetail() {
                                     >
                                         <CardContent>
                                             <Stack direction="row" spacing={2} alignItems="center">
-                                                <Avatar>
-                                                    <PersonIcon />
+                                                <Avatar
+                                                    sx={{ width: 35, height: 35 }}
+                                                    src={comment.user.icon===null ? init_icon : comment.user.icon}
+                                                >
+                                                    
                                                 </Avatar>
                                                 <Typography
                                                     variant='body2'
