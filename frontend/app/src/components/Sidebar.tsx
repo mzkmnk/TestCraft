@@ -1,5 +1,4 @@
 import React from 'react';
-import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout, Menu } from 'antd';
@@ -356,6 +355,7 @@ const Sidebar: React.FC = () => {
                   <TimelineConnector />
                 </TimelineSeparator>
                 <TimelineContent>
+                  {moment(post.createdAt).fromNow()}
                   <Card
                     sx={cardStyle}
                     key={post.id}
@@ -385,7 +385,6 @@ const Sidebar: React.FC = () => {
                         >
                           {post.user?.username}
                           </Typography>}
-                      subheader={<Typography variant="caption" color="textSecondary">{moment(post.createdAt).fromNow()}</Typography>}
                     />
                     <CardContent sx={cardContentStyle}>
                       <Typography variant="body1" color="text.secondary">
@@ -570,9 +569,9 @@ const modalStyle = {
 
 
 const cardStyle = {
-  maxWidth: '90%', 
-  mb: 2,
-  padding: '16px',
+  maxWidth: '85%', 
+  mb: 1,
+  padding: '12px',
   boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)',
   borderRadius: 3,
   '&:hover': {
