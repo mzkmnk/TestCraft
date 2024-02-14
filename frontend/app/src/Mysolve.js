@@ -5,7 +5,7 @@ import { useAPI } from "./hooks/useAPI";
 import Pagination from "@mui/material/Pagination";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
-import { FaHeart } from "react-icons/fa";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import Loading from "./Loading";
 import "./workbookList.css";
 
@@ -53,24 +53,36 @@ function Mysolve() {
   const workbookLists = (
     <>
       {currentQuestions.map((workbook, index) => (
-        <div
-          className="question"
-          key={index}
-          onClick={() =>
-            handleQuestionClick(workbook.id, workbook.solved_count)
-          }
-        >
-          <div className="questionHeader">
-            <h3>{workbook.workbook_name}</h3>
-            <span className="createdBy">
-              created by {workbook.create_id__username} ({workbook.created_at})
+        <div className="question" key={index}>
+          <Link
+            to={`/solved/${workbook.id}/${workbook.solved_count}`}
+            style={{ position: "absolute", inset: 0 }}
+          />
+          <span className="questionHeader">
+            <span>
+              <p style={{ fontSize: "1.5rem" }}>{workbook.workbook_name}</p>
+              <p>{workbook.description}</p>
+              <span
+                className="createdBy"
+                style={{ display: "flex", alignItems: "center" }}
+              >
+                <p style={{ margin: "0 auto" }}>
+                  created by{" "}
+                  <Link to={`/profile/${workbook.create_id}`}>
+                    {workbook.create_id__username}
+                  </Link>{" "}
+                  ({workbook.created_at})
+                </p>
+                <span className="likeStyle">
+                  <FavoriteIcon
+                    color="primary"
+                    style={{ opacity: 0.6, marginLeft: 10, marginTop: 2 }}
+                  />
+                  <span>{workbook.like_count}</span>
+                </span>
+              </span>
             </span>
-          </div>
-          <p>{workbook.description}</p>
-          <div className="likeStyle">
-            <FaHeart className="likeIconStyle" />
-            <span>{workbook.like_count}</span>
-          </div>
+          </span>
         </div>
       ))}
     </>

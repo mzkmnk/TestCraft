@@ -1,16 +1,14 @@
-import { FaHeart, FaRegHeart } from "react-icons/fa";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Pagination from "@mui/material/Pagination";
 import { useAPI } from "../hooks/useAPI";
 import "../workbookList.css";
+import IconButton from "@mui/material/IconButton";
 
 export function DisplayWorkbookList({ workbooks, setWorkbooks }) {
   const API = useAPI({ APIName: "questionsall_like" });
-  const navigate = useNavigate();
-  const handleQuestionClick = (workbookId) => {
-    navigate(`/solve/${workbookId}`);
-  };
 
   // pagenation
   const [currentPage, setCurrentPage] = useState(1);
@@ -63,30 +61,36 @@ export function DisplayWorkbookList({ workbooks, setWorkbooks }) {
           </h2>
           <div className="questionsContainer">
             {currentQuestions.map((question, index) => (
-              <div
-                className="question"
-                key={index}
-                onClick={() => handleQuestionClick(question.id)}
-              >
-                <div className="questionHeader">
-                  <h3>{question.workbook_name}</h3>
-                  <span className="createdBy">
-                    created by {question.create_id__username} (
-                    {question.created_at})
+              <div className="question" key={index}>
+                {console.log(question)}
+                <Link
+                  to={`/solve/${question.id}`}
+                  style={{ position: "absolute", inset: 0 }}
+                />
+                <span className="questionHeader">
+                  <span>
+                    <p style={{ fontSize: "1.5rem" }}>
+                      {question.workbook_name}
+                    </p>
+                    <p>{question.description}</p>
+                    <p className="createdBy">
+                      created by{" "}
+                      <Link to={`/profile/${question.create_id}`}>
+                        {question.create_id__username}
+                      </Link>{" "}
+                      ({question.created_at})
+                    </p>
                   </span>
-                </div>
-                <p>{question.description}</p>
-                <div
-                  className="likeStyle"
-                  onClick={(e) => handleLikeClick(e, question.id)}
-                >
-                  {question.liked ? (
-                    <FaHeart className="likeIconStyle" />
-                  ) : (
-                    <FaRegHeart className="likeIconStyle" />
-                  )}
-                  <span className="likeCount">{question.like_count}</span>
-                </div>
+                  <IconButton
+                    color="primary"
+                    style={{ zIndex: 1, position: "relative" }}
+                    onClick={(e) => handleLikeClick(e, question.id)}
+                    size="small"
+                  >
+                    {question.liked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+                    <span className="likeCount">{question.like_count}</span>
+                  </IconButton>
+                </span>
               </div>
             ))}
           </div>

@@ -68,6 +68,7 @@ export function useAPI({
   const [isLoading, setIsLoading] = useState(loadOnStart ? true : null);
   const [isSuccess, setIsSuccess] = useState(null);
   const [error, setError] = useState(null);
+  const [status, setStatus] = useState(null);
   const navigate = useNavigate();
 
   const stateInit = () => {
@@ -75,6 +76,7 @@ export function useAPI({
     setIsLoading(true);
     setError(undefined);
     setIsSuccess(undefined);
+    setStatus(undefined);
   };
   const statusInit = () => {
     setIsLoading(null);
@@ -137,6 +139,7 @@ export function useAPI({
         console.log("reqData", reqData);
         const response = await fetch(url, reqData);
         if (!response.ok) {
+          setStatus(response.status);
           throw new Error(`${response.status} ${response.statusText}`);
         }
 
@@ -169,5 +172,5 @@ export function useAPI({
     }
   }, [body, isLoginRequired, loadOnStart, params, sendAPI]);
 
-  return { sendAPI, data, isLoading, isSuccess, error, statusInit };
+  return { sendAPI, data, isLoading, isSuccess, error, statusInit, status };
 }

@@ -12,6 +12,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Alert from "@mui/material/Alert";
 import { useAPI } from "./hooks/useAPI";
 import Snackbar from "@mui/material/Snackbar";
+import CircularProgress from "@mui/material/CircularProgress";
 
 import UserHeader from "./UserHeader";
 
@@ -150,14 +151,16 @@ function LoginForm() {
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
+                disabled={loginAPI.isLoading}
               >
-                Sign In
+                {loginAPI.isLoading ? <CircularProgress /> : "Sign In"}
               </Button>
             </Box>
             <Button
               type="submit"
               sx={{ mt: 1, mb: 2, width: "200px" }}
               onClick={handleChange}
+              disabled={loginAPI.isLoading}
             >
               パスワードを忘れた場合
             </Button>

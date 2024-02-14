@@ -149,6 +149,14 @@ class DeleteWorkBookSchema(Schema):
 @api.post("/signup")
 def signup(request, payload: SignUpSchema):
     try:
+        is_username_exist = User.objects.filter(username = payload.username).exists()
+        if(is_username_exist):
+            return JsonResponse(
+                {
+                    "message":"ユーザー名が既に存在しています。",
+                },
+                status = 422,
+            )
         user = User.objects.create_user(
             username = payload.username,
             email = payload.email,
@@ -573,12 +581,13 @@ def questionsall(request):
             'workbook_name',
             'description',
             'create_id__username',
+            'create_id',
             'created_at',
             'updated_at',
             'like_count',
         )
         workbooks_with_likes = []
-        for workbook in workbooks:
+        for workbook in workbooks:       
             liked_by_user = Like.objects.filter(user=request.user, workbook_id=workbook['id']).exists()
             workbook['liked_by_user'] = liked_by_user
             workbooks_with_likes.append(workbook)
