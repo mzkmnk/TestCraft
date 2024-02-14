@@ -8,6 +8,7 @@ export const messageSent = /* GraphQL */ `
       sender {
         id
         username
+        icon
         userPublicName
         email
         school
@@ -24,6 +25,7 @@ export const messageSent = /* GraphQL */ `
       receiver {
         id
         username
+        icon
         userPublicName
         email
         school
@@ -53,6 +55,7 @@ export const postCreated = /* GraphQL */ `
       user {
         id
         username
+        icon
         userPublicName
         email
         school
@@ -91,6 +94,7 @@ export const commentAddedToPost = /* GraphQL */ `
       user {
         id
         username
+        icon
         userPublicName
         email
         school
@@ -124,6 +128,7 @@ export const postLiked = /* GraphQL */ `
       user {
         id
         username
+        icon
         userPublicName
         email
         school
@@ -156,6 +161,7 @@ export const userFollowed = /* GraphQL */ `
       follower {
         id
         username
+        icon
         userPublicName
         email
         school
@@ -172,6 +178,7 @@ export const userFollowed = /* GraphQL */ `
       following {
         id
         username
+        icon
         userPublicName
         email
         school

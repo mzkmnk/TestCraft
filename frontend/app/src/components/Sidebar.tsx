@@ -60,6 +60,7 @@ interface MenuItem {
 interface User {
   id: string;
   username: string;
+  icon: string;
   email: string;
   isCompanyUser: boolean;
   isOwnCompany: boolean;
@@ -105,8 +106,12 @@ const Sidebar: React.FC = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [isPostLike, setIsPostLike] = useState(false);
   const [snackbarContent, setSnackbarContent] = useState('');
+  
+  const baseS3Url = "https://user-profile-icon.s3.ap-northeast-1.amazonaws.com/media/";
 
-   const navigate = useNavigate();
+  const init_icon = "https://user-profile-icon.s3.ap-northeast-1.amazonaws.com/media/icon/init_user.jpg";
+
+  const navigate = useNavigate();
 
   const loginInfoAPI  = useAPI({
     APIName: 'get_user_info_change',
@@ -366,6 +371,7 @@ const Sidebar: React.FC = () => {
                       avatar={
                         <Avatar
                           sx={ avatarStyle }
+                          src={ post.user.icon===null ? init_icon : baseS3Url+post.user.icon}
                           aria-label="recipe"
                           onClick={(e) => { e.stopPropagation(); userProfileClick(post.user.id); }}
                         >
