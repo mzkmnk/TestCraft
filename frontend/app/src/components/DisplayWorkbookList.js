@@ -23,6 +23,10 @@ export function DisplayWorkbookList({ workbooks, setWorkbooks }) {
     setCurrentPage(value);
   };
 
+  const formatDate = (date) => {
+    return new Date(date).toLocaleString();
+  };
+
   // いいねボタン
   const handleLikeClick = (e, workbookId) => {
     e.stopPropagation();

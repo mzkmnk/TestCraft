@@ -29,6 +29,10 @@ function Mysolve() {
     loadOnStart: true,
   });
 
+  const formatDate = (date) => {
+    return new Date(date).toLocaleString();
+  };
+
   useEffect(() => {
     if (API.isSuccess === false) {
       navigate("/error");

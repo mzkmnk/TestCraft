@@ -48,6 +48,10 @@ function Mycreate() {
     loadOnStart: true,
   });
 
+  const formatDate = (date) => {
+    return new Date(date).toLocaleString();
+  };
+
   const deleteAPI = useAPI({
     APIName: "delete_workbook",
   });
