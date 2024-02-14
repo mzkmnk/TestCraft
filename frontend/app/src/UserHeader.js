@@ -207,12 +207,13 @@ const UserHeader = ({ position = "static" }) => {
                   解答する
                 </MenuItem>
                 <MenuItem
-                  component={Link}
-                  to="/editor"
-                  onClick={handleMenuClose}
+                  onClick={() => {
+                    navigate("/editor", { state: { type: "new" } });
+                    handleMenuClose();
+                  }}
                 >
                   <NoteAddIcon style={styles.icon} />
-                  作成する
+                  新規作成
                 </MenuItem>
                 <MenuItem
                   component={Link}
