@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     'corsheaders',
     'api',
     'ninja',
-    'corsheaders',
     'storages',
 ]
 
