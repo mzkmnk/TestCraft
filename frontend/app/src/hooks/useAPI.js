@@ -40,6 +40,7 @@ const APIs = {
   post_like: `${urlBase}/post_like`,
   get_post_detail: (postId) => `${urlBase}/get_post_detail/${postId}`,
   post_comment: `${urlBase}/post_comment`,
+  change_icon: `${urlBase}/change_icon`,
 };
 
 /**
@@ -102,9 +103,9 @@ export function useAPI({
         // ログイン認証
         if (isLoginRequired) {
           const response = await fetch(APIs.check_auth, {
-            headers: {
-              "Content-Type": "application/json",
-            },
+            // headers: {
+            //   "Content-Type": "application/json",
+            // },
             credentials: "include",
           });
           const data = await response.json();
@@ -123,17 +124,17 @@ export function useAPI({
         console.log("url", url);  
         const reqData = body
           ? {
-              headers: {
-                "Content-Type": "application/json",
-              },
+              // headers: {
+              //   "Content-Type": "application/json",
+              // },
               credentials: "include",
               method: "POST",
               body: body,
             }
           : {
-              headers: {
-                "Content-Type": "application/json",
-              },
+              // headers: {
+              //   "Content-Type": "application/json",
+              // },
               credentials: "include",
             };
         console.log("reqData", reqData);

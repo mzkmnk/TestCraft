@@ -29,6 +29,7 @@ class User(AbstractUser):
     is_email_certification= models.BooleanField(default = False)
     key = models.CharField(max_length = 48, null = True, blank = True)
     following = models.ManyToManyField('self', through='Follow', symmetrical=False, related_name='followers')
+    icon = models.ImageField(upload_to='icon/', null=True, blank=True)
     
     def count_following(self):return self.following.count()
     def count_followers(self):return self.followers.count()
