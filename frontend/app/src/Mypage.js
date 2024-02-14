@@ -33,6 +33,8 @@ function MyPage() {
   const location = useLocation();
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [chartData, setChartData] = useState({});
+  const [message, setMessage] = useState("");
+  const [severity, setSeverity] = useState("success"); // ["error", "warning", "info", "success"
   const API = useAPI({
     APIName: "get_graph_data",
     isLoginRequired: true,
@@ -91,10 +93,18 @@ function MyPage() {
   }, [navigate, API.data, API.isSuccess]);
 
   useEffect(() => {
-    if (location.state?.message) {
+    if (location.state?.message && location.state?.severity) {
       setOpenSnackbar(true);
+      setMessage(location.state.message);
+      setSeverity(location.state.severity);
+      navigate(location.pathname, { replace: true });
     }
-  }, [location]);
+  }, [
+    location.pathname,
+    location.state?.message,
+    location.state?.severity,
+    navigate,
+  ]);
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
@@ -175,10 +185,10 @@ function MyPage() {
         >
           <Alert
             onClose={handleCloseSnackbar}
-            severity={location.state.severity}
+            severity={severity}
             sx={{ width: "100%" }}
           >
-            {location.state.message}
+            {message}
           </Alert>
         </Snackbar>
       )}

@@ -7,7 +7,7 @@ import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { EditorHeader } from "./EditorHeader";
 import Paper from "@mui/material/Paper";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -220,7 +220,28 @@ const validationQuestionTree = (questionTree: QuestionTree) => {
 };
 
 export default function EditorApp({ workBook }) {
-  if (!workBook) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  let editingQuestionTree;
+  let editingTitle;
+  let editingIsEdit;
+
+  if (location.state?.type !== "new") {
+    editingQuestionTree = sessionStorage.getItem("editingQuestionTree");
+    editingTitle = sessionStorage.getItem("editingTitle");
+    editingIsEdit = sessionStorage.getItem("editingIsEdit");
+  }
+
+  if (!workBook && editingQuestionTree && editingTitle && editingIsEdit) {
+    const editingWorkbook = {
+      info: {
+        title: editingTitle,
+      },
+      questions: JSON.parse(editingQuestionTree),
+      isEdit: editingIsEdit === true,
+    };
+    workBook = editingWorkbook;
+  } else if (!workBook) {
     workBook = {
       info: { title: "新規ドキュメント" },
       questions: {
@@ -238,7 +259,6 @@ export default function EditorApp({ workBook }) {
 
   const [questionTree, setQuestionTree] = useState(workBook.questions);
   const [title, setTitle] = useState(workBook.info.title);
-  const navigate = useNavigate();
   const saveAPI = useAPI({ APIName: "save_data" });
   const saveAPIForUpdate = useAPI({ APIName: "save_data" });
   const { workbookId } = useParams();
@@ -250,6 +270,15 @@ export default function EditorApp({ workBook }) {
     setIsMessageOpen(false);
   };
   const [isSuccess, setIsSuccess] = useState(null);
+  useEffect(() => {
+    sessionStorage.setItem("editingQuestionTree", JSON.stringify(questionTree));
+    sessionStorage.setItem("editingTitle", title);
+    sessionStorage.setItem("editingIsEdit", isEdit);
+  }, [questionTree, title, isEdit]);
+
+  useEffect(() => {
+    navigate(location.pathname, { replace: true });
+  }, [navigate, location.pathname]);
 
   useEffect(() => {
     if (saveAPI.isSuccess === true) {
@@ -439,6 +468,8 @@ export default function EditorApp({ workBook }) {
   ) {
     setIsEdit(true);
     setIsLatest(false);
+
+    sessionStorage.setItem("editingQuestionTree", JSON.stringify(questionTree));
     const changedQuestion = questionTree[changedQuestionId];
 
     if (
@@ -487,7 +518,6 @@ export default function EditorApp({ workBook }) {
         },
       });
     }
-    console.log(questionTree);
   }
 
   function handleChangeBool(
@@ -731,7 +761,10 @@ export default function EditorApp({ workBook }) {
                 variant="standard"
                 label="タイトル"
                 value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                onChange={(e) => {
+                  setIsLatest(false);
+                  setTitle(e.target.value);
+                }}
                 margin="normal"
                 InputProps={{ style: { fontSize: "2rem" } }}
               />
