@@ -82,7 +82,7 @@ export function DisplayWorkbookList({ workbooks, setWorkbooks }) {
                       <Link to={`/profile/${question.create_id}`}>
                         {question.create_id__username}
                       </Link>{" "}
-                      ({question.created_at})
+                      ({formatDate(question.created_at)})
                     </p>
                   </span>
                   <IconButton

@@ -114,7 +114,7 @@ function Mycreate() {
                       <p style={{ fontSize: "1.5rem" }}>
                         {question.workbook_name}
                       </p>
-                      <p className="createdBy">作成日：{question.created_at}</p>
+                      <p className="createdBy">作成日：{formatDate(question.created_at)}</p>
                     </span>
                     <IconButton
                       aria-describedby={index + "popover"}
