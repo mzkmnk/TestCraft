@@ -98,6 +98,23 @@ const Sidebar: React.FC = () => {
   });
 
   useEffect(() => {
+    if(loginInfoAPI.isSuccess){
+      const data = loginInfoAPI.data;
+      if(data.success){
+        setUserId(data.user_id);
+      }else{
+        console.log(data.error);
+      }
+    }else{
+      console.log("useAPI loginInfoAPI error");
+    }
+  },[loginInfoAPI.isSuccess]);
+  
+  useEffect(() => {
+    console.log("userId:", userId);
+  }, [userId]);
+
+  useEffect(() => {
     const fetchPosts = async () => {
       try{
           setLoading(true);
@@ -150,24 +167,6 @@ const Sidebar: React.FC = () => {
     }
   },[postCommentAPI.isSuccess,postCommentAPI.data]);
 
-  
-
-  useEffect(() => {
-    if(loginInfoAPI.isSuccess){
-      const data = loginInfoAPI.data;
-      if(data.success){
-        setUserId(data.user_id);
-      }else{
-        console.log(data.error);
-      }
-    }else{
-      console.log("useAPI loginInfoAPI error");
-    }
-  },[loginInfoAPI.isSuccess]);
-  
-  useEffect(() => {console.log("userId:", userId);}, [userId]);
-
-
   const handleMenuClick = (path) => {navigate(path);}
 
   const handleOpenModal = () => {setIsModalOpen(true);};
@@ -198,11 +197,6 @@ const Sidebar: React.FC = () => {
   });
 
   const handlePostLikeClick = async (postId: string) => {
-    // if(isPostLike){
-    //   setSnackbarContent('いいねを取り消しました');
-    // }else{
-    //   setSnackbarContent('いいねしました');
-    // }
     postLikeAPI.sendAPI({
       body:JSON.stringify({
         postId: postId,
@@ -256,8 +250,6 @@ const Sidebar: React.FC = () => {
 
   const handleSendMessage =  async (message: string) => {
     try{
-      console.log("userId",userId);
-      console.log("message",message); 
       const newPost = await client.graphql({
         query: createPost,
         variables: {
@@ -386,7 +378,7 @@ const Sidebar: React.FC = () => {
                       }}
                       onClick={(e) => { e.stopPropagation(); handlePostLikeClick(post.id);}}
                     >
-                      {post.likes.some((like) => like.user.id === userId) ? <FavoriteIcon sx={{color : "#1876D1"}} /> : <FavoriteBorderIcon />}
+                      {post.likes.some((like) => like.user.id === userId.toString()) ? <FavoriteIcon sx={{color : "#1876D1"}} /> : <FavoriteBorderIcon />}
                     </IconButton>
                     <Typography variant="body2" color="text.secondary" sx={{ marginLeft: '8px' }}>
                       {post.likes.length}
