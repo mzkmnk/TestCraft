@@ -167,7 +167,7 @@ export default function ChangeProfilePage() {
                                     className="form-control"
                                     id="school"
                                     placeholder={userSchool}
-                                    value={userSchool === 'まだ情報がありません。' ? '' : userSchool}
+                                    value={userSchool === 'まだ情報がありません。' ?  '' : userSchool}
                                     onChange={(e) => setUserSchool(e.target.value)}
                                 />
                             </MDBCol>
@@ -185,7 +185,7 @@ export default function ChangeProfilePage() {
                             width:'100px',
                         }}
                         className="ms-1"
-                        onClick={saveUserInfo}
+                        onClick={handleSaveUserInfo}
                     >
                         Save
                     </MDBBtn>
