@@ -505,6 +505,7 @@ def get_user_info(request):
                 "email":user.email,
                 "school":user.school,
                 "icon":icon_url,
+                "icon_init":user.icon.url,
                 "followCount":user.count_following(),
                 "followerCount":user.count_followers(),
                 "error":None,

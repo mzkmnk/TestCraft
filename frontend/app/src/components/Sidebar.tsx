@@ -102,6 +102,7 @@ const Sidebar: React.FC = () => {
   const [message, setMessage] = useState('');
   const [comment, setComment] = useState('');
   const [userId, setUserId] = useState('');
+  const [icon, setIcon] = useState('');
   const [loading, setLoading] = useState(true);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [isPostLike, setIsPostLike] = useState(false);
@@ -123,6 +124,7 @@ const Sidebar: React.FC = () => {
       const data = loginInfoAPI.data;
       if(data.success){
         setUserId(data.user_id);
+        setIcon(data.icon_init);
       }else{
         console.log(data.error);
       }
@@ -295,9 +297,10 @@ const Sidebar: React.FC = () => {
       query : postCreated,
     }).subscribe({
       next: (value) => {
-        console.log("value",value);
         if(value.data &&  value.data.postCreated){
           const newPost = value.data.postCreated as Post;
+          newPost.user.icon = icon;
+          console.log("value",value);
           setPosts(prevPosts => [newPost, ...prevPosts]);
         }
       }
@@ -317,7 +320,7 @@ const Sidebar: React.FC = () => {
 
   const menuItems: MenuItem[] = [
     { label: 'マイプロフィール', key: '/profile/'+ userId,onClick: () => handleMenuClick('/profile/'+ userId) },
-    { label: 'いいねした投稿', key: '/like_post',onClick: () => handleMenuClick('/like_post') },
+    // { label: 'いいねした投稿', key: '/like_post',onClick: () => handleMenuClick('/like_post') },
   ];
 
   if(loading){return <LoadingScreen />;}
