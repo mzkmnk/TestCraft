@@ -461,7 +461,11 @@ const Sidebar: React.FC = () => {
                   <Button
                     variant="contained"
                     color="primary"
+                    disabled={!message.trim()}
                     onClick={() => handleSendMessage(message)}
+                    sx={{
+                      opacity: !message.trim() ? 0.5 : 1,
+                    }}
                   >
                     投稿する
                   </Button>
