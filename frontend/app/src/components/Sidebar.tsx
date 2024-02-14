@@ -7,17 +7,33 @@ import 'antd/dist/reset.css';
 import moment from 'moment';
 
 //MUI
-import { Button, Modal, Box, TextField, Typography,Snackbar,Alert } from '@mui/material';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardActions from '@mui/material/CardActions';
-import IconButton from '@mui/material/IconButton';
+import {
+  Button,
+  Modal,
+  Box,
+  TextField,
+  Typography,
+  Snackbar,
+  Alert,
+  Card,
+  CardContent,
+  CardActions,
+  IconButton,
+  CardHeader,
+  Avatar,
+} from '@mui/material';
+
+import Timeline from '@mui/lab/Timeline';
+import TimelineItem,{ timelineItemClasses } from '@mui/lab/TimelineItem';
+import TimelineSeparator from '@mui/lab/TimelineSeparator';
+import TimelineConnector from '@mui/lab/TimelineConnector';
+import TimelineContent from '@mui/lab/TimelineContent';
+import TimelineDot from '@mui/lab/TimelineDot';
+
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import CommentIcon from '@mui/icons-material/Comment';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import CardHeader from '@mui/material/CardHeader';
-import Avatar from '@mui/material/Avatar';
 import { red } from '@mui/material/colors';
 
 
@@ -82,6 +98,7 @@ const Sidebar: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
   const [commentCurrentPostId, setCommentCurrentPostId] = useState('');
+  const [commentCurrentPost, setCommentCurrentPost] = useState<Post>();
   const [message, setMessage] = useState('');
   const [comment, setComment] = useState('');
   const [userId, setUserId] = useState('');
@@ -175,8 +192,8 @@ const Sidebar: React.FC = () => {
 
   const handleCommentClick = (postId: string) => {
     setCommentCurrentPostId(postId);
+    setCommentCurrentPost(posts.find((post) => post.id === postId));
     setIsCommentModalOpen(true);
-
   };
 
   const handleSendComment = async (postId,comment) => {
@@ -303,13 +320,8 @@ const Sidebar: React.FC = () => {
 
   return (
     <>
-      <Layout style={{ minHeight: '100vh' }}>
-        <Sider style={
-          { position: 'fixed', top: '64px', height: 'calc(100vh - 64px)', overflowY: 'auto' }
-          }
-          width={250}
-          className="site-layout-background"
-        >
+      <Layout style={layoutStyle}>
+        <Sider style={siderStyle}>
           <Menu
             mode="inline"
             defaultSelectedKeys={['1']}
@@ -328,156 +340,184 @@ const Sidebar: React.FC = () => {
             </Button>
           </Box>
         </Sider>
-        <Layout style={{ flex: 1 }}>
-          <Content
-            style={{ marginTop: '2rem',marginLeft: 250, padding: '64px 50px' }}
+        <Content style={contentStyle}>
+          <Timeline
+            sx={{
+              [`& .${timelineItemClasses.root}:before`]: {
+                flex: 0,
+                padding: 0,
+              }
+            }}
           >
             {posts.map((post) => (
-              <Card
-                sx={cardStyle}
-                key={post.id}
-                onClick = {() => navigate(`/post_detail/${post.id}`)}
-              >
-                <CardHeader
-                  sx = {cardHeaderStyle}
-                  avatar={
-                    <Avatar
-                      sx={ avatarStyle }
-                      aria-label="recipe"
-                      onClick={(e) => { e.stopPropagation(); userProfileClick(post.user.id); }}
-                    >
-                      {post.user?.username[0]}
-                    </Avatar>
-                  }
-                  action={
-                    <IconButton aria-label="settings">
-                      <MoreVertIcon />
-                    </IconButton>
-                  }
-                  title={
-                    <Typography
-                      variant="h6"
-                      onClick={(e) => { e.stopPropagation(); userProfileClick(post.user.id); }}
-                      style={{ cursor:'Pointer' }}
-                    >
-                      {post.user?.username}
-                      </Typography>}
-                  subheader={<Typography variant="caption" color="textSecondary">{moment(post.createdAt).fromNow()}</Typography>}
-                />
-                <CardContent sx={cardContentStyle}>
-                  <Typography variant="body1" color="text.secondary">
-                    {post.content}
-                  </Typography>
-                </CardContent>
-                <CardActions sx = {cardActionsStyle}>
-                  <Box display="flex" alignItems="center">
-                    <IconButton
-                      aria-label="postlike"
-                      sx={{
-                        '&:hover': { color: '#1876D1' }
-                      }}
-                      onClick={(e) => { e.stopPropagation(); handlePostLikeClick(post.id);}}
-                    >
-                      {/* {post.likes.some((like) => like.user.id === userId.toString()) ? <FavoriteIcon sx={{color : "#1876D1"}} /> : <FavoriteBorderIcon />} */}
-                      {post.likes.some((like) => {
-                        console.log("typeof like.user.id",typeof like.user.id);
-                        console.log("typeof userId",typeof userId);
-                        return Number(like.user.id) === Number(userId);
-                        }) ? <FavoriteIcon sx={{color : "#1876D1"}} /> : <FavoriteBorderIcon />}
-                    </IconButton>
-                    <Typography variant="body2" color="text.secondary" sx={{ marginLeft: '8px' }}>
-                      {post.likes.length}
-                    </Typography>
-                  </Box>
-                  <Box display="flex" alignItems="center">
-                    <IconButton
-                      aria-label="comment"
-                      sx={{ '&:hover': { color: 'primary.main' } }}
-                      onClick={(e) => { e.stopPropagation(); handleCommentClick(post.id); }}
-                    >
-                      <CommentIcon />
-                    </IconButton>
-                    <Typography variant="body2" color="text.secondary" sx={{ marginLeft: '8px' }}>
-                      {post.comments.length}
-                    </Typography>
-                  </Box>
-                </CardActions>
-              </Card>
+              <TimelineItem key={post.id}>
+                <TimelineSeparator>
+                  <TimelineDot color="primary" variant="outlined" />
+                  <TimelineConnector />
+                </TimelineSeparator>
+                <TimelineContent>
+                  <Card
+                    sx={cardStyle}
+                    key={post.id}
+                    onClick = {() => navigate(`/post_detail/${post.id}`)}
+                  >
+                    <CardHeader
+                      sx = {cardHeaderStyle}
+                      avatar={
+                        <Avatar
+                          sx={ avatarStyle }
+                          aria-label="recipe"
+                          onClick={(e) => { e.stopPropagation(); userProfileClick(post.user.id); }}
+                        >
+                          {post.user?.username[0]}
+                        </Avatar>
+                      }
+                      action={
+                        <IconButton aria-label="settings">
+                          <MoreVertIcon />
+                        </IconButton>
+                      }
+                      title={
+                        <Typography
+                          variant="h6"
+                          onClick={(e) => { e.stopPropagation(); userProfileClick(post.user.id); }}
+                          style={{ cursor:'Pointer' }}
+                        >
+                          {post.user?.username}
+                          </Typography>}
+                      subheader={<Typography variant="caption" color="textSecondary">{moment(post.createdAt).fromNow()}</Typography>}
+                    />
+                    <CardContent sx={cardContentStyle}>
+                      <Typography variant="body1" color="text.secondary">
+                        {post.content}
+                      </Typography>
+                    </CardContent>
+                    <CardActions sx = {cardActionsStyle}>
+                      <Box display="flex" alignItems="center">
+                        <IconButton
+                          aria-label="postlike"
+                          sx={{
+                            '&:hover': { color: '#1876D1' }
+                          }}
+                          onClick={(e) => { e.stopPropagation(); handlePostLikeClick(post.id);}}
+                        >
+                          {post.likes.some((like) => {
+                            return Number(like.user.id) === Number(userId);
+                            }) ? <FavoriteIcon sx={{color : "#1876D1"}} /> : <FavoriteBorderIcon />}
+                        </IconButton>
+                        <Typography variant="body2" color="text.secondary" sx={{ marginLeft: '8px' }}>
+                          {post.likes.length}
+                        </Typography>
+                      </Box>
+                      <Box display="flex" alignItems="center">
+                        <IconButton
+                          aria-label="comment"
+                          sx={{ '&:hover': { color: 'primary.main' } }}
+                          onClick={(e) => { e.stopPropagation(); handleCommentClick(post.id); }}
+                        >
+                          <CommentIcon />
+                        </IconButton>
+                        <Typography variant="body2" color="text.secondary" sx={{ marginLeft: '8px' }}>
+                          {post.comments.length}
+                        </Typography>
+                      </Box>
+                    </CardActions>
+                  </Card>
+                </TimelineContent>
+              </TimelineItem>
             ))}
-          </Content>
-          <Modal
-            open={isModalOpen}
-            onClose={handleCloseModal}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
-          >
-            <Box sx={modalStyle}>
-              <Box display="flex" flexDirection="column">
-                <Typography id="modal-modal-title" variant="h6" component="h2">
-                  新しい投稿
-                </Typography>
-                  <TextField
-                    autoFocus
-                    margin='dense'
-                    id="message"
-                    label="何を投稿する？"
-                    type='text'
-                    fullWidth
-                    multiline
-                    rows={6}
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    variant="outlined"
-                  />
-                  <Box display="flex" justifyContent="flex-end" mt={2}>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={() => handleSendMessage(message)}
-                    >
-                      投稿する
-                    </Button>
-                  </Box>
-                </Box>
-            </Box>
-          </Modal>
-          <Modal
-            open={isCommentModalOpen}
-            onClose={() => setIsCommentModalOpen(false)}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
-          >
-            <Box sx={modalStyle}>
-              <Box display="flex" flexDirection="column">
-                <Typography id="modal-modal-title" variant="h6" component="h2">
-                  コメント
-                </Typography>
+          </Timeline>
+        </Content>
+        <Modal
+          open={isModalOpen}
+          onClose={handleCloseModal}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={modalStyle}>
+            <Box display="flex" flexDirection="column">
+              <Typography id="modal-modal-title" variant="h6" component="h2">
+                新しい投稿
+              </Typography>
                 <TextField
                   autoFocus
                   margin='dense'
                   id="message"
-                  label="コメントしよう!!"
+                  label="何を投稿する？"
                   type='text'
                   fullWidth
                   multiline
                   rows={6}
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
                   variant="outlined"
                 />
                 <Box display="flex" justifyContent="flex-end" mt={2}>
                   <Button
                     variant="contained"
                     color="primary"
-                    onClick={() => handleSendComment(commentCurrentPostId,comment)}
+                    onClick={() => handleSendMessage(message)}
                   >
-                    コメントする
+                    投稿する
                   </Button>
                 </Box>
               </Box>
+          </Box>
+        </Modal>
+        <Modal
+          open={isCommentModalOpen}
+          onClose={() => setIsCommentModalOpen(false)}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={modalStyle}>
+            <Box display="flex" flexDirection="column">
+              <Typography id="modal-modal-title" variant="h6" component="h2">
+                投稿
+              </Typography>
+              {commentCurrentPost && (
+                <Box mb={2} p={2} sx={{ border: '1px solid #e0e0e0', borderRadius: '4px', backgroundColor: '#f9f9f9' }}>
+                  <Typography variant="h6" component="h2">
+                    {`投稿者: ${commentCurrentPost.user.username}`}
+                  </Typography>
+                  <Typography variant="body1" sx={{ my: 1 }}>
+                    {commentCurrentPost.content}
+                  </Typography>
+                  <Typography variant="caption" display="block" color="text.secondary">
+                    {`投稿日時: ${moment(commentCurrentPost.createdAt).fromNow()}`}
+                  </Typography>
+                </Box>
+              )}
             </Box>
-          </Modal>
-        </Layout>
+            <Box display="flex" flexDirection="column">
+              <Typography id="modal-modal-title" variant="h6" component="h2">
+                コメント
+              </Typography>
+              <TextField
+                autoFocus
+                margin='dense'
+                id="message"
+                label="コメントしよう!!"
+                type='text'
+                fullWidth
+                multiline
+                rows={6}
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                variant="outlined"
+              />
+              <Box display="flex" justifyContent="flex-end" mt={2}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => handleSendComment(commentCurrentPostId,comment)}
+                >
+                  コメントする
+                </Button>
+              </Box>
+            </Box>
+          </Box>
+        </Modal>
       </Layout>
       <Snackbar
         open={openSnackbar}
@@ -492,6 +532,28 @@ const Sidebar: React.FC = () => {
     </>
   );
 };
+const layoutStyle = {
+  display: 'flex',
+  minHeight: '100vh',
+};
+
+const siderStyle = {
+  position: 'fixed',
+  top: '64px',
+  left: 0,
+  height: 'calc(100vh - 64px)',
+  width: '250px',
+  overflowY: 'auto',
+};
+
+const contentStyle = {
+  flexGrow: 1,
+  marginLeft: '250px',
+  paddingTop: '64px',
+  transition: 'margin-left .2s',
+  zIndex: 0,
+};
+
 
 const modalStyle = {
   position: 'absolute',
