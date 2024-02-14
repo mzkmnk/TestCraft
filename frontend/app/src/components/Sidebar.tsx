@@ -378,7 +378,12 @@ const Sidebar: React.FC = () => {
                       }}
                       onClick={(e) => { e.stopPropagation(); handlePostLikeClick(post.id);}}
                     >
-                      {post.likes.some((like) => like.user.id === userId.toString()) ? <FavoriteIcon sx={{color : "#1876D1"}} /> : <FavoriteBorderIcon />}
+                      {/* {post.likes.some((like) => like.user.id === userId.toString()) ? <FavoriteIcon sx={{color : "#1876D1"}} /> : <FavoriteBorderIcon />} */}
+                      {post.likes.some((like) => {
+                        console.log("typeof like.user.id",typeof like.user.id);
+                        console.log("typeof userId",typeof userId);
+                        return Number(like.user.id) === Number(userId);
+                        }) ? <FavoriteIcon sx={{color : "#1876D1"}} /> : <FavoriteBorderIcon />}
                     </IconButton>
                     <Typography variant="body2" color="text.secondary" sx={{ marginLeft: '8px' }}>
                       {post.likes.length}
