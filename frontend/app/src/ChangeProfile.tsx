@@ -1,21 +1,30 @@
-import React, { useEffect } from 'react';
+import React, { useEffect,useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import {
+    Snackbar,
+    Alert,
+    CircularProgress,
+} from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person'; 
 
 import UserHeader from "./UserHeader";
 import LoadingScreen from './LoadingScreen.tsx';
 import { useAPI } from "./hooks/useAPI";
+import { set } from 'date-fns';
 
 export default function ChangeProfilePage() {
-    const [username, setUsername] = React.useState('');
-    const [password, setPassword] = React.useState('');
-    const [userSchool, setUserSchool] = React.useState('');
-    const [followCount, setFollowCount] = React.useState(0);
-    const [followerCount, setFollowerCount] = React.useState(0);
-    const [icon, setIcon] = React.useState();
-    const [preview, setPreview] = React.useState();
-    const [loading, setLoading] = React.useState(true);
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [userSchool, setUserSchool] = useState('');
+    const [followCount, setFollowCount] = useState(0);
+    const [followerCount, setFollowerCount] = useState(0);
+    const [icon, setIcon] = useState();
+    const [preview, setPreview] = useState();
+    const [loading, setLoading] = useState(true);
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [snackbarContent, setSnackbarContent] = useState('');
+    const [isIconLoading, setIsIconLoading] = useState(false);
 
     const init_icon = "https://user-profile-icon.s3.ap-northeast-1.amazonaws.com/media/icon/init_user.jpg";
 
@@ -36,7 +45,7 @@ export default function ChangeProfilePage() {
             setUsername(getInfoAPI.data.username);
             setFollowCount(getInfoAPI.data.followCount);
             setFollowerCount(getInfoAPI.data.followerCount);
-            if(getInfoAPI.data.icon === "https://user-profile-icon.s3.ap-northeast-1.amazonaws.com/media/") {
+            if(getInfoAPI.data.icon === "https://user-profile-icon.s3.ap-northeast-1.amazonaws.com/media/") {//あとで修正できたらする
                 setIcon(undefined);
                 setPreview(undefined);
             }else{
@@ -86,7 +95,14 @@ export default function ChangeProfilePage() {
 
     const handleIconChange = (event) => {
         const formData = new FormData();
-        formData.append('icon', event.target.files[0]);
+        const files = event.target.files[0];
+        if(files.size > 2024*2024){
+            setSnackbarContent('ファイルサイズが大きすぎます。');
+            handleOpenSnackbar();
+            return;
+        }else if(files === undefined){return;}
+        setIsIconLoading(true);
+        formData.append('icon', files);
         changeIcon.sendAPI({
             body:formData
         });
@@ -97,17 +113,31 @@ export default function ChangeProfilePage() {
             const data = changeIcon.data;
             if(data.success) {
                 setIcon(data.icon);
+                setSnackbarContent('アイコンを変更しました。');
+                handleOpenSnackbar();
             } else {
                 console.error(data.error);
+                setSnackbarContent('アイコンの変更に失敗しました。');
+                handleOpenSnackbar();
             }
         }
     },[changeIcon.isSuccess, changeIcon.data]);
+
+    useEffect(() => {setIsIconLoading(false);},[icon])
 
     const saveUserInfo = (event) => {
         event.preventDefault();
         handleSaveUserInfo();
     };
 
+    const handleOpenSnackbar = () => {setOpenSnackbar(true);};
+
+    const handleCloseSnackbar = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setOpenSnackbar(false);
+    };
 
     return (
         <>
@@ -125,24 +155,30 @@ export default function ChangeProfilePage() {
                                         id="icon-upload"
                                         onChange={handleIconChange}
                                     />
-                                    <label
-                                        htmlFor = "icon-upload"
-                                        style={{ cursor: 'pointer' }}
-                                    >
-                                        <img
-                                            src={preview || icon || init_icon}
-                                            alt="avatar"
-                                            className="rounded-circle"
-                                            style={{
-                                                width: '100px',
-                                                height: '100px',
-                                                objectFit: 'cover',
-                                                objectPosition: 'center',
-                                                transition: 'opacity 0.3s',
-                                            }}
-                                            onMouseOver={(e) => e.target.style.opacity = 0.7}
-                                            onMouseOut={(e) => e.target.style.opacity = 1}
-                                        />
+                                    <label htmlFor="icon-upload" style={{ cursor: 'pointer' }}>
+                                        {isIconLoading ? (
+                                            <CircularProgress
+                                                style={{
+                                                    width: '90px',
+                                                    height: '90px',
+                                                }}
+                                            />
+                                        ) : (
+                                            <img
+                                                src={preview || icon || init_icon}
+                                                alt="avatar"
+                                                className="rounded-circle"
+                                                style={{
+                                                    width: '100px',
+                                                    height: '100px',
+                                                    objectFit: 'cover',
+                                                    objectPosition: 'center',
+                                                    transition: 'opacity 0.3s',
+                                                }}
+                                                onMouseOver={(e) => e.target.style.opacity = 0.7}
+                                                onMouseOut={(e) => e.target.style.opacity = 1}
+                                            />
+                                        )}
                                     </label>
                                     {/* <p className="text-muted mb-1">今後対応予定です。</p>
                                     <p className="text-muted mb-4">今後対応予定です。</p> */}
@@ -227,6 +263,16 @@ export default function ChangeProfilePage() {
                     </div>
                 </div>
             </section>
+            <Snackbar
+                open={openSnackbar}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+            >
+                <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
+                {snackbarContent}
+                </Alert>
+            </Snackbar>
         </>
     );
 }
