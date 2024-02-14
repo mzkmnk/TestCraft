@@ -1,6 +1,7 @@
 import React from 'react';
 import { useEffect,useState } from 'react';
 import { useParams,useNavigate } from 'react-router-dom';
+import moment from 'moment';
 
 import {
     Card,
@@ -21,10 +22,18 @@ import {
     CardActions,
     Box,
 } from '@mui/material';
+
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import CommentIcon from '@mui/icons-material/Comment';
 import PersonIcon from '@mui/icons-material/Person'; 
+
+import Timeline from '@mui/lab/Timeline';
+import TimelineItem,{ timelineItemClasses } from '@mui/lab/TimelineItem';
+import TimelineSeparator from '@mui/lab/TimelineSeparator';
+import TimelineConnector from '@mui/lab/TimelineConnector';
+import TimelineContent from '@mui/lab/TimelineContent';
+import TimelineDot from '@mui/lab/TimelineDot';
 
 import UserHeader from './UserHeader';
 import { useAPI } from './hooks/useAPI';
@@ -146,7 +155,12 @@ function PostDetail() {
         setLoading(false);
     },[getPostDetailAPI.isSuccess,getPostDetailAPI.data]);
 
+    const fromNow = (date) => {
+        return moment(date).fromNow();
+    };
+
     if(loading){return <LoadingScreen />;};
+
     return (
         <>
             <UserHeader />
@@ -217,38 +231,49 @@ function PostDetail() {
                 </ListItem>
             </List>
             <List sx={{ maxWidth: '60%', margin: 'auto' }}>
-                {comments.map((comment, index) => (
-                    <React.Fragment key={index}>
-                        <ListItem
-                            alignItems='flex-start'
-                            sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', mb: 2 }}
-                        >
-                            <CardContent>
-                                <Stack direction="row" spacing={2} alignItems="center">
-                                    <Avatar>
-                                        <PersonIcon />
-                                    </Avatar>
-                                    <Typography
-                                        variant='body2'
-                                        color='text.secondary'
+                <Timeline
+                    sx={{
+                        [`& .${timelineItemClasses.root}:before`]: {
+                            flex: 0,
+                            padding: 0,
+                        } 
+                    }}
+                >
+                    {comments.map((comment, index) => (
+                        <React.Fragment key={index}>
+                            <TimelineItem key={index}>
+                                <TimelineSeparator>
+                                    <TimelineDot color="primary" variant='outlined' />
+                                    <TimelineConnector />
+                                </TimelineSeparator>
+                                <TimelineContent>
+                                    {moment(comment.createdAt).fromNow()}
+                                    <ListItem
+                                        alignItems='flex-start'
+                                        sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', mb: 2 }}
                                     >
-                                        {comment.user.username} · {formatDate(comment.createdAt)}
-                                    </Typography>
-                                </Stack>
-                                <Typography variant='body1' sx={{ mt: 1 }}>
-                                    {comment.content}
-                                </Typography>
-                            </CardContent>
-                        </ListItem>
-                        <Divider
-                            variant="fullWidth"
-                            sx={{
-                                mb: 2,
-                                bgcolor: theme.palette.main,
-                            }} 
-                        />
-                    </React.Fragment>
-                ))}
+                                        <CardContent>
+                                            <Stack direction="row" spacing={2} alignItems="center">
+                                                <Avatar>
+                                                    <PersonIcon />
+                                                </Avatar>
+                                                <Typography
+                                                    variant='body2'
+                                                    color='text.secondary'
+                                                >
+                                                    {comment.user.username} · {formatDate(comment.createdAt)}
+                                                </Typography>
+                                            </Stack>
+                                            <Typography variant='body1' sx={{ mt: 1 }}>
+                                                {comment.content}
+                                            </Typography>
+                                        </CardContent>
+                                    </ListItem>
+                                </TimelineContent>
+                            </TimelineItem>
+                        </React.Fragment>
+                    ))}
+                </Timeline>
             </List>
             <Snackbar
                 open={openSnackbar}
