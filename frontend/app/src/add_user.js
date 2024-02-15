@@ -35,11 +35,11 @@ function AddUser() {
       addUserAPI.data.success === true
     ) {
       const data = addUserAPI.data;
-      const csvData = JSON.stringify(data.csv_data);
-      const csvFile = csvData.replace(/^"(.*)"$/, "$1");
-      const csvRows = csvFile.split("\\r\\n");
+      const csvData = JSON.stringify(data.csv_data).replace(/^"|"$/g, '');
+      const unescapedCsvData = csvData.replace(/\\r\\n/g, "\n").replace(/\\n/g, "\n");
+      const csvRows = unescapedCsvData.split("\n");
 
-      setFileData(csvData);
+      setFileData(unescapedCsvData);
       setUploadFin("データの登録が完了しました。");
       setUploadData(csvRows);
     }
@@ -51,12 +51,7 @@ function AddUser() {
       // ExcelJSを使用してExcelファイルを作成
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet("Sheet 1");
-
-      // CSVデータをExcelファイルに書き込む
-      console.log(typeof csvData);
-      const csvFile = csvData.replace(/^"(.*)"$/, "$1");
-      const csvRows = csvFile.split("\\r\\n");
-      console.log(csvRows);
+      const csvRows = csvData.split("\n");
       csvRows.forEach((row) => {
         const columns = row.split(",");
         worksheet.addRow(columns);
@@ -133,18 +128,27 @@ function AddUser() {
           </div>
         )}
         {upload_data && (
-          <div style={{ fontFamily: "Verdana", fontSize: "16px" }}>
-            <pre>
-              {JSON.stringify(upload_data, null, 2).replace(
-                /(^"|"$|\[|\])/g,
-                ""
-              )}
-            </pre>
-          </div>
+          <table style={tableStyle}>
+            <tbody>
+              {upload_data.map((row, index) => (
+                <tr key={index}>
+                  {row.split(",").map((cell, cellIndex) => (
+                    <td key={cellIndex}>{cell}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
     </>
   );
 }
+
+const tableStyle = {
+  margin: "auto",
+  fontFamily: "Verdana",
+  fontSize: "16px"
+};
 
 export default AddUser;
