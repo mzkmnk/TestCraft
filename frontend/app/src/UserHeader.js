@@ -124,13 +124,13 @@ const UserHeader = ({ position = "static" }) => {
           </Typography>
           {isLoggedIn ? (
             <>
-              <MenuItem
-                component={Link}
-                to="/sns"
-                onClick={handleMenuClose}
+              <Button
+                color="inherit"
+                style={{cursor:"pointer"}}
+                onClick={() => navigate("/sns")}
               >
-                sns 
-              </MenuItem>
+                sns
+              </Button>
               <Button
                 color="inherit"
                 aria-controls="user-menu-appbar"
