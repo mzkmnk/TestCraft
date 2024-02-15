@@ -450,7 +450,7 @@ def profile(request,userId:int):
             {
                 "success":True,
                 "username":user.username,
-                "icon":user.icon.url,
+                "icon":user.icon.url if user.icon else None,
                 "email":user.email,
                 "school":user.school,
                 "isFollow":isFollow,
@@ -509,7 +509,6 @@ def get_user_info(request):
     try:
         user = request.user
         icon_url = urljoin(f'https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.{settings.AWS_S3_REGION_NAME}.amazonaws.com/media/', user.icon.name)
-        print(icon_url)
         return JsonResponse(
             {
                 "success":True,
@@ -518,7 +517,7 @@ def get_user_info(request):
                 "email":user.email,
                 "school":user.school,
                 "icon":icon_url,
-                "icon_init":user.icon.name,
+                "icon_init":user.icon.name if user.icon else None,
                 "followCount":user.count_following(),
                 "followerCount":user.count_followers(),
                 "error":None,
@@ -546,7 +545,7 @@ def change_icon(request,icon:UploadedFile):
         return JsonResponse(
             {
                 "success":True,
-                "icon":user.icon.url,
+                "icon":user.icon.url if user.icon else None,
                 "error":None,
             },
             status = 200,
@@ -1457,7 +1456,7 @@ def get_post_detail(request,postId:int):
                 "user":{
                     "id":comment.user.id,
                     "username":comment.user.username,
-                    "icon":comment.user.icon.url,
+                    "icon":comment.user.icon.url if comment.user.icon else None,
                 },
             }
             for comment in Comment.objects.filter(post = post).order_by('-created_at')
@@ -1468,7 +1467,7 @@ def get_post_detail(request,postId:int):
                 "user":{
                     "id":like.user.id,
                     "username":like.user.username,
-                    "icon":like.user.icon.url,
+                    "icon":like.user.icon.url if like.user.icon else None,
                 },
             }
             for like in postLike.objects.filter(post = post)
@@ -1482,7 +1481,7 @@ def get_post_detail(request,postId:int):
                 "user":{
                     "id":user.id,
                     "username":user.username,
-                    "icon":user.icon.url,
+                    "icon":user.icon.url if user.icon else None,
                 },
             },
             "comments":comments,
@@ -1528,7 +1527,7 @@ def post_comment(request,payload:PostCommentSchema):
                     "user":{
                         "id":comment.user.id,
                         "username":comment.user.username,
-                        "icon":comment.user.icon.url,
+                        "icon":comment.user.icon.url if comment.user.icon else None,
                     },
                     "post":{
                         "id":comment.post.id,
