@@ -297,54 +297,30 @@ const Sidebar: React.FC = () => {
     } catch (error) {
       console.error("handleSendMessage error",error);
     }
-    // ここから
-    try{
-      const sub = client.graphql({
-        query : postCreated,
-      }).subscribe({
-        next: (value) => {
-          if(value.data &&  value.data.postCreated){
-            const newPost = value.data.postCreated as Post;
-            console.log("icon",icon);
-            console.log("userId",userId);
-            console.log("newPost",newPost);
-            if(icon === undefined){
-              newPost.user.icon = "icon/init_user.jpg";
-            }else{
-              newPost.user.icon = icon;
-            }
-            console.log("value",value);
-            setPosts(prevPosts => [newPost, ...prevPosts]);
-          }
-        }
-      })
-    }catch(error){
-      console.error("handleSendMessage error",error);
-    }
-    // ここまで
   }
 
-  // useEffect(() => {
-  //   const sub = client.graphql({
-  //     query : postCreated,
-  //   }).subscribe({
-  //     next: (value) => {
-  //       if(value.data &&  value.data.postCreated){
-  //         const newPost = value.data.postCreated as Post;
-  //         console.log("icon",icon);
-  //         console.log("userId",userId);
-  //         console.log("newPost",newPost);
-  //         if(icon === undefined){
-  //           newPost.user.icon = "icon/init_user.jpg";
-  //         }else{
-  //           newPost.user.icon = icon;
-  //         }
-  //         console.log("value",value);
-  //         setPosts(prevPosts => [newPost, ...prevPosts]);
-  //       }
-  //     }
-  //   })
-  // },[]);
+  useEffect(() => {
+    const sub = client.graphql({
+      query : postCreated,
+    }).subscribe({
+      next: (value) => {
+        if(value.data &&  value.data.postCreated){
+          const newPost = value.data.postCreated as Post;
+          console.log("icon",icon);
+          console.log("userId",userId);
+          console.log("newPost",newPost);
+          if(icon === undefined){
+            newPost.user.icon = "icon/init_user.jpg";
+          }else{
+            newPost.user.icon = icon;
+          }
+          console.log("value",value);
+          setPosts(prevPosts => [newPost, ...prevPosts]);
+        }
+      }
+    })
+    return () => sub.unsubscribe();
+  },[]);
 
   const handleOpenSnackbar = () => {setOpenSnackbar(true);};
 
