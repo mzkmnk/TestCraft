@@ -102,7 +102,7 @@ const Sidebar: React.FC = () => {
   const [message, setMessage] = useState('');
   const [comment, setComment] = useState('');
   const [userId, setUserId] = useState('');
-  const [icon, setIcon] = useState('');
+  const [icon, setIcon] = useState(undefined);
   const [loading, setLoading] = useState(true);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [isPostLike, setIsPostLike] = useState(false);
@@ -110,7 +110,8 @@ const Sidebar: React.FC = () => {
   
   const baseS3Url = "https://user-profile-icon.s3.ap-northeast-1.amazonaws.com/media/";
 
-  const init_icon = "https://user-profile-icon.s3.ap-northeast-1.amazonaws.com/media/icon/init_user.jpg";
+  // const init_icon = "https://user-profile-icon.s3.ap-northeast-1.amazonaws.com/media/icon/init_user.jpg";
+  const init_icon = "icon/init_user.jpg"
 
   const navigate = useNavigate();
 
@@ -140,7 +141,7 @@ const Sidebar: React.FC = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try{
-          setLoading(true);
+        setLoading(true);
         const postData = await client.graphql({
           query: listPosts,
         });
@@ -273,6 +274,8 @@ const Sidebar: React.FC = () => {
 
   const handleSendMessage =  async (message: string) => {
     try{
+      console.log("userId",userId);
+      console.log("message",message);
       const newPost = await client.graphql({
         query: createPost,
         variables: {
@@ -299,7 +302,8 @@ const Sidebar: React.FC = () => {
       next: (value) => {
         if(value.data &&  value.data.postCreated){
           const newPost = value.data.postCreated as Post;
-          newPost.user.icon = icon;
+          console.log("icon",icon);
+          newPost.user.icon = icon===undefined ? init_icon : icon;
           console.log("value",value);
           setPosts(prevPosts => [newPost, ...prevPosts]);
         }
