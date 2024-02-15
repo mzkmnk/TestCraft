@@ -509,6 +509,7 @@ def get_user_info(request):
     try:
         user = request.user
         icon_url = urljoin(f'https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.{settings.AWS_S3_REGION_NAME}.amazonaws.com/media/', user.icon.name)
+        print(icon_url)
         return JsonResponse(
             {
                 "success":True,
@@ -954,7 +955,7 @@ def save_answer(request,payload:SaveAnswerSchema):
 @api.get("/solve_workbook")
 def solve_workbook(request):
     try:
-        user_answers = UserAnswer.objects.filter(user = request.user).values(
+        user_answers = UserAnswer.objects.filter(user = request.user).order_by('-created_at').values(
             'workbook__id',
             'workbook__workbook_name',
             'workbook__description',
@@ -964,6 +965,7 @@ def solve_workbook(request):
             'workbook__like_count',
             'answer_json',
             'solved_count',
+            'created_at'
         )
         user_answers_with_categories = []
         for user_answer in user_answers:
@@ -984,6 +986,7 @@ def solve_workbook(request):
                 "like_count":user_answer['workbook__like_count'],
                 "answer_json":user_answer['answer_json'],
                 "solved_count":user_answer['solved_count'],
+                "solved_created_at":user_answer['created_at'],
             }
             for user_answer in user_answers
         ]
@@ -1009,11 +1012,13 @@ def solve_detail(request,workbookId:int,solved_count:int):
         workbook = Workbook.objects.get(id = workbookId)
         user_answer = UserAnswer.objects.get(user = request.user, workbook = workbook, solved_count = solved_count)
         problem = Problem.objects.get(workbook_id = workbookId).problem_json
+        print("Ok2")
         ai_comment = AiComment.objects.get(
             workbook = workbook,
             user = request.user,
             solved_count = solved_count,
         )
+        print("Ok3")
         return JsonResponse(
             {
                 "success":True,
