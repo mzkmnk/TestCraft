@@ -682,13 +682,15 @@ def get_create_user_workbook(request):
 def add_user(request ,payload:CsvUploadSchema):
     try:
         data_str = payload.csv_data
+        print(f"{data_str = }")
         df = pd.read_csv(StringIO(data_str))
         df["ユーザー名"]=""
+        print(f"{df.head() = }")
         for index, row in df.iterrows():
-            #data_str3=r.split(",")
-            
-            user_name=row["社員名"]+str(row["社員番号"])
-            
+            user_name=f"{row['社員名']}_{str(request.user.id).zfill(5)}_{str(row['社員番号']).zfill(5)}"
+            if(User.objects.filter(username=user_name).exists()):
+                df.at[index, 'ユーザー名'] = f"{user_name}は既に登録されています。"
+                continue
             user = User.objects.create_user(
                 username=user_name,
                 email=request.user.email,
