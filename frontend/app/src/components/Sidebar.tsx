@@ -123,16 +123,19 @@ const Sidebar: React.FC = () => {
   useEffect(() => {
     if(loginInfoAPI.isSuccess){
       const data = loginInfoAPI.data;
+      console.log("loginInfoAPI,data",data);
       if(data.success){
         setUserId(data.user_id);
         setIcon(data.icon_init);
+        localStorage.setItem("user_id",data.user_id);
+        localStorage.setItem("icon_path",data.icon_init);
       }else{
         console.log(data.error);
       }
     }else{
       console.log("useAPI loginInfoAPI error");
     }
-  },[loginInfoAPI.isSuccess]);
+  },[loginInfoAPI.isSuccess,loginInfoAPI.data]);
   
   useEffect(() => {
     console.log("userId:", userId);
@@ -309,12 +312,14 @@ const Sidebar: React.FC = () => {
           console.log("icon",icon);
           console.log("userId",userId);
           console.log("newPost",newPost);
-          if(icon === undefined){
-            newPost.user.icon = "icon/init_user.jpg";
-          }else{
-            newPost.user.icon = icon;
-          }
-          console.log("value",value);
+          console.log("typeof", typeof localStorage.getItem("icon_path"));
+          newPost.user.icon = localStorage.getItem("icon_path") === 'null' ? "icon/init_user.jpg" : localStorage.getItem("icon_path");
+          // if(localStorage.getItem("icon_path") === null){
+          //   newPost.user.icon = "icon/init_user.jpg";
+          // }else{
+          //   newPost.user.icon = localStorage.getItem("icon_path");
+          // }
+          console.log("newPost",newPost);
           setPosts(prevPosts => [newPost, ...prevPosts]);
         }
       }

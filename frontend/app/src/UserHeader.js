@@ -103,6 +103,8 @@ const UserHeader = ({ position = "static" }) => {
   };
 
   const handleLogout = async () => {
+    localStorage.removeItem("icon_path");
+    localStorage.removeItem("user_id");
     logoutAPI.sendAPI({ body: {} });
   };
 
@@ -122,13 +124,13 @@ const UserHeader = ({ position = "static" }) => {
           </Typography>
           {isLoggedIn ? (
             <>
-              <MenuItem
-                component={Link}
-                to="/sns"
-                onClick={handleMenuClose}
+              <Button
+                color="inherit"
+                style={{cursor:"pointer"}}
+                onClick={() => navigate("/sns")}
               >
-                sns 
-              </MenuItem>
+                sns
+              </Button>
               <Button
                 color="inherit"
                 aria-controls="user-menu-appbar"
