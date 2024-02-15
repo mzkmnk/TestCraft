@@ -105,6 +105,8 @@ const UserHeader = ({ position = "static" }) => {
   };
 
   const handleLogout = async () => {
+    localStorage.removeItem("icon_path");
+    localStorage.removeItem("user_id");
     logoutAPI.sendAPI({ body: {} });
   };
 
