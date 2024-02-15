@@ -75,7 +75,7 @@ function Mysolve() {
                   <Link to={`/profile/${workbook.create_id}`}>
                     {workbook.create_id__username}
                   </Link>{" "}
-                  ({formatDate(workbook.created_at)})
+                  ({formatDate(workbook.solved_created_at)})
                 </p>
                 <span className="likeStyle">
                   <FavoriteIcon
