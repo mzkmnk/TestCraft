@@ -308,7 +308,11 @@ const Sidebar: React.FC = () => {
           const newPost = value.data.postCreated as Post;
           console.log("icon",icon);
           console.log("newPost",newPost);
-          newPost.user.icon === undefined ? "icon/init_user.jpg" : icon;
+          if(icon === undefined){
+            newPost.user.icon = "icon/init_user.jpg";
+          }else{
+            newPost.user.icon = icon;
+          }
           console.log("value",value);
           setPosts(prevPosts => [newPost, ...prevPosts]);
         }
