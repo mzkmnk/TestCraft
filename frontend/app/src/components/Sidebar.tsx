@@ -274,6 +274,8 @@ const Sidebar: React.FC = () => {
 
   const handleSendMessage =  async (message: string) => {
     try{
+      console.log("userId",userId);
+      console.log("message",message);
       const newPost = await client.graphql({
         query: createPost,
         variables: {
