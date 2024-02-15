@@ -10,8 +10,6 @@ import {
     Avatar,
     IconButton,
     Stack,
-    List,
-    ListItem,
     Divider,
     useTheme,
     TextField,
@@ -26,7 +24,6 @@ import {
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import CommentIcon from '@mui/icons-material/Comment';
-import PersonIcon from '@mui/icons-material/Person'; 
 
 import Timeline from '@mui/lab/Timeline';
 import TimelineItem,{ timelineItemClasses } from '@mui/lab/TimelineItem';

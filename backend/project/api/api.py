@@ -1268,6 +1268,8 @@ def ai_score(request,payload:AiScore):
         print("question_trees",question_trees[question_keys[0]])
         if(hasattr(question_trees[question_keys[0]],"childIds")):
             for childIds_parent in question_trees[question_keys[0]].childIds:
+                print("childIds_parent",childIds_parent)
+                print("question_trees[childIds_parent]",question_trees[childIds_parent])
                 if(hasattr(question_trees[childIds_parent],"childIds")):
                     child_keys = list(question_trees[childIds_parent].childIds)
                     if(any( child_key in target_answers for child_key in child_keys )):
@@ -1303,6 +1305,29 @@ def ai_score(request,payload:AiScore):
                     print("*"*30)
                 else:
                     print("No childIds child")
+                    if(hasattr(question_trees[childIds_parent],"useAIScoring")):
+                        if(question_trees[childIds_parent].useAIScoring):
+                            question_text : str = question_trees[childIds_parent].question
+                            questions : list[str] = [ question_trees[childIds_parent].question ]
+                            user_answers : list[str] = [ answers.get(childIds_parent,'ユーザは解答していません。') ]
+                            
+                            # print("question_text",question_text)
+                            # print("questions",questions)
+                            # print("user_answers",user_answers)
+
+                            check_answer_data = check_answer(question_text,questions,user_answers,[target_answers[0]])
+
+                            for i,data in enumerate(check_answer_data):
+                                results.append(
+                                    {
+                                        "id":childIds_parent,
+                                        "is_correct":data["is_correct"],
+                                        "confidence":data["confidence"],
+                                        "explanation":data["explanation"],
+                                    }
+                                )
+                    else:
+                        print("No useAIScoring")
         else:
             print("No childIds parent")
         
