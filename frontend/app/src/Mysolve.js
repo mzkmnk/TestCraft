@@ -67,7 +67,7 @@ function Mysolve() {
           <div className="questionHeader">
             <h3>{workbook.workbook_name}</h3>
             <span className="createdBy">
-              created by {workbook.create_id__username} ({formatDate(workbook.created_at)})
+              created by {workbook.create_id__username} ({formatDate(workbook.solved_created_at)})
             </span>
           </div>
           <p>{workbook.description}</p>
