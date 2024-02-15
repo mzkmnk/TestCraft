@@ -1,11 +1,19 @@
 import { FaHeart, FaRegHeart } from "react-icons/fa";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Pagination from "@mui/material/Pagination";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Grid from '@mui/material/Grid';
+
 import { useAPI } from "../hooks/useAPI";
 import "../workbookList.css";
 
 export function DisplayWorkbookList({ workbooks, setWorkbooks }) {
+  const [sortOption, setSortOption] = useState("date");
+  const [sortedWorkbooks, setSortedWorkbooks] = useState([]);
   const API = useAPI({ APIName: "questionsall_like" });
   const navigate = useNavigate();
   const handleQuestionClick = (workbookId) => {
@@ -17,7 +25,7 @@ export function DisplayWorkbookList({ workbooks, setWorkbooks }) {
   const questionsPerPage = 6;
   const indexOfLastQuestions = currentPage * questionsPerPage;
   const indexOfFirstQuestions = indexOfLastQuestions - questionsPerPage;
-  const currentQuestions = workbooks.slice(
+  const currentQuestions = sortedWorkbooks.slice(
     indexOfFirstQuestions,
     indexOfLastQuestions
   );
@@ -54,17 +62,51 @@ export function DisplayWorkbookList({ workbooks, setWorkbooks }) {
     );
   };
 
+  const handleSortChange = (event) => {setSortOption(event.target.value)};
+
+  useEffect(() => {
+    let sorted = [...workbooks];
+    switch(sortOption){
+      case "date":
+        sorted.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+        break
+      case "likes":
+        sorted.sort((a,b) => b.like_count - a.like_count);
+        break
+      case "likesByMe":
+        sorted = sorted.filter((workbook) => workbook.liked);
+        break
+      default:
+        break
+    }
+    setSortedWorkbooks(sorted);
+  },[workbooks, sortOption]);
+
   return (
     <div className="body">
+      <Grid container alignItems="center" justifyContent="space-between" spacing={2}>
+        <Grid item>
+          <h2>問題一覧</h2>
+        </Grid>
+        <Grid item>
+          <FormControl variant="outlined" size="small">
+            <InputLabel id="sort-select-label">ソートオプション</InputLabel>
+            <Select
+              labelId="sort-select-label"
+              id="sort-select"
+              value={sortOption}
+              onChange={handleSortChange}
+              label="ソートオプション"
+            >
+              <MenuItem value="date">日付順</MenuItem>
+              <MenuItem value="likes">いいねが多い順</MenuItem>
+              <MenuItem value="likesByMe">自分がいいねした問題</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+      </Grid>
       {workbooks.length !== 0 ? (
         <>
-          <h2
-            style={{
-              marginLeft: 1,
-            }}
-          >
-            問題一覧
-          </h2>
           <div className="questionsContainer">
             {currentQuestions.map((question, index) => (
               <div
