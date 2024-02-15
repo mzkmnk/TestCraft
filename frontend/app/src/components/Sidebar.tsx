@@ -110,8 +110,8 @@ const Sidebar: React.FC = () => {
   
   const baseS3Url = "https://user-profile-icon.s3.ap-northeast-1.amazonaws.com/media/";
 
-  // const init_icon = "https://user-profile-icon.s3.ap-northeast-1.amazonaws.com/media/icon/init_user.jpg";
-  const init_icon = "icon/init_user.jpg"
+  const init_icon = "https://user-profile-icon.s3.ap-northeast-1.amazonaws.com/media/icon/init_user.jpg";
+  // const init_icon = "icon/init_user.jpg"
 
   const navigate = useNavigate();
 
@@ -303,7 +303,8 @@ const Sidebar: React.FC = () => {
         if(value.data &&  value.data.postCreated){
           const newPost = value.data.postCreated as Post;
           console.log("icon",icon);
-          newPost.user.icon = icon===undefined ? init_icon : icon;
+          console.log("newPost",newPost);
+          newPost.user.icon = icon===undefined ? "icon/init_user.jpg" : icon;
           console.log("value",value);
           setPosts(prevPosts => [newPost, ...prevPosts]);
         }
@@ -378,7 +379,7 @@ const Sidebar: React.FC = () => {
                       avatar={
                         <Avatar
                           sx={ avatarStyle }
-                          src={ post.user.icon===null ? init_icon : baseS3Url+post.user.icon}
+                          src={ post.user.icon === '' ? init_icon : baseS3Url+post.user.icon}
                           aria-label="recipe"
                           onClick={(e) => { e.stopPropagation(); userProfileClick(post.user.id); }}
                         >
