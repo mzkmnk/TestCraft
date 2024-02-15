@@ -959,6 +959,7 @@ def solve_workbook(request):
             'workbook__workbook_name',
             'workbook__description',
             'workbook__create_id__username',
+            'workbook__create_id',
             'workbook__created_at',
             'workbook__updated_at',
             'workbook__like_count',
@@ -980,6 +981,7 @@ def solve_workbook(request):
                 "workbook_name":user_answer['workbook__workbook_name'],
                 "description":user_answer['workbook__description'],
                 "create_id__username":user_answer['workbook__create_id__username'],
+                "create_id":user_answer['workbook__create_id'],
                 "created_at":user_answer['workbook__created_at'],
                 "updated_at":user_answer['workbook__updated_at'],
                 "like_count":user_answer['workbook__like_count'],
@@ -989,6 +991,7 @@ def solve_workbook(request):
             }
             for user_answer in user_answers
         ]
+        print(workbook)
         return JsonResponse(
             {
                 'success' : True,
