@@ -139,6 +139,10 @@ const Sidebar: React.FC = () => {
   }, [userId]);
 
   useEffect(() => {
+    console.log("icon:", icon);
+  },[icon]);
+
+  useEffect(() => {
     const fetchPosts = async () => {
       try{
         setLoading(true);
