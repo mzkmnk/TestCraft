@@ -230,6 +230,7 @@ export default function EditorApp({ workBook }) {
     editingQuestionTree = sessionStorage.getItem("editingQuestionTree");
     editingTitle = sessionStorage.getItem("editingTitle");
     editingIsEdit = sessionStorage.getItem("editingIsEdit");
+    console.log("editingIsEdit,", editingIsEdit);
   }
 
   if (!workBook && editingQuestionTree && editingTitle && editingIsEdit) {
@@ -238,7 +239,7 @@ export default function EditorApp({ workBook }) {
         title: editingTitle,
       },
       questions: JSON.parse(editingQuestionTree),
-      isEdit: editingIsEdit === true,
+      isEdit: editingIsEdit === "true",
     };
     workBook = editingWorkbook;
   } else if (!workBook) {
