@@ -238,7 +238,7 @@ export default function EditorApp({ workBook }) {
         title: editingTitle,
       },
       questions: JSON.parse(editingQuestionTree),
-      isEdit: editingIsEdit === true,
+      isEdit: editingIsEdit === "true",
     };
     workBook = editingWorkbook;
   } else if (!workBook) {
@@ -305,6 +305,7 @@ export default function EditorApp({ workBook }) {
     };
     const data = JSON.stringify(workBook);
     saveAPI.sendAPI({ body: data });
+    console.log("workBookId", workbookId);
   }
 
   function updateDataInDB() {

@@ -94,7 +94,7 @@ export function EditorHeader({
             <IconButton color="inherit" onClick={handleIsEdit}>
               {isEdit ? <LockIcon /> : <LockOpenIcon />}
             </IconButton>
-            {saveStatusIcon}
+            {/*saveStatusIcon*/}
             <IconButton color="inherit" onClick={exitFunc}>
               <ExitButton />
             </IconButton>
