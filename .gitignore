@@ -19,3 +19,5 @@ lambdaFuncPackage
 /frontend/app/src/graphql
 
 /frontend/app/src/aws-exports.js
+
+/backend/project/project/settings_key.env
