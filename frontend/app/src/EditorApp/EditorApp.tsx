@@ -230,7 +230,6 @@ export default function EditorApp({ workBook }) {
     editingQuestionTree = sessionStorage.getItem("editingQuestionTree");
     editingTitle = sessionStorage.getItem("editingTitle");
     editingIsEdit = sessionStorage.getItem("editingIsEdit");
-    console.log("editingIsEdit,", editingIsEdit);
   }
 
   if (!workBook && editingQuestionTree && editingTitle && editingIsEdit) {
@@ -306,6 +305,7 @@ export default function EditorApp({ workBook }) {
     };
     const data = JSON.stringify(workBook);
     saveAPI.sendAPI({ body: data });
+    console.log("workBookId", workbookId);
   }
 
   function updateDataInDB() {
