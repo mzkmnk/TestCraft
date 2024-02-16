@@ -59,7 +59,10 @@ export function EditorHeader({
       setIsLatest(true);
       saveAPI.statusInit();
       setIsMessageOpen(true);
-      setMessage("保存しました");
+      setMessage("保存しました" + saveAPI.data.id);
+      if (saveAPI.data.id !== undefined) {
+        sessionStorage.setItem("editingWorkbookId", saveAPI.data.id);
+      }
       setIsSuccess(true);
     } else if (saveAPI.isSuccess === false) {
       setIsLatest(false);
@@ -94,7 +97,7 @@ export function EditorHeader({
             <IconButton color="inherit" onClick={handleIsEdit}>
               {isEdit ? <LockIcon /> : <LockOpenIcon />}
             </IconButton>
-            {/*saveStatusIcon*/}
+            {saveStatusIcon}
             <IconButton color="inherit" onClick={exitFunc}>
               <ExitButton />
             </IconButton>
