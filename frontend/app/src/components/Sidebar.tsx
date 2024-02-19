@@ -312,11 +312,13 @@ const Sidebar: React.FC = () => {
           console.log("icon",icon);
           console.log("userId",userId);
           console.log("newPost",newPost);
+          console.log("data",value.data);
           console.log("typeof", typeof localStorage.getItem("icon_path"));
-          newPost.user.icon = localStorage.getItem("icon_path") === 'null' ? "icon/init_user.jpg" : localStorage.getItem("icon_path");
-          // if(localStorage.getItem("icon_path") === null){
-          //   newPost.user.icon = "icon/init_user.jpg";
-          // }else{
+          // newPost.user.icon = localStorage.getItem("icon_path") === 'null' ? "icon/init_user.jpg" : localStorage.getItem("icon_path");
+          if(localStorage.getItem("icon_path") === 'null'){
+            newPost.user.icon = "icon/init_user.jpg";
+          }
+          // else{
           //   newPost.user.icon = localStorage.getItem("icon_path");
           // }
           console.log("newPost",newPost);
