@@ -43,6 +43,8 @@ function QuestionsAll() {
         <DisplayWorkbookList
           workbooks={workbooks}
           setWorkbooks={setWorkbooks}
+          selectQuestions={false}
+          selectQuestionsId={[]}
         />
       ) : null}
     </>

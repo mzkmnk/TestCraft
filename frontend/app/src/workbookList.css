@@ -29,6 +29,11 @@
   cursor: pointer;
 }
 
+/* 選択時の背景の色 */
+.question.selected {
+  background-color: #e0f7fa;
+}
+
 .questionHeader {
   display: flex;
   justify-content: space-between;

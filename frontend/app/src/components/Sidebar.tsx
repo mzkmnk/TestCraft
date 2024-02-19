@@ -22,6 +22,10 @@ import {
   Avatar,
 } from '@mui/material';
 
+//MUI Icons
+import SendIcon from '@mui/icons-material/Send';
+import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
+
 import Timeline from '@mui/lab/Timeline';
 import TimelineItem,{ timelineItemClasses } from '@mui/lab/TimelineItem';
 import TimelineSeparator from '@mui/lab/TimelineSeparator';
@@ -33,7 +37,6 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import CommentIcon from '@mui/icons-material/Comment';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { red } from '@mui/material/colors';
 
 
 //aws設定
@@ -46,7 +49,8 @@ import config from '../aws-exports.js';
 
 import { useAPI } from '../hooks/useAPI';
 import LoadingScreen from '../LoadingScreen.tsx';
-import { set } from 'date-fns';
+import { DisplayWorkbookList } from './DisplayWorkbookList.js';
+import { textToLink } from './utility.tsx';
 
 Amplify.configure(config);
 
@@ -96,16 +100,18 @@ interface Post {
 const Sidebar: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [workbooks, setWorkbooks] = useState([]);
   const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
+  const [isProblemModalOpen, setIsProblemModalOpen] = useState(false);
   const [commentCurrentPostId, setCommentCurrentPostId] = useState('');
   const [commentCurrentPost, setCommentCurrentPost] = useState<Post>();
+  const [selectQuestionsId, setSelectQuestionsId] = useState([]);
   const [message, setMessage] = useState('');
   const [comment, setComment] = useState('');
   const [userId, setUserId] = useState('');
   const [icon, setIcon] = useState(undefined);
   const [loading, setLoading] = useState(true);
   const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [isPostLike, setIsPostLike] = useState(false);
   const [snackbarContent, setSnackbarContent] = useState('');
   
   const baseS3Url = "https://user-profile-icon.s3.ap-northeast-1.amazonaws.com/media/";
@@ -136,14 +142,6 @@ const Sidebar: React.FC = () => {
       console.log("useAPI loginInfoAPI error");
     }
   },[loginInfoAPI.isSuccess,loginInfoAPI.data]);
-  
-  useEffect(() => {
-    console.log("userId:", userId);
-  }, [userId]);
-
-  useEffect(() => {
-    console.log("icon:", icon);
-  },[icon]);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -203,6 +201,23 @@ const Sidebar: React.FC = () => {
   const handleOpenModal = () => {setIsModalOpen(true);};
 
   const handleCloseModal = () => {setIsModalOpen(false);};
+
+  const handleProblemOpenModal = () => {setIsProblemModalOpen(true);};
+  
+  const handleProblemCloseModal = () => {
+    setIsProblemModalOpen(false);
+    console.log("selectQuestionsId",selectQuestionsId);
+  };
+
+const selectQuestions = (questionId) => {
+  setSelectQuestionsId(prev => {
+    if(prev.includes(questionId)){
+      return prev.filter(id => id !== questionId);
+    }else{
+      return [...prev, questionId];
+    }
+  });
+}
 
   const handleCommentClick = (postId: string) => {
     setCommentCurrentPostId(postId);
@@ -277,6 +292,29 @@ const Sidebar: React.FC = () => {
     }
   },[postLikeAPI.isSuccess,postLikeAPI.data]);
 
+  const getProblemListAPI = useAPI({
+    APIName: "questionsall",
+    isLoginRequired: true,
+    loadOnStart: true,
+  });
+
+  useEffect(() => {
+    if(getProblemListAPI.isSuccess){
+      const data = getProblemListAPI.data;
+      if(data.success){
+        console.log("wokbook_data",data);
+        setWorkbooks(
+          getProblemListAPI.data.workbooks.map((workbooks) => ({
+            ...workbooks,
+            liked: workbooks.liked_by_user,
+          }))
+        );
+      }else{
+        console.log(data.error);
+      }
+    }
+  },[getProblemListAPI.isSuccess,getProblemListAPI.data]);
+
   const userProfileClick = (userId:string) => {navigate(`/profile/${userId}`)};
 
   const handleSendMessage =  async (message: string) => {
@@ -309,18 +347,9 @@ const Sidebar: React.FC = () => {
       next: (value) => {
         if(value.data &&  value.data.postCreated){
           const newPost = value.data.postCreated as Post;
-          console.log("icon",icon);
-          console.log("userId",userId);
-          console.log("newPost",newPost);
-          console.log("data",value.data);
-          console.log("typeof", typeof localStorage.getItem("icon_path"));
-          // newPost.user.icon = localStorage.getItem("icon_path") === 'null' ? "icon/init_user.jpg" : localStorage.getItem("icon_path");
           if(localStorage.getItem("icon_path") === 'null'){
             newPost.user.icon = "icon/init_user.jpg";
           }
-          // else{
-          //   newPost.user.icon = localStorage.getItem("icon_path");
-          // }
           console.log("newPost",newPost);
           setPosts(prevPosts => [newPost, ...prevPosts]);
         }
@@ -389,7 +418,9 @@ const Sidebar: React.FC = () => {
                   <Card
                     sx={cardStyle}
                     key={post.id}
-                    onClick = {() => navigate(`/post_detail/${post.id}`)}
+                    onClick = {(e) => {
+                      if(e.target.tagName === 'A'){e.stopPropagation();}
+                      else{navigate(`/post_detail/${post.id}`)}}}
                   >
                     <CardHeader
                       sx = {cardHeaderStyle}
@@ -418,8 +449,22 @@ const Sidebar: React.FC = () => {
                           </Typography>}
                     />
                     <CardContent sx={cardContentStyle}>
-                      <Typography variant="body1" color="text.secondary">
-                        {post.content}
+                      <Typography
+                        variant="body1"
+                        color="text.secondary"
+                        component={'div'}
+                        >
+                        {/* {post.content} */}
+                        <div
+                          dangerouslySetInnerHTML={{
+                            __html: textToLink(post.content)
+                          }}
+                          style={{
+                            whiteSpace: "pre-wrap",
+                            lineHeight: "176%",
+                            fontSize: ".9rem"
+                          }}
+                        />
                       </Typography>
                     </CardContent>
                     <CardActions sx = {cardActionsStyle}>
@@ -486,16 +531,49 @@ const Sidebar: React.FC = () => {
                   <Button
                     variant="contained"
                     color="primary"
+                    onClick={handleProblemOpenModal}
+                    sx={{ marginRight: 2 }}
+                  >
+                    <LibraryBooksIcon />
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="primary"
                     disabled={!message.trim()}
                     onClick={() => handleSendMessage(message)}
                     sx={{
                       opacity: !message.trim() ? 0.5 : 1,
                     }}
                   >
-                    投稿する
+                    {/* <SendIcon sx={iconStyle} /> */}
+                    <SendIcon />
                   </Button>
                 </Box>
               </Box>
+          </Box>
+        </Modal>
+        <Modal
+          open={isProblemModalOpen}
+          onClose={handleProblemCloseModal}
+          aria-labelledby="simple-modal-title"
+          aria-describedby="simple-modal-description" 
+        >
+          <Box sx={modalProblemStyle}>
+            <DisplayWorkbookList
+              workbooks={workbooks}
+              setWorkbooks={setWorkbooks}
+              selectQuestions={selectQuestions}
+              selectQuestionsId={selectQuestionsId}
+              />
+            <Box display="flex" justifyContent="flex-end" mt={2}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleProblemCloseModal}
+              >
+                問題を選択する
+              </Button>
+            </Box>
           </Box>
         </Modal>
         <Modal
@@ -602,6 +680,23 @@ const modalStyle = {
   outline: 'none'
 };
 
+const modalProblemStyle = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 1000,
+  height: 600,
+  maxWidth: '90%',
+  maxHeight: '80%',
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  borderRadius: 3,
+  boxShadow: 24,
+  p: 4,
+  overflowY: 'auto',
+};
+
 
 const cardStyle = {
   maxWidth: '85%', 
@@ -645,6 +740,10 @@ const buttonStyle = {
   width: '100%',
   margin: '0.5rem 0',
   borderRadius: '20px',
+};
+
+const iconStyle = {
+  marginRight: "10px",
 };
 
 const fromNow = (date) => {
