@@ -88,7 +88,7 @@ export function DisplayWorkbookList({ workbooks, setWorkbooks }) {
         </Grid>
         <Grid item>
           <FormControl variant="outlined" size="small">
-            <InputLabel id="sort-select-label">ソートオプション</InputLabel>
+            <InputLabel id="sort-select-label">ソート</InputLabel>
             <Select
               labelId="sort-select-label"
               id="sort-select"
