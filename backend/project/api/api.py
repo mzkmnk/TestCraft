@@ -782,6 +782,7 @@ def save_data(request,data:JsonFormat):
         return JsonResponse(
             {
                 'success':True,
+                "id":workbook.id,
                 'error':None,
             },
             status = 200

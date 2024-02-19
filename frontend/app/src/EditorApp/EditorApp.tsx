@@ -226,6 +226,10 @@ export default function EditorApp({ workBook }) {
   let editingTitle;
   let editingIsEdit;
 
+  if (location.state?.type === "new") {
+    sessionStorage.removeItem("editingWorkbookId");
+  }
+
   if (location.state?.type !== "new") {
     editingQuestionTree = sessionStorage.getItem("editingQuestionTree");
     editingTitle = sessionStorage.getItem("editingTitle");
@@ -295,28 +299,75 @@ export default function EditorApp({ workBook }) {
 
   // 保存用関数
   function save() {
-    workBook = {
-      info: {
-        title: title,
-        workbook_id: workbookId,
-      },
-      questions: questionTree,
-      isEdit: isEdit,
-    };
+    let localWorkbookId;
+    if (workbookId === undefined) {
+      localWorkbookId = sessionStorage.getItem("editingWorkbookId");
+    }
+    if (workbookId === undefined && localWorkbookId !== null) {
+      workBook = {
+        info: {
+          title: title,
+          workbook_id: localWorkbookId,
+        },
+        questions: questionTree,
+        isEdit: isEdit,
+      };
+    } else if (workbookId === undefined) {
+      workBook = {
+        info: {
+          title: title,
+        },
+        questions: questionTree,
+        isEdit: isEdit,
+      };
+    } else {
+      workBook = {
+        info: {
+          title: title,
+          workbook_id: workbookId,
+        },
+        questions: questionTree,
+        isEdit: isEdit,
+      };
+    }
+
     const data = JSON.stringify(workBook);
     saveAPI.sendAPI({ body: data });
-    console.log("workBookId", workbookId);
   }
 
   function updateDataInDB() {
-    workBook = {
-      info: {
-        title: title,
-        workbook_id: workbookId,
-      },
-      questions: questionTree,
-      isEdit: isEdit,
-    };
+    let localWorkbookId;
+    if (workbookId === undefined) {
+      localWorkbookId = sessionStorage.getItem("editingWorkbookId");
+    }
+    if (workbookId === undefined && localWorkbookId !== null) {
+      workBook = {
+        info: {
+          title: title,
+          workbook_id: localWorkbookId,
+        },
+        questions: questionTree,
+        isEdit: isEdit,
+      };
+    } else if (workbookId === undefined) {
+      workBook = {
+        info: {
+          title: title,
+        },
+        questions: questionTree,
+        isEdit: isEdit,
+      };
+    } else {
+      workBook = {
+        info: {
+          title: title,
+          workbook_id: workbookId,
+        },
+        questions: questionTree,
+        isEdit: isEdit,
+      };
+    }
+
     const data = JSON.stringify(workBook);
     saveAPIForUpdate.sendAPI({ body: data });
   }
