@@ -659,7 +659,7 @@ export default function EditorApp({ workBook }) {
       defaultQuestion = {
         questionType: "nested",
         parentId: parentId,
-        question: "",
+        question: updatedQuestion.question || "",
         childIds: [],
       };
     } else if (selectedType === "radio") {
