@@ -1,37 +1,99 @@
-import React from 'react';
+import React, { useState } from "react";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
-import Toolbar from "@mui/material/Toolbar";
 import UserHeader from "./UserHeader";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import createImage from "./img/createImage.webp";
+import answerImage from "./img/answerImage.webp";
+import SNSImage from "./img/SNSImage.webp";
+import { useNavigate } from "react-router-dom";
+import "./topPage.css";
 
 function TopPage() {
+  const [firstImage, setFirstImage] = useState("createImage");
+  const [secondImage, setSecondImage] = useState("answerImage");
+  const [thirdImage, setThirdImage] = useState("SNSImage");
+  const imageSeq = [firstImage, secondImage, thirdImage];
+
+  const handleClick = (image) => {
+    if (image === firstImage) {
+      return;
+    } else if (image === secondImage) {
+      setFirstImage(secondImage);
+      setSecondImage(thirdImage);
+      setThirdImage(firstImage);
+    } else if (image === thirdImage) {
+      setFirstImage(thirdImage);
+      setSecondImage(firstImage);
+      setThirdImage(secondImage);
+    }
+  };
+  const navigate = useNavigate();
   return (
     <>
       <UserHeader />
-      <Container component="main" maxWidth="md" sx={{ p: 4 }}>
-        <Toolbar />
-        <Typography variant="h2" gutterBottom>
-          TestCraftへようこそ!
-        </Typography>
-        <Typography paragraph>
-          このアプリは、あなたの学習を効果的にサポートするために設計されています。文字入力から始まるあなたの学習旅行で、私たちは最高のパートナーになりたいと思っています。以下の機能を通じて、あなたの学習体験を豊かにすることを目指しています。
-        </Typography>
-        <Typography variant="h5" gutterBottom>
-          特徴
-        </Typography>
-        <Typography paragraph>
-          カスタマイズ可能なテキスト作成: あなたのニーズに合わせてテキストをカスタマイズ。
-        </Typography>
-        <Typography paragraph>
-          リアルタイムのフィードバック: 文章の構成や文法について、リアルタイムでフィードバック。
-        </Typography>
-        <Typography paragraph>
-          ユーザーフレンドリーなインターフェース: 直感的で使いやすいデザイン。
-        </Typography>
-        <Typography paragraph>
-          このアプリを通じて、あなたの学習がより楽しく、より有意義なものになることを願っています。さあ、今すぐ始めましょう！
-        </Typography>
-      </Container>
+      <Box className="container">
+        <Box className="explanation">
+          <Typography variant="h3">宣伝文句</Typography>
+          <Button
+            variant="contained"
+            fullWidth
+            onClick={() => window.open("/signup", "_blank", "noreferrer")}
+            sx={{ marginTop: 2, maxWidth: "30rem" }}
+          >
+            はじめる
+          </Button>
+          <Button
+            variant="outlined"
+            fullWidth
+            onClick={() => window.open("/login", "_blank", "noreferrer")}
+            sx={{ marginTop: 2, maxWidth: "30rem" }}
+          >
+            ログイン
+          </Button>
+        </Box>
+
+        <Box className="image-container">
+          {/* 画像サイズを取得するための隠し画像 他にいい方法があるかも? */}
+          <Box
+            component="img"
+            className={`image`}
+            style={{ visibility: "hidden", position: "relative" }}
+            src={createImage}
+            alt="createImage"
+            onClick={() => handleClick("createImage")}
+          />
+          <Box
+            component="img"
+            className={`image image${imageSeq.findIndex(
+              (image) => image === "createImage"
+            )}`}
+            src={createImage}
+            alt="createImage"
+            onClick={() => handleClick("createImage")}
+          />
+          <Box
+            component="img"
+            className={`image image${imageSeq.findIndex(
+              (image) => image === "answerImage"
+            )}`}
+            src={answerImage}
+            alt="answerImage"
+            onClick={() => handleClick("answerImage")}
+          />
+          <Box
+            component="img"
+            className={`image image${imageSeq.findIndex(
+              (image) => image === "SNSImage"
+            )}`}
+            src={SNSImage}
+            alt="SNSImage"
+            onClick={() => handleClick("SNSImage")}
+          />
+        </Box>
+      </Box>
     </>
   );
 }
