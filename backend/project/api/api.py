@@ -1329,3 +1329,71 @@ def create_group(request,payload:CreateGroupSchema):
             },
             status = 400,            
         )
+
+#グループ参加時のAPI
+@api.post("/group_join/{group_id}/{workbook_id}/{user_id}")
+def group_join(request,group_id:int,workbook_id:int,user_id:int):
+    try:
+        if(request.user.id != user_id):
+            return JsonResponse(
+                {
+                    "success":False,
+                    "error":"ユーザーが一致しません。",
+                },
+                status = 400,
+            )
+        group = Group.objects.get(id = group_id)
+        workbook = Workbook.objects.get(id = workbook_id)
+        problem = Problem.objects.get(workbook_id = workbook_id)
+        print(workbook)
+        print(problem)
+        data = {
+            "workbook":{
+                "id":workbook.id,
+                "workbook_name":workbook.workbook_name,
+                "description":workbook.description,
+                "create_id__username":workbook.create_id.username,
+                "created_at":workbook.created_at,
+                "updated_at":workbook.updated_at,
+                "like_count":workbook.like_count,
+            },
+            "problem":{
+                "id":problem.id,
+                "problem_json":problem.problem_json,
+            }
+        }
+        if(group.is_public):
+            return JsonResponse(
+                {
+                    "success":True,
+                    "data":data,
+                    "error":None,
+                },
+                status = 200,
+            )
+        else:
+            if(GroupMember.objects.filter(group = group, user = User.objects.get(id=user_id)).exists()):
+                return JsonResponse(
+                    {
+                        "success":True,
+                        "data":data,
+                        "error":None,
+                    },
+                    status = 200,
+                )
+            else:
+                return JsonResponse(
+                    {
+                        "success":False,
+                        "error":"グループに参加できません。",
+                    },
+                    status = 400,
+                )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "error":str(e),
+            },
+            status = 400,
+        )
