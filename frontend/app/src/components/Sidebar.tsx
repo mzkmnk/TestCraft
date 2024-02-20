@@ -342,6 +342,7 @@ const selectQuestions = (questionId) => {
       console.log("newPost",newPost);
       setIsModalOpen(false);
       setMessage('');
+      setSelectQuestionsId([]);
       setSnackbarContent('投稿しました');
       handleOpenSnackbar();
     } catch (error) {
