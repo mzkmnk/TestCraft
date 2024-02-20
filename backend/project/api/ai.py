@@ -41,6 +41,7 @@ def check_answer(
         なぜ間違ってるかを説明してください。
         また返答はjson形式だけでお願いします。
         is_correctはtrueかfalseで、confidenceは0~100の間で、explanationは説明を書いてください。
+        またあなたは先生なので、生徒に教えるように丁寧に優しい説明を書いてください。
         例:
             {{
             "is_correct": true,
