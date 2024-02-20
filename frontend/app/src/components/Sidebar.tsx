@@ -207,25 +207,25 @@ const Sidebar: React.FC = () => {
   const handleProblemCloseModal = () => {
     setIsProblemModalOpen(false);
     console.log("selectQuestionsId",selectQuestionsId);
-
-  const workbooksText = selectQuestionsId.map((workbook) => {
-    if(message.includes('https://www.testcrafts.net/solve/' + workbook)){
-      console.log("exist");
-    }else{
-      setMessage(prevMessage => prevMessage + ' ' + 'https://www.testcrafts.net/solve/' + workbook + ' ');
-    }
-  });
+    const workbooksText = selectQuestionsId.map((workbook) => {
+      if(message.includes('https://www.testcrafts.net/solve/' + workbook)){
+        console.log("degug");
+      }else{
+        setMessage(prevMessage => prevMessage + ' ' + 'https://www.testcrafts.net/solve/' + workbook + ' ');
+      }
+    });
   };
 
-const selectQuestions = (questionId) => {
-  setSelectQuestionsId(prev => {
-    if(prev.includes(questionId)){
-      return prev.filter(id => id !== questionId);
-    }else{
-      return [...prev, questionId];
-    }
-  });
-}
+  const selectQuestions = (questionId) => {
+    setSelectQuestionsId(prev => {
+      if(prev.includes(questionId)){
+        return prev.filter(id => id !== questionId);
+      }else{
+        return [...prev, questionId];
+      }
+    });
+
+  }
 
   const handleCommentClick = (postId: string) => {
     setCommentCurrentPostId(postId);

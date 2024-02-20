@@ -19,6 +19,7 @@ import {
     Alert,
     CardActions,
     Box,
+    Modal,
 } from '@mui/material';
 
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -35,11 +36,16 @@ import TimelineDot from '@mui/lab/TimelineDot';
 import UserHeader from './UserHeader';
 import { useAPI } from './hooks/useAPI';
 import LoadingScreen from './LoadingScreen.tsx';
+import { DisplayWorkbookList } from './components/WorkbookForModal.js';
+import { textToLink } from './components/utility.tsx';
 
 function PostDetail() {
     const [postData,setPostData] = useState(null);
     const [comments,setComments] = useState([]);
     const [likes,setLikes] = useState([]);
+    const [workbooks, setWorkbooks] = useState([]);
+    const [selectQuestionsId, setSelectQuestionsId] = useState([]);
+    const [isProblemModalOpen, setIsProblemModalOpen] = useState(false);
     const [icon,setIcon] = useState();
     const [likesCount,setLikesCount] = useState([]);
     const [newComment,setNewComment] = useState('');
@@ -75,6 +81,29 @@ function PostDetail() {
         APIName: 'post_comment',
     });
 
+    const getProblemListAPI = useAPI({
+        APIName: "questionsall",
+        isLoginRequired: true,
+        loadOnStart: true,
+      });
+    
+    useEffect(() => {
+        if(getProblemListAPI.isSuccess){
+          const data = getProblemListAPI.data;
+          if(data.success){
+            console.log("wokbook_data",data);
+            setWorkbooks(
+              getProblemListAPI.data.workbooks.map((workbooks) => ({
+                ...workbooks,
+                liked: workbooks.liked_by_user,
+              }))
+            );
+          }else{
+            console.log(data.error);
+          }
+        }
+    },[getProblemListAPI.isSuccess,getProblemListAPI.data]);
+
     const formatDate = (date) => {
         return new Date(date).toLocaleString();
     };
@@ -87,6 +116,7 @@ function PostDetail() {
             })
         });
         setSnackbarContent('コメントを投稿しました');
+        setSelectQuestionsId([]);
         handleOpenSnackbar();
     };
 
@@ -114,6 +144,29 @@ function PostDetail() {
           return;
         }
         setOpenSnackbar(false);
+    };
+
+    const selectQuestions = (questionId) => {
+        setSelectQuestionsId(prev => {
+          if(prev.includes(questionId)){
+            return prev.filter(id => id !== questionId);
+          }else{
+            return [...prev, questionId];
+          }
+        });
+    };
+
+    const handleProblemCloseModal = () => {
+        setIsProblemModalOpen(false);
+        console.log("selectQuestionsId",selectQuestionsId);
+    
+      const workbooksText = selectQuestionsId.map((workbook) => {
+        if(newComment.includes('https://www.testcrafts.net/solve/' + workbook)){
+          console.log("exist");
+        }else{
+          setNewComment(prevMessage => prevMessage + ' ' + 'https://www.testcrafts.net/solve/' + workbook + ' ');
+        }
+      });
     };
 
     useEffect(() => {
@@ -167,6 +220,8 @@ function PostDetail() {
         return moment(date).fromNow();
     };
 
+    const handleProblemOpenModal = () => {setIsProblemModalOpen(true);};
+
     if(loading){return <LoadingScreen />;};
 
     return (
@@ -176,8 +231,20 @@ function PostDetail() {
                 sx={{ maxWidth: '60%', margin: 'auto', mt: 4, mb: 4, boxShadow: theme.shadows[3], borderRadius: theme.shape.borderRadius }}
             >
                 <CardContent>
-                    <Typography variant='h5' component='div' gutterBottom>
-                        {postData?.content}
+                    <Typography
+                        variant='h5'
+                        component='div'
+                        gutterBottom
+                    >
+                        <div
+                          dangerouslySetInnerHTML={{
+                            __html: textToLink(postData?.content ?? "")
+                          }}
+                          style={{
+                            whiteSpace: "pre-wrap",
+                            lineHeight: "176%",
+                          }}
+                        />
                     </Typography>
                     <Stack direction="row" spacing={2} alignItems="center" mt={1} mb={2}>
                         <Avatar
@@ -230,6 +297,12 @@ function PostDetail() {
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
                     />
+                    <Button 
+                        variant="contained"
+                        onClick={() => handleProblemOpenModal()}
+                    >
+                        問題を登録する。
+                    </Button>
                     <Button
                         variant="contained"
                         disabled={!newComment.trim()}
@@ -273,7 +346,15 @@ function PostDetail() {
                                             </Typography>
                                         </Stack>
                                         <Typography variant='body1' sx={{ mt: 1 }}>
-                                            {comment.content}
+                                            <div
+                                                dangerouslySetInnerHTML={{
+                                                    __html: textToLink(comment?.content ?? "")
+                                                }}
+                                                style={{
+                                                    whiteSpace: "pre-wrap",
+                                                    lineHeight: "176%",
+                                                }}
+                                            />
                                         </Typography>
                                     </CardContent>
                                 </Box>
@@ -292,6 +373,30 @@ function PostDetail() {
                 {snackbarContent}
                 </Alert>
             </Snackbar>
+            <Modal
+                open={isProblemModalOpen}
+                onClose={handleProblemCloseModal}
+                aria-labelledby="simple-modal-title"
+                aria-describedby="simple-modal-description" 
+            >
+                <Box sx={modalProblemStyle}>
+                    <DisplayWorkbookList
+                        workbooks={workbooks}
+                        setWorkbooks={setWorkbooks}
+                        selectQuestions={selectQuestions}
+                        selectQuestionsId={selectQuestionsId}
+                    />
+                    <Box display="flex" justifyContent="flex-end" mt={2}>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleProblemCloseModal}
+                        >
+                        問題を選択する
+                        </Button>
+                    </Box>
+                </Box>
+            </Modal>
         </>
     );
 }
@@ -299,6 +404,22 @@ function PostDetail() {
 const cardActionsStyle = {
     justifyContent: "space-between",
     padding: "0 16px 16px",
-  };
+};
 
+const modalProblemStyle = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 1000,
+    height: 600,
+    maxWidth: '90%',
+    maxHeight: '80%',
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    borderRadius: 3,
+    boxShadow: 24,
+    p: 4,
+    overflowY: 'auto',
+};
 export default PostDetail;
