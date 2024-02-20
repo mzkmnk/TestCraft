@@ -43,15 +43,16 @@ export function useTimer({ startSeconds = 0, notificationTime = 0 }) {
     const timer = setInterval(() => {
       // 直接更新ではなく、更新関数を渡すと、依存配列に追加する必要がなくなる。
       setSecondsTimer((time) => time - 1);
-      if (secondsTimer === notificationTime) {
-        setIsNotificationTime(true);
-      }
-      if (secondsTimer === 0) {
+      if (secondsTimer - 1 === 0) {
         finish();
+        return;
+      }
+      if (secondsTimer - 1 < notificationTime && isNotificationTime === false) {
+        setIsNotificationTime(true);
       }
     }, 1000);
     return () => clearInterval(timer);
-  }, [isActive, secondsTimer]);
+  }, [isActive, isNotificationTime, notificationTime, secondsTimer]);
 
   // hh:mm:ss形式にフォーマット
   let time = { hour: "", minutes: "", seconds: "" };
@@ -60,7 +61,7 @@ export function useTimer({ startSeconds = 0, notificationTime = 0 }) {
   if (hour < 10) {
     time.hour = "0" + hour;
   } else {
-    time.hour = hour;
+    time.hour = "0" + hour;
   }
 
   const minutes = Math.floor((secondsTimer - time.hour * 3600) / 60);
