@@ -134,6 +134,15 @@ class FollowSchema(Schema):
 class DeleteWorkBookSchema(Schema):
     workbookId:int
 
+class CreateGroupSchema(Schema):
+    groupName:str # グループ名
+    hostId:int # グループのホストのID
+    isPublic:bool # 公開かどうか
+    groupUsers:List[int] # 非公開の場合アクセスできるユーザーIDのリスト
+    startTime:Optional[str] # グループの開始時間
+    endTime:Optional[str] # グループの終了時間
+
+
 # API
 # ユーザー登録するAPI
 @api.post("/signup")
@@ -1272,4 +1281,51 @@ def ai_score(request,payload:AiScore):
                 "error":str(e),
             },
             status = 400,
+        )
+
+
+#  class CreateGroupSchema(Schema):
+#     groupName:str # グループ名
+#     hostId:int # グループのホストのID
+#     isPublic:bool # 公開かどうか
+#     groupUsers:List[int] # 非公開の場合アクセスできるユーザーIDのリスト
+#     startTime:Optional[str] # グループの開始時間
+#     endTime:Optional[str] # グループの終了時間  
+ 
+@api.post("/create_group")
+def create_group(request,payload:CreateGroupSchema):
+    try:
+        group_name : str = payload.groupName
+        host = User.objects.get(id = payload.hostId)
+        is_public : bool = payload.isPublic
+        group_users : list[int] = payload.groupUsers
+        start_time = payload.startTime
+        end_time = payload.endTime
+        group = Group.objects.create(
+            group_name = group_name,
+            host = host,
+            is_public = is_public,
+            start_time = start_time,
+            end_time = end_time,
+        )
+        if not is_public:
+            for user_id in group_users:
+                group_user = GroupMember.objects.create(
+                    group = group,
+                    user = User.objects.get(id = user_id),
+                )
+        return JsonResponse(
+            {
+                "success":True,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "error":str(e),
+            },
+            status = 400,            
         )
