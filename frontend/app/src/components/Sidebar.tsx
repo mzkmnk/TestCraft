@@ -49,7 +49,7 @@ import config from '../aws-exports.js';
 
 import { useAPI } from '../hooks/useAPI';
 import LoadingScreen from '../LoadingScreen.tsx';
-import { DisplayWorkbookList } from './DisplayWorkbookList.js';
+import { DisplayWorkbookList } from './WorkbookForModal.js';
 import { textToLink } from './utility.tsx';
 
 Amplify.configure(config);
@@ -207,13 +207,14 @@ const Sidebar: React.FC = () => {
   const handleProblemCloseModal = () => {
     setIsProblemModalOpen(false);
     console.log("selectQuestionsId",selectQuestionsId);
-    const workbooksText = selectQuestionsId.map((workbook) => {
-      if(message.includes('https://www.testcrafts.net/solve/' + workbook)){
-        console.log("exist");
-      }else{
-        setMessage(prevMessage => prevMessage + ' ' + 'https://www.testcrafts.net/solve/' + workbook + ' ');
-      }
-    });
+
+  const workbooksText = selectQuestionsId.map((workbook) => {
+    if(message.includes('https://www.testcrafts.net/solve/' + workbook)){
+      console.log("exist");
+    }else{
+      setMessage(prevMessage => prevMessage + ' ' + 'https://www.testcrafts.net/solve/' + workbook + ' ');
+    }
+  });
   };
 
 const selectQuestions = (questionId) => {

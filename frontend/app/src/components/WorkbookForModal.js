@@ -8,17 +8,16 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import Grid from '@mui/material/Grid';
+import IconButton from "@mui/material/IconButton";
 
 import { useAPI } from "../hooks/useAPI";
 import "../workbookList.css";
-import IconButton from "@mui/material/IconButton";
 
 export function DisplayWorkbookList({ workbooks, setWorkbooks, selectQuestions, selectQuestionsId }) {
   const [sortOption, setSortOption] = useState("date");
   const [sortedWorkbooks, setSortedWorkbooks] = useState([]);
   const API = useAPI({ APIName: "questionsall_like" });
   const navigate = useNavigate();
-
   const handleQuestionClick = (workbookId) => {
     if(selectQuestions){
       selectQuestions(workbookId);
@@ -119,36 +118,25 @@ export function DisplayWorkbookList({ workbooks, setWorkbooks, selectQuestions, 
               <div
                 className={`question ${selectQuestionsId.includes(question.id) ? 'selected' : ''}`}
                 key={index}
+                onClick={() => handleQuestionClick(question.id)}
               >
-                {console.log(question.id)}
-                <Link
-                  to={`/solve/${question.id}`}
-                  style={{ position: "absolute", inset: 0 }}
-                />
-                <span className="questionHeader">
-                  <span>
-                    <p style={{ fontSize: "1.5rem" }}>
-                      {question.workbook_name}
-                    </p>
-                    <p>{question.description}</p>
-                    <p className="createdBy">
-                      created by{" "}
-                      <Link to={`/profile/${question.create_id}`}>
-                        {question.create_id__username}
-                      </Link>{" "}
-                      ({formatDate(question.created_at)})
-                    </p>
+                <div className="questionHeader">
+                  <h3>{question.workbook_name}</h3>
+                  <span className="createdBy">
+                    created by {question.create_id__username} (
+                    {formatDate(question.created_at)})
                   </span>
-                  <IconButton
-                    color="primary"
-                    style={{ zIndex: 1, position: "relative" }}
-                    onClick={(e) => handleLikeClick(e, question.id)}
-                    size="small"
-                  >
-                    {question.liked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-                    <span className="likeCount">{question.like_count}</span>
-                  </IconButton>
-                </span>
+                </div>
+                <p>{question.description}</p>
+                <IconButton
+                  color="primary"
+                  style={{ zIndex: 1, position: "relative" }}
+                  onClick={(e) => handleLikeClick(e, question.id)}
+                  size="small"
+                >
+                  {question.liked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+                  <span className="likeCount">{question.like_count}</span>
+                </IconButton>
               </div>
             ))}
           </div>
