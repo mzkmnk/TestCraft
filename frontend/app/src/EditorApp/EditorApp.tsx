@@ -19,6 +19,11 @@ import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
+import { AnswerSelectionModal } from "./AnswerSelectionModal";
+import { format } from "./SwitchableTextField";
+import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
+import IconButton from "@mui/material/IconButton";
+import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
 
 const theme = createTheme({
   palette: {
@@ -372,8 +377,7 @@ export default function EditorApp({ workBook }) {
     saveAPIForUpdate.sendAPI({ body: data });
   }
 
-  // state更新関数群 React Reducerを使うべきではある（コードが分かりにくくなる && 面倒）
-  // optionsとanswersの追加と削除などは、分岐を複雑にして共通化できるが、可読性が下がるのでやらない。
+  // state更新関数群 React Reducerを使うべき
   function handleAddNewOption(updateQuestionId: Id) {
     setIsEdit(true);
     setIsLatest(false);
@@ -389,7 +393,7 @@ export default function EditorApp({ workBook }) {
     }
   }
 
-  function handleAddNewAnswer(updateQuestionId: Id) {
+  function handleAddNewAnswer(updateQuestionId: Id, value = "") {
     setIsEdit(true);
     setIsLatest(false);
     const updatedQuestion = questionTree[updateQuestionId];
@@ -401,7 +405,28 @@ export default function EditorApp({ workBook }) {
         ...questionTree,
         [updateQuestionId]: {
           ...updatedQuestion,
-          answers: [...updatedQuestion.answers, { id: createId(), value: "" }],
+          answers: [...updatedQuestion.answers, { id: createId(), value }],
+        },
+      });
+    }
+  }
+
+  function handleReplaceAnswers(
+    updateQuestionId: Id,
+    newAnswerValues: string[]
+  ) {
+    setIsEdit(true);
+    setIsLatest(false);
+    const updatedQuestion = questionTree[updateQuestionId];
+    if (
+      updatedQuestion.questionType === "radio" ||
+      updatedQuestion.questionType === "textarea"
+    ) {
+      setQuestionTree({
+        ...questionTree,
+        [updateQuestionId]: {
+          ...updatedQuestion,
+          answers: newAnswerValues.map((value) => ({ id: createId(), value })),
         },
       });
     }
@@ -441,6 +466,9 @@ export default function EditorApp({ workBook }) {
     setIsLatest(false);
     const updatedQuestion = questionTree[updateQuestionId];
     if (updatedQuestion.questionType === "radio") {
+      const removedOptionValue = updatedQuestion.options.find(
+        (option) => option.id === removedOptionId
+      ).value;
       setQuestionTree({
         ...questionTree,
         [updateQuestionId]: {
@@ -448,6 +476,11 @@ export default function EditorApp({ workBook }) {
           options: [
             ...updatedQuestion.options.filter(
               (option) => option.id !== removedOptionId
+            ),
+          ],
+          answers: [
+            ...updatedQuestion.answers.filter(
+              (answer) => answer.value !== removedOptionValue
             ),
           ],
         },
@@ -529,6 +562,10 @@ export default function EditorApp({ workBook }) {
       changedPropertyName === "options" &&
       changedQuestion.questionType === "radio"
     ) {
+      const changedOptionValue = changedQuestion.options.find(
+        (option) => option.id === changedId
+      ).value;
+
       setQuestionTree({
         ...questionTree,
         [changedQuestionId]: {
@@ -540,6 +577,16 @@ export default function EditorApp({ workBook }) {
                 : option
             ),
           ],
+          answers:
+            changedQuestion.answers.length !== 0
+              ? [
+                  ...changedQuestion.answers.map((answer) =>
+                    answer.value === changedOptionValue
+                      ? { id: answer.id, value: updatedValue }
+                      : answer
+                  ),
+                ]
+              : [],
         },
       });
     } else if (
@@ -847,6 +894,7 @@ export default function EditorApp({ workBook }) {
                 questionTree={questionTree}
                 handleAddNewOption={handleAddNewOption}
                 handleAddNewAnswer={handleAddNewAnswer}
+                handleReplaceAnswers={handleReplaceAnswers}
                 handleAddNewQuestion={handleAddNewQuestion}
                 handleRemoveOption={handleRemoveOption}
                 handleRemoveAnswer={handleRemoveAnswer}
@@ -871,7 +919,11 @@ interface Props {
   questionNumber: number[]; // 問題番号 表示順から生成
   questionTree: QuestionTree;
   handleAddNewOption: (updateQuestionId: Id) => void;
-  handleAddNewAnswer: (updateQuestionId: Id) => void;
+  handleAddNewAnswer: (updateQuestionId: Id, value?: string) => void;
+  handleReplaceAnswers: (
+    updateQuestionId: Id,
+    newAnswerValues: string[]
+  ) => void;
   handleAddNewQuestion: (parentQuestionId: Id) => void;
   handleRemoveOption: (updateQuestionId: Id, removedOptionId: Id) => void;
   handleRemoveAnswer: (updateQuestionId: Id, removedOptionId: Id) => void;
@@ -901,6 +953,7 @@ function QuestionEditor({
   questionTree,
   handleAddNewOption,
   handleAddNewAnswer,
+  handleReplaceAnswers,
   handleAddNewQuestion,
   handleRemoveOption,
   handleRemoveAnswer,
@@ -910,6 +963,7 @@ function QuestionEditor({
   handleChangeBool,
 }: Props) {
   const displayQuestion = questionTree[questionId];
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // ルートの場合は終了する
   if (displayQuestion.questionType === "root") {
@@ -920,9 +974,9 @@ function QuestionEditor({
       <Typography sx={{ fontSize: "1.15rem" }}>
         {"問題 " + questionNumber.join("-") + "："}
       </Typography>
-      <Button onClick={() => handleRemoveQuestion(questionId)} color="error">
-        問題を削除
-      </Button>
+      <IconButton onClick={() => handleRemoveQuestion(questionId)} size="large">
+        <DeleteOutlinedIcon style={{ transform: "scale(1.2)" }} />
+      </IconButton>
     </Box>
   );
   const questionField = (
@@ -986,6 +1040,7 @@ function QuestionEditor({
               questionTree={questionTree}
               handleAddNewOption={handleAddNewOption}
               handleAddNewAnswer={handleAddNewAnswer}
+              handleReplaceAnswers={handleReplaceAnswers}
               handleAddNewQuestion={handleAddNewQuestion}
               handleRemoveOption={handleRemoveOption}
               handleRemoveAnswer={handleRemoveAnswer}
@@ -1007,24 +1062,19 @@ function QuestionEditor({
       <List>
         {displayQuestion.answers.map((answers) => (
           <ListItem key={answers.id}>
-            <TextField
-              defaultValue={answers.value}
-              onChange={(event) => {
-                handleChangeText(
-                  event.target.value,
-                  questionId,
-                  "answers",
-                  answers.id
-                );
-              }}
-              variant="outlined"
-            ></TextField>
-            <Button
+            <SwitchableTextField
+              value={answers.value}
+              setValue={handleChangeText}
+              args={[questionId, "answers", answers.id]}
+            ></SwitchableTextField>
+
+            <IconButton
               onClick={() => handleRemoveAnswer(questionId, answers.id)}
               color="error"
+              size="large"
             >
-              解答を削除
-            </Button>
+              <ClearOutlinedIcon />
+            </IconButton>
           </ListItem>
         ))}
       </List>
@@ -1044,12 +1094,13 @@ function QuestionEditor({
                 setValue={handleChangeText}
                 args={[questionId, "options", option.id]}
               ></SwitchableTextField>
-              <Button
+              <IconButton
                 onClick={() => handleRemoveOption(questionId, option.id)}
+                size="large"
                 color="error"
               >
-                選択肢を削除
-              </Button>
+                <ClearOutlinedIcon />
+              </IconButton>
             </ListItem>
           ))}
         </List>
@@ -1075,13 +1126,37 @@ function QuestionEditor({
         </FormGroup>
       </>
     );
+
+    const radioAnswerList = (
+      <>
+        <Typography>解答</Typography>
+        <List>
+          {displayQuestion.answers.map((answers) => (
+            <ListItem key={answers.id}>{format(answers.value)}</ListItem>
+          ))}
+        </List>
+      </>
+    );
+
     return (
       <Box sx={{}}>
         {questionNumberField}
         {questionTypeSelector}
         {questionField}
         {optionFieldList}
-        {answersField}
+        {radioAnswerList}
+        {/*モーダルが開くたび初期化されるようにする。*/}
+        {isModalOpen && (
+          <AnswerSelectionModal
+            open={isModalOpen}
+            setOpen={setIsModalOpen}
+            options={displayQuestion.options}
+            canMultiple={displayQuestion.canMultiple}
+            questionId={questionId}
+            handleReplaceAnswers={handleReplaceAnswers}
+          />
+        )}
+        <Button onClick={() => setIsModalOpen(true)}>解答を選択</Button>
       </Box>
     );
   } else if (displayQuestion.questionType === "textarea") {

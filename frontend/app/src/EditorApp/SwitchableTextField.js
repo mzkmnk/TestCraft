@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
 import { MathJax, MathJaxContext } from "better-react-mathjax";
 import Box from "@mui/material/Box";
 import SyntaxHighlighter from "react-syntax-highlighter";
@@ -9,9 +8,15 @@ import hlStyle from "react-syntax-highlighter/dist/esm/styles/hljs/docco";
 // Typographyのラップ
 function Paragraph({ children }) {
   return (
-    <Typography style={{ fontSize: "1.1rem", whiteSpace: "pre-line" }}>
+    <span
+      style={{
+        fontSize: "1.1rem",
+        whiteSpace: "pre-line",
+        wordWrap: "break-word",
+      }}
+    >
       {children}
-    </Typography>
+    </span>
   );
 }
 
@@ -132,7 +137,21 @@ export function SwitchableTextField({ value, setValue, args = [] }) {
           }}
           onClick={toggleState}
         >
-          {displayValue}
+          <button
+            style={{
+              padding: 0,
+              margin: "0 auto",
+              border: "none",
+              outline: "none",
+              font: "inherit",
+              color: "inherit",
+              background: "none",
+              width: "100%",
+              textAlign: "left",
+            }}
+          >
+            {displayValue}
+          </button>
         </Box>
       )}
     </>
