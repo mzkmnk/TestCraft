@@ -19,7 +19,6 @@ export function DisplayForms({ info = {}, questionTree, questionId }) {
   };
 
   const handleCheckBoxAnswers = (event, questionId) => {
-    console.log(answers);
     let updateValue = {};
 
     if (event.target.checked) {
