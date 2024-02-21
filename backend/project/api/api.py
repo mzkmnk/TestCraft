@@ -493,6 +493,7 @@ def get_user_info(request):
             {
                 "success":True,
                 "username":user.username,
+                "user_id":user.id,
                 "email":user.email,
                 "school":user.school,
                 "followCount":user.count_following(),
@@ -1313,14 +1314,25 @@ def create_group(request,payload:CreateGroupSchema):
         group_users : list[int] = payload.groupUsers
         start_time = payload.startTime
         end_time = payload.endTime
-        group = Group.objects.create(
-            test_name = test_name,
-            workbook = Workbook.objects.get(id = workbook_id),
-            host = host,
-            is_public = is_public,
-            start_time = start_time,
-            end_time = end_time,
-        )
+        if(host.is_own_company):
+            group = Group.objects.create(
+                test_name = test_name,
+                workbook = Workbook.objects.get(id = workbook_id),
+                host = host,
+                company = host.company,
+                is_public = is_public,
+                start_time = start_time,
+                end_time = end_time,
+            )
+        else:
+            group = Group.objects.create(
+                test_name = test_name,
+                workbook = Workbook.objects.get(id = workbook_id),
+                host = host,
+                is_public = is_public,
+                start_time = start_time,
+                end_time = end_time,
+            )
         if not is_public:
             for user_id in group_users:
                 group_user = GroupMember.objects.create(
@@ -1343,17 +1355,80 @@ def create_group(request,payload:CreateGroupSchema):
             status = 400,            
         )
 
+#グループ一覧を取得するAPI
+@api.get("/group_list")
+def group_list(request):
+    try:
+        user = request.user
+        if(user.is_company_user or user.is_own_company):
+            company = user.company
+            groups_val = Group.objects.filter(company = company).values(
+                'id',
+                'workbook_id',
+                'test_name',
+                'host__username',
+                'is_public',
+                'start_time',
+                'end_time',
+            )
+            # print(f"{groups_val=}")
+            groups = [
+                {
+                    "id":group['id'],
+                    "workbook_id":group['workbook_id'],
+                    "test_name":group['test_name'],
+                    "host":group['host__username'],
+                    "is_public":group['is_public'],
+                    "start_time":group['start_time'],
+                    "end_time":group['end_time'],
+                }
+                for group in groups_val
+            ]
+            data = {
+                "groups":groups,
+            }
+            print(data)
+            return JsonResponse(
+                {
+                    "success":True,
+                    "data":data,
+                    "error":None,
+                },
+                status = 200,
+            )
+        else:
+            return JsonResponse(
+                {
+                    "success":False,
+                    "data":None,
+                    "error":"権限がありません。",
+                },
+                status = 200,
+            )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "data":None,
+                "error":str(e),
+            },
+            status = 400
+        )
+
 #グループ参加時のAPI
 @api.get("/group_join/{group_id}/{workbook_id}/{user_id}")
 def group_join(request,group_id:int,workbook_id:int,user_id:int):
     try:
+        print("ok")
+        print(f"{group_id=},{workbook_id=},{user_id=},{request.user.id=}")
+        print(type(user_id),type(request.user.id))
         if(request.user.id != user_id):
             return JsonResponse(
                 {
                     "success":False,
                     "error":"ユーザーが一致しません。",
                 },
-                status = 400,
+                status = 200,
             )
         group = Group.objects.get(id = group_id)
         user = User.objects.get(id = user_id)
@@ -1361,6 +1436,7 @@ def group_join(request,group_id:int,workbook_id:int,user_id:int):
         group = Group.objects.get(id = group_id)
         workbook = Workbook.objects.get(id = workbook_id)
         problem = Problem.objects.get(workbook_id = workbook_id)
+        print("ok")
         data = {
             "workbook":{
                 "id":workbook.id,
@@ -1374,6 +1450,15 @@ def group_join(request,group_id:int,workbook_id:int,user_id:int):
             "problem":{
                 "id":problem.id,
                 "problem_json":problem.problem_json,
+            },
+            "group":{
+                "id":group.id,
+                "test_name":group.test_name,
+                "host__username":group.host.username,
+                "is_public":group.is_public,
+                "start_time":group.start_time,
+                "end_time":group.end_time,
+                "end_time":group.end_time,
             }
         }
         if(group.is_public):
@@ -1406,7 +1491,7 @@ def group_join(request,group_id:int,workbook_id:int,user_id:int):
                         "success":False,
                         "error":"グループに参加できません。",
                     },
-                    status = 400,
+                    status = 200,
                 )
     except Exception as e:
         return JsonResponse(
@@ -1417,3 +1502,26 @@ def group_join(request,group_id:int,workbook_id:int,user_id:int):
             status = 400,
         )
 
+# #グループ終了時の参加者の解答を返すAPI
+# @api.get("/group_result/{group_id}/{workbook_id}")
+# def group_result(request,group_id:int,workbook_id:int):
+#     try:
+#         group = Group.objects.get(id = group_id)
+#         workbook = Workbook.objects.get(id = workbook_id)
+#         return JsonResponse(
+#             {
+#                 "success":True,
+#                 # "data":data,
+#                 "error":None,
+#             },
+#             status = 200,
+#         )
+#     except Exception as e:
+#         return JsonResponse(
+#             {
+#                 "success":False,
+#                 "data":None,
+#                 "error":str(e),
+#             },
+#             status = 400,
+#         )
