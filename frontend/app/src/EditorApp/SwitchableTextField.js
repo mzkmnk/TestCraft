@@ -110,7 +110,6 @@ function parse(text) {
     } else if (text[i] === "$") {
       if (text.slice(i, i + 2) === "$$") {
         let mathEnd = text.indexOf("$$", i + 2);
-        console.log("math", text.slice(i + 2, mathEnd));
         if (mathEnd !== -1) {
           returnJSX.push(
             <Paragraph key={createId()}>{text.slice(nextStart, i)}</Paragraph>
@@ -118,12 +117,11 @@ function parse(text) {
           returnJSX.push(
             <MathJax key={createId()}>\({text.slice(i + 2, mathEnd)}\)</MathJax>
           );
-          nextStart = test[mathEnd + 2] === "\n" ? mathEnd + 3 : mathEnd + 2;
-          i = test[mathEnd + 2] === "\n" ? mathEnd + 2 : mathEnd + 1;
+          nextStart = text[mathEnd + 2] === "\n" ? mathEnd + 3 : mathEnd + 2;
+          i = text[mathEnd + 2] === "\n" ? mathEnd + 2 : mathEnd + 1;
         }
       } else {
         let mathEnd = text.indexOf("$", i + 1);
-        console.log("math", text.slice(i + 1, mathEnd));
         if (mathEnd !== -1) {
           returnJSX.push(
             <Paragraph key={createId()}>{text.slice(nextStart, i)}</Paragraph>

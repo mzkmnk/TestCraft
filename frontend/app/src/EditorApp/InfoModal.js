@@ -16,7 +16,7 @@ const style = {
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: "80%",
-  height: "60%",
+  height: "65%",
   bgcolor: "background.paper",
   border: "2px solid #000",
   overflowY: "auto",

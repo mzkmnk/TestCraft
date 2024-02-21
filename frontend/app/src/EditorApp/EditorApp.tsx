@@ -821,7 +821,9 @@ export default function EditorApp({ workBook }) {
             setIsLatest={setIsLatest}
             exitFunc={save}
             isEdit={isEdit}
+            setIsEdit={setIsEdit}
             handleIsEdit={handleIsEdit}
+            validateFunc={() => validationQuestionTree(questionTree)}
           />
           <Snackbar
             open={isMessageOpen}

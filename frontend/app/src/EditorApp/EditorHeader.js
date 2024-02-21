@@ -14,6 +14,10 @@ import Alert from "@mui/material/Alert";
 import LockIcon from "@mui/icons-material/Lock";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import { InfoModal } from "./InfoModal";
+import Modal from "@mui/material/Modal";
+import Button from "@mui/material/Button";
+import { useNavigate } from "react-router-dom";
+import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
 
 export function EditorHeader({
   saveFunc,
@@ -22,12 +26,16 @@ export function EditorHeader({
   setIsLatest,
   exitFunc,
   isEdit,
+  setIsEdit,
   handleIsEdit,
+  validateFunc,
 }) {
   const [message, setMessage] = useState("");
   const [isMessageOpen, setIsMessageOpen] = useState(false);
   const [isSuccess, setIsSuccess] = useState(null);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
+  const [isExitModalOpen, setIsExitModalOpen] = useState(false);
+  const navigate = useNavigate();
   const handleClose = (event, reason) => {
     setIsMessageOpen(false);
   };
@@ -73,6 +81,107 @@ export function EditorHeader({
     }
   }, [saveAPI, setIsLatest]);
 
+  const exitModal = (
+    <Modal
+      open={isExitModalOpen}
+      onClose={() => {
+        setIsExitModalOpen(false);
+      }}
+    >
+      <Box
+        sx={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "80%",
+          maxWidth: "25rem",
+          bgcolor: "background.paper",
+          border: "2px solid #000",
+          boxShadow: 24,
+          p: 3,
+          borderRadius: 2,
+          position: "relative",
+        }}
+      >
+        <Typography
+          variant="h3"
+          sx={{ fontSize: "1.4rem" }}
+          margin={1}
+          marginTop={0}
+        >
+          終了しますか？
+        </Typography>
+        <IconButton
+          color="error"
+          onClick={() => {
+            setIsExitModalOpen(false);
+          }}
+          sx={{ position: "absolute", top: 8, right: 8 }}
+        >
+          <ClearOutlinedIcon />
+        </IconButton>
+
+        <Box margin={1}>
+          {validateFunc().status === true ? (
+            <>
+              <Typography>編集を終了して、問題を解答可能にする</Typography>
+              <Button
+                color="inherit"
+                onClick={handleIsEdit}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "100%",
+                }}
+              >
+                {isEdit ? (
+                  <Box
+                    component="span"
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <LockIcon color="error" />
+                    編集中
+                  </Box>
+                ) : (
+                  <Box component="span">
+                    <LockOpenIcon color="success" />
+                    解答可能
+                  </Box>
+                )}
+              </Button>
+            </>
+          ) : (
+            <Typography>この問題はまだ解答可能ではありません</Typography>
+          )}
+        </Box>
+
+        <Box sx={{ mt: 2, display: "flex", justifyContent: "space-between" }}>
+          <Button
+            color="error"
+            onClick={() => {
+              navigate("/mypage");
+            }}
+          >
+            保存せずに終了
+          </Button>
+          <Button
+            color="primary"
+            onClick={() => {
+              exitFunc();
+            }}
+          >
+            保存して終了
+          </Button>
+        </Box>
+      </Box>
+    </Modal>
+  );
+
   return (
     <>
       <Box sx={{ height: 55 }}>
@@ -98,7 +207,13 @@ export function EditorHeader({
               {isEdit ? <LockIcon /> : <LockOpenIcon />}
             </IconButton>
             {saveStatusIcon}
-            <IconButton color="inherit" onClick={exitFunc}>
+            <IconButton
+              color="inherit"
+              onClick={() => {
+                console.log("exit");
+                setIsExitModalOpen(true);
+              }}
+            >
               <ExitButton />
             </IconButton>
           </Toolbar>
@@ -119,6 +234,7 @@ export function EditorHeader({
         </Alert>
       </Snackbar>
       <InfoModal open={isInfoOpen} setOpen={setIsInfoOpen} />
+      {exitModal}
     </>
   );
 }
