@@ -41,7 +41,7 @@ def check_answer(
         なぜ間違ってるかを説明してください。
         また返答はjson形式だけでお願いします。
         is_correctはtrueかfalseで、confidenceは0~100の間で、explanationは説明を書いてください。
-        またあなたは先生なので、生徒に教えるように丁寧に優しい説明を書いてください。
+        またあなたは先生なので、explanationでは生徒に教えるように丁寧に優しい説明を書いてください。
         例:
             {{
             "is_correct": true,
@@ -52,8 +52,8 @@ def check_answer(
 
         response = openai.ChatCompletion.create(
             # model="gpt-3.5-turbo-",
-             model="gpt-3.5-turbo-0125",
-            #model="gpt-4-0125-preview",
+            #model="gpt-3.5-turbo-0125",
+            model="gpt-4-0125-preview",
             messages=[
                 {"role": "system", "content": "以下の質問に答えてください。"},
                 {"role": "user", "content": prompt},
