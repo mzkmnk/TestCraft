@@ -74,7 +74,7 @@ function parse(text) {
         let codeEnd = text.indexOf("```", i + 3);
         if (codeEnd !== -1) {
           const languageEnd = text.indexOf("\n", i + 3);
-          const language = text.slice(i + 3, languageEnd + 1);
+          const language = text.slice(i + 3, languageEnd);
           returnJSX.push(
             <Paragraph key={createId()}>{text.slice(nextStart, i)}</Paragraph>
           );
