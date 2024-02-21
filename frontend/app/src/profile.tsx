@@ -12,6 +12,7 @@ import {
   MDBCardBody,
   MDBCardImage,
 } from 'mdb-react-ui-kit';
+import { ThemeProvider, createTheme } from '@mui/material/styles'
 
 import UserHeader from "./UserHeader";
 import { useAPI } from "./hooks/useAPI";
@@ -242,79 +243,93 @@ export default function ProfilePage() {
 
     if(loading){ return <LoadingScreen /> };
 
+    const theme = createTheme({
+        breakpoints: {
+          values: {
+            xs: 0,
+            sm: 600,
+            md: 960,
+            lg: 1365,
+            xl: 1920,
+          },
+        },
+    });
+
     return (
         <>
-        <UserHeader />
-        <section style={{ backgroundColor: '#eee' }}>
-            <MDBContainer className="py-5">
-                <MDBRow>
-                    <MDBCol lg="4">
-                        <MDBCard className="mb-4">
-                            <MDBCardBody className="text-center">
-                                <MDBCardImage
-                                    src={icon ? icon : init_icon}
-                                    alt="avatar"
-                                    className="rounded-circle"
-                                    style={{
-                                        width: '100px',
-                                        height: '100px',
-                                        objectFit: 'cover',
-                                        objectPosition: 'center',
-                                        transition: 'opacity 0.3s',
-                                    }}
-                                    fluid 
-                                />
-                                {/* <p className="text-muted mb-1">今後対応予定です。</p>
-                                <p className="text-muted mb-4">今後対応予定です。</p> */}
-                                <div style={followFollowerStyle}>
-                                    <div className="d-flex flex-column align-items-center">
-                                        <p className="font-weight-bold mb-0">follow</p>
-                                        <p className="font-weight-bold">{followCount}</p>
+        <ThemeProvider theme={theme}>
+            <UserHeader />
+            <section style={{ backgroundColor: '#eee' }}>
+                <MDBContainer className="py-5">
+                    <MDBRow>
+                        <MDBCol lg="4">
+                            <MDBCard className="mb-4">
+                                <MDBCardBody className="text-center">
+                                    <MDBCardImage
+                                        src={icon ? icon : init_icon}
+                                        alt="avatar"
+                                        className="rounded-circle"
+                                        style={{
+                                            width: '100px',
+                                            height: '100px',
+                                            objectFit: 'cover',
+                                            objectPosition: 'center',
+                                            transition: 'opacity 0.3s',
+                                        }}
+                                        fluid 
+                                    />
+                                    {/* <p className="text-muted mb-1">今後対応予定です。</p>
+                                    <p className="text-muted mb-4">今後対応予定です。</p> */}
+                                    <div style={followFollowerStyle}>
+                                        <div className="d-flex flex-column align-items-center">
+                                            <p className="font-weight-bold mb-0">follow</p>
+                                            <p className="font-weight-bold">{followCount}</p>
+                                        </div>
+                                        <div className="d-flex flex-column align-items-center">
+                                            <p className="font-weight-bold mb-0">follower</p>
+                                            <p className="font-weight-bold">{followerCount}</p>
+                                        </div>
                                     </div>
-                                    <div className="d-flex flex-column align-items-center">
-                                        <p className="font-weight-bold mb-0">follower</p>
-                                        <p className="font-weight-bold">{followerCount}</p>
-                                    </div>
-                                </div>
-                                <Button
-                                    variant="contained"
-                                    style={buttonStyles}
-                                    onClick={follow}
-                                >
-                                    {isFollow ? "フォロー解除":"フォローする"}
-                                </Button>
-                            </MDBCardBody>
-                        </MDBCard>
-                    </MDBCol>
-                    <MDBCol lg="8">
-                        <MDBCard className="mb-4">
-                        <MDBCardBody>
-                            <MDBRow>
-                            <MDBCol sm="3">
-                                <MDBCardText>Name</MDBCardText>
-                            </MDBCol>
-                            <MDBCol sm="9">
-                                <MDBCardText className="text-muted">{ username }</MDBCardText>
-                            </MDBCol>
-                            </MDBRow>
-                            <hr />
-                            <MDBRow>
+                                    <Button
+                                        variant="contained"
+                                        style={buttonStyles}
+                                        onClick={follow}
+                                    >
+                                        {isFollow ? "フォロー解除":"フォローする"}
+                                    </Button>
+                                </MDBCardBody>
+                            </MDBCard>
+                        </MDBCol>
+                        <MDBCol lg="8">
+                            <MDBCard className="mb-4">
+                            <MDBCardBody>
+                                <MDBRow>
                                 <MDBCol sm="3">
-                                    <MDBCardText>School</MDBCardText>
+                                    <MDBCardText>Name</MDBCardText>
                                 </MDBCol>
                                 <MDBCol sm="9">
-                                    <MDBCardText className="text-muted">{ userSchool }</MDBCardText>
+                                    <MDBCardText className="text-muted">{ username }</MDBCardText>
                                 </MDBCol>
-                            </MDBRow>
-                        </MDBCardBody>
-                        </MDBCard>
-                    </MDBCol>
-                </MDBRow>
-            </MDBContainer>
-        </section>
-        <div>
-            <CustomTabs defaultValue={0} tabsData={tabsData} />
-        </div>
+                                </MDBRow>
+                                <hr />
+                                <MDBRow>
+                                    <MDBCol sm="3">
+                                        <MDBCardText>School</MDBCardText>
+                                    </MDBCol>
+                                    <MDBCol sm="9">
+                                        <MDBCardText className="text-muted">{ userSchool }</MDBCardText>
+                                    </MDBCol>
+                                </MDBRow>
+                            </MDBCardBody>
+                            </MDBCard>
+                        </MDBCol>
+                    </MDBRow>
+                </MDBContainer>
+            </section>
+            <div>
+                <CustomTabs defaultValue={0} tabsData={tabsData} />
+            </div>
+        </ThemeProvider>
     </>
   );
 }
