@@ -52,8 +52,8 @@ def check_answer(
 
         response = openai.ChatCompletion.create(
             # model="gpt-3.5-turbo-",
-            # model="gpt-3.5-turbo-0125",
-            model="gpt-4-0125-preview",
+             model="gpt-3.5-turbo-0125",
+            #model="gpt-4-0125-preview",
             messages=[
                 {"role": "system", "content": "以下の質問に答えてください。"},
                 {"role": "user", "content": prompt},
