@@ -82,11 +82,6 @@ class CustomGroupMember(admin.ModelAdmin):
     search_fields = ('id',)
 admin.site.register(GroupMember,CustomGroupMember)
 
-class CustomComment(admin.ModelAdmin):
-    list_display = ('user','post','created_at')
-    search_fields = ('id',)
-admin.site.register(Comment,CustomComment)
-
 class CustomPostLike(admin.ModelAdmin):
     list_display = ('user','post')
     search_fields = ('id',)
