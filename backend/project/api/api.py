@@ -1829,7 +1829,9 @@ def post_comment(request,payload:PostCommentSchema):
                 "error":str(e),
             },
             status = 400
-        )# #グループ終了時の参加者の解答を返すAPI
+        )
+
+#グループ終了時の参加者の解答を返すAPI
 # @api.get("/group_result/{group_id}/{workbook_id}")
 # def group_result(request,group_id:int,workbook_id:int):
 #     try:
