@@ -7,6 +7,7 @@ import { DisplayFormsForSP } from "./DisplayFormsForSP";
 import { useQuestions } from "../context/QuestionsContext";
 import { DisplayResult } from "./DisplayResult";
 import Modal from "@mui/material/Modal";
+import { MathJaxContext } from "better-react-mathjax";
 
 export function AnswerForms({
   exitFunc,
@@ -113,85 +114,20 @@ export function AnswerForms({
   if (document.documentElement.clientWidth < 700) {
     return (
       <>
-        <Box
-          sx={{
-            margin: 3,
-            marginTop: 4,
-          }}
-        >
-          {!resultMode ? (
-            <DisplayFormsForSP
-              info={info}
-              questionTree={questionTree}
-              questionId={pages[displayPageIndex]}
-            />
-          ) : (
-            <DisplayResult
-              questionTree={questionTree}
-              questionId={pages[displayPageIndex]}
-              correctIds={correctIds}
-              questionCount={questionCount}
-              answers={answers}
-              AiComments={AiComments}
-            />
-          )}
-        </Box>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-          }}
-        >
-          <Box sx={{ padding: 1, margin: 1 }}>
-            <Button disabled={isFirstQuestion} onClick={handlePrevQuestion}>
-              前へ
-            </Button>
-          </Box>
-          <Box sx={{ padding: 1, margin: 1 }}>
-            {isLastQuestion ? (
-              <Button onClick={() => setIsCheckOpen(true)}>終了</Button>
+        <MathJaxContext>
+          <Box
+            sx={{
+              margin: 3,
+              marginTop: 4,
+            }}
+          >
+            {!resultMode ? (
+              <DisplayFormsForSP
+                info={info}
+                questionTree={questionTree}
+                questionId={pages[displayPageIndex]}
+              />
             ) : (
-              <Button onClick={handleNextQuestion}>次へ</Button>
-            )}
-          </Box>
-        </Box>
-        {checkModal}
-      </>
-    );
-  }
-  // それ以外の場合
-  return (
-    <>
-      <Box
-        sx={{
-          width: "100%",
-          overflow: "hidden",
-        }}
-      >
-        <Box
-          sx={{
-            padding: 1,
-            margin: 1,
-          }}
-        >
-          {!resultMode ? (
-            <DisplayForms
-              info={info}
-              questionTree={questionTree}
-              questionId={pages[displayPageIndex]}
-            />
-          ) : (
-            <Box
-              sx={{
-                margin: 3,
-                marginTop: 3,
-                maxWidth: "55rem",
-                marginLeft: "auto",
-                marginRight: "auto",
-                height: "calc(100vh - 180px)",
-                overflowY: "auto",
-              }}
-            >
               <DisplayResult
                 questionTree={questionTree}
                 questionId={pages[displayPageIndex]}
@@ -200,34 +136,103 @@ export function AnswerForms({
                 answers={answers}
                 AiComments={AiComments}
               />
-            </Box>
-          )}
-        </Box>
-        <Box
-          sx={{
-            position: "fixed",
-            display: "flex",
-            justifyContent: "space-between",
-            width: "100%",
-            bottom: 0,
-            backgroundColor: "whitesmoke",
-          }}
-        >
-          <Box sx={{ padding: 1, margin: 1 }}>
-            <Button disabled={isFirstQuestion} onClick={handlePrevQuestion}>
-              前へ
-            </Button>
-          </Box>
-          <Box sx={{ padding: 1, margin: 1 }}>
-            {isLastQuestion ? (
-              <Button onClick={() => setIsCheckOpen(true)}>終了</Button>
-            ) : (
-              <Button onClick={handleNextQuestion}>次へ</Button>
             )}
           </Box>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <Box sx={{ padding: 1, margin: 1 }}>
+              <Button disabled={isFirstQuestion} onClick={handlePrevQuestion}>
+                前へ
+              </Button>
+            </Box>
+            <Box sx={{ padding: 1, margin: 1 }}>
+              {isLastQuestion ? (
+                <Button onClick={() => setIsCheckOpen(true)}>終了</Button>
+              ) : (
+                <Button onClick={handleNextQuestion}>次へ</Button>
+              )}
+            </Box>
+          </Box>
+          {checkModal}
+        </MathJaxContext>
+      </>
+    );
+  }
+  // それ以外の場合
+  return (
+    <>
+      <MathJaxContext>
+        <Box
+          sx={{
+            width: "100%",
+            overflow: "hidden",
+          }}
+        >
+          <Box
+            sx={{
+              padding: 1,
+              margin: 1,
+            }}
+          >
+            {!resultMode ? (
+              <DisplayForms
+                info={info}
+                questionTree={questionTree}
+                questionId={pages[displayPageIndex]}
+              />
+            ) : (
+              <Box
+                sx={{
+                  margin: 3,
+                  marginTop: 3,
+                  maxWidth: "55rem",
+                  marginLeft: "auto",
+                  marginRight: "auto",
+                  height: "calc(100vh - 180px)",
+                  overflowY: "auto",
+                }}
+              >
+                <DisplayResult
+                  questionTree={questionTree}
+                  questionId={pages[displayPageIndex]}
+                  correctIds={correctIds}
+                  questionCount={questionCount}
+                  answers={answers}
+                  AiComments={AiComments}
+                />
+              </Box>
+            )}
+          </Box>
+          <Box
+            sx={{
+              position: "fixed",
+              display: "flex",
+              justifyContent: "space-between",
+              width: "100%",
+              bottom: 0,
+              backgroundColor: "whitesmoke",
+            }}
+          >
+            <Box sx={{ padding: 1, margin: 1 }}>
+              <Button disabled={isFirstQuestion} onClick={handlePrevQuestion}>
+                前へ
+              </Button>
+            </Box>
+            <Box sx={{ padding: 1, margin: 1 }}>
+              {isLastQuestion ? (
+                <Button onClick={() => setIsCheckOpen(true)}>終了</Button>
+              ) : (
+                <Button onClick={handleNextQuestion}>次へ</Button>
+              )}
+            </Box>
+          </Box>
         </Box>
-      </Box>
-      {checkModal}
+        {checkModal}
+      </MathJaxContext>
     </>
   );
 }
