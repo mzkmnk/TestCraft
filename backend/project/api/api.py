@@ -1450,6 +1450,15 @@ def group_join(request,group_id:int,workbook_id:int,user_id:int):
             "problem":{
                 "id":problem.id,
                 "problem_json":problem.problem_json,
+            },
+            "group":{
+                "id":group.id,
+                "test_name":group.test_name,
+                "host__username":group.host.username,
+                "is_public":group.is_public,
+                "start_time":group.start_time,
+                "end_time":group.end_time,
+                "end_time":group.end_time,
             }
         }
         if(group.is_public):

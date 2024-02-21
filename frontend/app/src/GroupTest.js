@@ -26,7 +26,16 @@ export function GroupTest() {
       console.log(data);
       if(data.success){
         console.log("success");
-        console.log(data);
+        //ここでグループの開始時間と終了時間を取得して、現在時刻と比較する。
+        const nowDate = new Date();
+        const startTime = new Date(data.data.group.start_time);
+        const endTime = new Date(data.data.group.end_time);
+        if(nowDate < startTime || nowDate > endTime){
+          navigate('/group_test_all');
+          // navigate('group_test_all',{
+          //   state: { message: "アクセスできません。", severity: "error" },
+          // })
+        }
       }else{
         navigate("/mypage",{
           state: { message: "グループに参加できませんでした。", severity: "error" },
