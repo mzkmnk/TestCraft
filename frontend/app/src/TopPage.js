@@ -36,7 +36,11 @@ function TopPage() {
       <UserHeader />
       <Box className="container">
         <Box className="explanation">
-          <Typography variant="h3">宣伝文句</Typography>
+          <Typography variant="h3">
+            Test Craftsで
+            <br />
+            快適なテスト作成・解答
+          </Typography>
           <Button
             variant="contained"
             fullWidth
