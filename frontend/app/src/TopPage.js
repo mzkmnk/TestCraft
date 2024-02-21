@@ -1,14 +1,11 @@
 import React, { useState } from "react";
-import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import UserHeader from "./UserHeader";
-import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import createImage from "./img/createImage.webp";
 import answerImage from "./img/answerImage.webp";
 import SNSImage from "./img/SNSImage.webp";
-import { useNavigate } from "react-router-dom";
 import "./topPage.css";
 
 function TopPage() {
@@ -30,7 +27,6 @@ function TopPage() {
       setThirdImage(secondImage);
     }
   };
-  const navigate = useNavigate();
   return (
     <>
       <UserHeader />
