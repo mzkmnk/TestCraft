@@ -444,11 +444,11 @@ const Sidebar: React.FC = () => {
                           {post.user?.username[0]}
                         </Avatar>
                       }
-                      action={
-                        <IconButton aria-label="settings">
-                          <MoreVertIcon />
-                        </IconButton>
-                      }
+                      // action={
+                      //   <IconButton aria-label="settings">
+                      //     <MoreVertIcon />
+                      //   </IconButton>
+                      // }
                       title={
                         <Typography
                           variant="h6"
