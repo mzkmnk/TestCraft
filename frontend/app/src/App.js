@@ -22,7 +22,7 @@ import ChangePass from "./change_pass";
 import ChangeProfilePage from "./ChangeProfile.tsx";
 import ProfilePage from "./profile.tsx";
 import Sns from "./Sns.js";
-
+import { PlanTest } from "./PlanTest.js";
 import Error from "./Error.js";
 
 function App() {
@@ -39,9 +39,9 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/questionsAll" element={<QuestionsAll />} />
         <Route path="/editor" element={<Editor />} />
-        <Route path="/email_verification" element={<EmailVerification />}/>
-        <Route path='/change_pass_send' element={<ChangePassSend />}/>
-        <Route path='/change_pass' element={<ChangePass />}/>
+        <Route path="/email_verification" element={<EmailVerification />} />
+        <Route path="/change_pass_send" element={<ChangePassSend />} />
+        <Route path="/change_pass" element={<ChangePass />} />
 
         <Route
           path="/editor/:workbookId"
@@ -61,6 +61,7 @@ function App() {
         <Route path="/solved/:workbookId/:solved_count" element={<Solved />} />
         <Route path="/sns" element={<Sns />} />
         <Route path="/error" element={<Error />} />
+        <Route path="/plan_test" element={<PlanTest />} />
       </Routes>
     </Router>
   );
