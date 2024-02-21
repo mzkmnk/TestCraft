@@ -43,6 +43,8 @@ const APIs = {
   post_comment: `${urlBase}/post_comment`,
   change_icon: `${urlBase}/change_icon`,
   create_group: `${urlBase}/create_group`,
+  group_list: `${urlBase}/group_list`,
+  group_join: (arr) => `${urlBase}/group_join/${arr[0]}/${arr[1]}/${arr[2]}`,
 };
 
 /**

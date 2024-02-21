@@ -21,7 +21,11 @@ import AddIcon from "@mui/icons-material/Add";
 import SendIcon from "@mui/icons-material/Send";
 import GroupIcon from "@mui/icons-material/Group";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import TableViewIcon from '@mui/icons-material/TableView';
+import WorkspacesIcon from '@mui/icons-material/Workspaces';
+
 import { useAPI } from "./hooks/useAPI";
+import { set } from "date-fns";
 
 const UserHeader = ({ position = "static" }) => {
   const navigate = useNavigate();
@@ -33,6 +37,7 @@ const UserHeader = ({ position = "static" }) => {
   const [questionsMenuAnchorEl, setQuestionsMenuAnchorEl] =
     React.useState(null);
   const [companyMenuAnchorEl, setCompanyMenuAnchorEl] = React.useState(null);
+  const [companyGroupMenuAnchorEl, setCompanyGroupMenuAnchorEl] = React.useState(null);
 
   const isCompanyUserAPI = useAPI({
     APIName: "is_company_user",
@@ -96,10 +101,15 @@ const UserHeader = ({ position = "static" }) => {
     setCompanyMenuAnchorEl(event.currentTarget);
   };
 
+  const handleCompanyGroupMenuClick = (event) => {
+    setCompanyGroupMenuAnchorEl(event.currentTarget);
+  };
+
   const handleMenuClose = () => {
     setUserMenuAnchorEl(null);
     setQuestionsMenuAnchorEl(null);
     setCompanyMenuAnchorEl(null);
+    setCompanyGroupMenuAnchorEl(null);
   };
 
   const handleLogout = async () => {
@@ -189,6 +199,45 @@ const UserHeader = ({ position = "static" }) => {
                   ログアウト
                 </MenuItem>
               </Menu>
+              {(isOwnCompanyUser || isCompanyUser) && (
+                <>
+                  <Button
+                    color="inherit"
+                    aria-controls="group-menu-appbar"
+                    aria-haspopup="true"
+                    onClick={handleCompanyGroupMenuClick}
+                    style={{ cursor: "pointer" }}
+                  >
+                    グループ機能
+                  </Button>
+                  <Menu
+                    id="group-menu-appbar"
+                    anchorEl={companyGroupMenuAnchorEl}
+                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                    transformOrigin={{ vertical: "top", horizontal: "right" }}
+                    open={Boolean(companyGroupMenuAnchorEl)}
+                    onClose={handleMenuClose}
+                    TransitionComponent={Fade}
+                  >
+                    <MenuItem
+                      component={Link}
+                      to="/plan_test"
+                      onClick={handleMenuClose}
+                    >
+                      <TableViewIcon style={styles.icon} />
+                      グループテスト作成
+                    </MenuItem>
+                    <MenuItem
+                      component={Link}
+                      to="/group_test_all"
+                      onClick={handleMenuClose}
+                    >
+                      <WorkspacesIcon style={styles.icon} />
+                      グループテスト一覧
+                    </MenuItem>
+                  </Menu>
+                </>
+              )}
               <Button
                 color="inherit"
                 aria-controls="questions-menu-appbar"
