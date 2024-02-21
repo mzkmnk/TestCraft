@@ -216,14 +216,15 @@ class Message(models.Model):
 
 # グループ機能のためのモデル
 class Group(models.Model):
-    group_name = models.CharField(max_length=48)
+    test_name = models.CharField(max_length=48)
+    workbook = models.ForeignKey(Workbook, on_delete=models.CASCADE)
     host = models.ForeignKey(User, on_delete=models.CASCADE, related_name='host')
     is_public = models.BooleanField(default=False)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
 
     def __str__(self):
-        return self.group_name
+        return self.test_name
 
 class GroupMember(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='group')

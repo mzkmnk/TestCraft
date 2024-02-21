@@ -73,7 +73,7 @@ class CustomComment(admin.ModelAdmin):
 admin.site.register(Comment,CustomComment)
 
 class CustomGroup(admin.ModelAdmin):
-    list_display = ('id','group_name','host')
+    list_display = ('id','test_name','host')
     search_fields = ('id',)
 admin.site.register(Group,CustomGroup)
 

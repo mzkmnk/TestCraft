@@ -135,8 +135,8 @@ class DeleteWorkBookSchema(Schema):
     workbookId:int
 
 class CreateGroupSchema(Schema):
-    groupName:str # グループ名
-    hostId:int # グループのホストのID
+    testName:str # グループ名
+    workbookId:int # 問題ID
     isPublic:bool # 公開かどうか
     groupUsers:List[int] # 非公開の場合アクセスできるユーザーIDのリスト
     startTime:Optional[str] # グループの開始時間
@@ -782,6 +782,16 @@ import json
 @api.get("/edit_workbook/{workbookId}")
 def edit_workbook(request,workbookId:int):
     try:
+        access_user = request.user
+        workbook = Workbook.objects.get(id = workbookId)
+        if(access_user != workbook.create_id):
+            return JsonResponse(
+                {
+                    'success':False,
+                    'error':"権限がありません。",
+                },
+                status = 400
+            )
         json_data = Problem.objects.get(workbook_id = workbookId).problem_json
         return JsonResponse(
             {
@@ -1285,7 +1295,8 @@ def ai_score(request,payload:AiScore):
 
 
 #  class CreateGroupSchema(Schema):
-#     groupName:str # グループ名
+#     testName:str # グループ名
+#     workbookId:int # 問題ID
 #     hostId:int # グループのホストのID
 #     isPublic:bool # 公開かどうか
 #     groupUsers:List[int] # 非公開の場合アクセスできるユーザーIDのリスト
@@ -1295,14 +1306,16 @@ def ai_score(request,payload:AiScore):
 @api.post("/create_group")
 def create_group(request,payload:CreateGroupSchema):
     try:
-        group_name : str = payload.groupName
-        host = User.objects.get(id = payload.hostId)
+        test_name : str = payload.testName
+        workbook_id : int = payload.workbookId
+        host = request.user
         is_public : bool = payload.isPublic
         group_users : list[int] = payload.groupUsers
         start_time = payload.startTime
         end_time = payload.endTime
         group = Group.objects.create(
-            group_name = group_name,
+            test_name = test_name,
+            workbook = Workbook.objects.get(id = workbook_id),
             host = host,
             is_public = is_public,
             start_time = start_time,
@@ -1345,8 +1358,6 @@ def group_join(request,group_id:int,workbook_id:int,user_id:int):
         group = Group.objects.get(id = group_id)
         workbook = Workbook.objects.get(id = workbook_id)
         problem = Problem.objects.get(workbook_id = workbook_id)
-        print(workbook)
-        print(problem)
         data = {
             "workbook":{
                 "id":workbook.id,
