@@ -1356,6 +1356,9 @@ def group_join(request,group_id:int,workbook_id:int,user_id:int):
                 status = 400,
             )
         group = Group.objects.get(id = group_id)
+        user = User.objects.get(id = user_id)
+        group_member = GroupMember.objects.filter(group = group, user = user).exists()
+        group = Group.objects.get(id = group_id)
         workbook = Workbook.objects.get(id = workbook_id)
         problem = Problem.objects.get(workbook_id = workbook_id)
         data = {
@@ -1374,6 +1377,11 @@ def group_join(request,group_id:int,workbook_id:int,user_id:int):
             }
         }
         if(group.is_public):
+            if not group_member:
+                GroupMember.objects.create(
+                    group = group,
+                    user = user,
+                )
             return JsonResponse(
                 {
                     "success":True,
@@ -1408,3 +1416,4 @@ def group_join(request,group_id:int,workbook_id:int,user_id:int):
             },
             status = 400,
         )
+
