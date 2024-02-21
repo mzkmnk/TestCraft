@@ -12,7 +12,7 @@ import Loading from "./Loading";
 export default function ReadWorkbook({ nextAppName }) {
   const { workbookId } = useParams();
   const API = useAPI({
-    APIName: "edit_workbook",
+    APIName: "read_workbook",
     params: workbookId,
     loadOnStart: true,
   });

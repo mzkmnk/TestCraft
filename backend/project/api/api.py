@@ -793,6 +793,16 @@ import json
 @api.get("/edit_workbook/{workbookId}")
 def edit_workbook(request,workbookId:int):
     try:
+        access_user = request.user
+        workbook = Workbook.objects.get(id = workbookId)
+        if(access_user != workbook.create_id):
+            return JsonResponse(
+                {
+                    'success':False,
+                    'error':"権限がありません。",
+                },
+                status = 400
+            )
         json_data = Problem.objects.get(workbook_id = workbookId).problem_json
         return JsonResponse(
             {
@@ -811,6 +821,31 @@ def edit_workbook(request,workbookId:int):
             },
             status = 400
         )
+
+#問題解答時の問題取得API
+import json
+@api.get("/read_workbook/{workbookId}")
+def read_workbook(request,workbookId:int):
+    try:
+        json_data = Problem.objects.get(workbook_id = workbookId).problem_json
+        return JsonResponse(
+            {
+                'success': True,
+                'data' : json.loads(json_data),
+                'error' : None,
+            },
+            status = 200
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                'success': False,
+                'data' : None,
+                'error' : str(e),
+            },
+            status = 400
+        )
+
 
 #like機能
 @api.post("/questionsall/{workbookId}/like")

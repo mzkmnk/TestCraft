@@ -15,6 +15,7 @@ const APIs = {
   get_graph_data: `${urlBase}/get_graph_data`,
   save_data: `${urlBase}/save_data`,
   edit_workbook: (workbookId) => `${urlBase}/edit_workbook/${workbookId}`,
+  read_workbook: (workbookId) => `${urlBase}/read_workbook/${workbookId}`,
   questionsall_like: (workbookId) =>
     `${urlBase}/questionsall/${workbookId}/like`,
   save_answer: `${urlBase}/save_answer`,
