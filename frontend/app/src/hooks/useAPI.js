@@ -34,6 +34,7 @@ const APIs = {
   profile: (userId) => `${urlBase}/profile/${userId}`,
   follow: `${urlBase}/follow`,
   delete_workbook: `${urlBase}/delete_workbook`,
+  create_group: `${urlBase}/create_group`,
 };
 
 /**
