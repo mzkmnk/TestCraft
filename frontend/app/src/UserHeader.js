@@ -21,6 +21,9 @@ import AddIcon from "@mui/icons-material/Add";
 import SendIcon from "@mui/icons-material/Send";
 import GroupIcon from "@mui/icons-material/Group";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import TableViewIcon from '@mui/icons-material/TableView';
+import WorkspacesIcon from '@mui/icons-material/Workspaces';
+
 import { useAPI } from "./hooks/useAPI";
 
 const UserHeader = ({ position = "static" }) => {
@@ -277,6 +280,22 @@ const UserHeader = ({ position = "static" }) => {
                     >
                       <SendIcon style={styles.icon} />
                       お知らせ送信
+                    </MenuItem>
+                    <MenuItem
+                      component={Link}
+                      to="/plan_test"
+                      onClick={handleMenuClose}
+                    >
+                      <TableViewIcon style={styles.icon} />
+                      グループテスト作成
+                    </MenuItem>
+                    <MenuItem
+                      component={Link}
+                      to="/group_test_all"
+                      onClick={handleMenuClose}
+                    >
+                      <WorkspacesIcon style={styles.icon} />
+                      グループテスト一覧
                     </MenuItem>
                   </Menu>
                 </>

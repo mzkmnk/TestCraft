@@ -23,6 +23,7 @@ import ChangeProfilePage from "./ChangeProfile.tsx";
 import ProfilePage from "./profile.tsx";
 import Sns from "./Sns.js";
 import { PlanTest } from "./PlanTest.js";
+import { GroupTestALL } from "./GroupTestAll.js";
 import Error from "./Error.js";
 
 function App() {
@@ -62,6 +63,7 @@ function App() {
         <Route path="/sns" element={<Sns />} />
         <Route path="/error" element={<Error />} />
         <Route path="/plan_test" element={<PlanTest />} />
+        <Route path="/group_test_all" element={<GroupTestALL />} />
       </Routes>
     </Router>
   );
