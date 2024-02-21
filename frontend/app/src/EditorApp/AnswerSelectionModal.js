@@ -9,6 +9,8 @@ import RadioGroup from "@mui/material/RadioGroup";
 import { format } from "./SwitchableTextField";
 import FormGroup from "@mui/material/FormGroup";
 import Checkbox from "@mui/material/Checkbox";
+import IconButton from "@mui/material/IconButton";
+import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
 
 const style = {
   position: "absolute",
@@ -75,7 +77,13 @@ export function AnswerSelectionModal({
         <Typography align="center" variant="h3" fontSize={"1.5rem"}>
           解答を選択
         </Typography>
-        <Box sx={{ margin: 1 }}>
+        <IconButton
+          sx={{ position: "absolute", top: 0, right: 0 }}
+          onClick={() => setOpen(false)}
+        >
+          <ClearOutlinedIcon />
+        </IconButton>
+        <Box sx={{ margin: 1.5 }}>
           {canMultiple ? (
             <FormGroup>
               {options.map((option) => (
@@ -83,7 +91,7 @@ export function AnswerSelectionModal({
                   key={option.id}
                   value={option.value}
                   control={<Checkbox />}
-                  label={format(option.value)}
+                  label={option.value === "" ? "未記入" : format(option.value)}
                   checked={
                     CheckboxState[option.value] !== undefined &&
                     CheckboxState[option.value]
@@ -103,7 +111,7 @@ export function AnswerSelectionModal({
                   key={option.id}
                   value={option.value}
                   control={<Radio />}
-                  label={format(option.value)}
+                  label={option.value === "" ? "未記入" : format(option.value)}
                 />
               ))}
             </RadioGroup>

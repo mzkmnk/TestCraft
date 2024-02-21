@@ -62,7 +62,6 @@ export function DisplayWorkbookList({ workbooks, setWorkbooks }) {
           <div className="questionsContainer">
             {currentQuestions.map((question, index) => (
               <div className="question" key={index}>
-                {console.log(question)}
                 <Link
                   to={`/solve/${question.id}`}
                   style={{ position: "absolute", inset: 0 }}
