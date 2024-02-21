@@ -234,4 +234,4 @@ class GroupMember(models.Model):
         unique_together = (('group', 'user'),)
 
     def __str__(self):
-        return f"{self.group.group_name} - {self.user.username}"
+        return f"{self.group.test_name} - {self.user.username}"
