@@ -192,8 +192,6 @@ function FormatInputField({
       </Box>
     );
   } else if (question.questionType === "textarea") {
-    console.log("questionId", questionId);
-    console.log("answers[questionId]", answers[questionId]);
     return (
       <Box marginBottom={marginBottom}>
         {isNested ? (
