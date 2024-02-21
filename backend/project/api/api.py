@@ -1344,7 +1344,7 @@ def create_group(request,payload:CreateGroupSchema):
         )
 
 #グループ参加時のAPI
-@api.post("/group_join/{group_id}/{workbook_id}/{user_id}")
+@api.get("/group_join/{group_id}/{workbook_id}/{user_id}")
 def group_join(request,group_id:int,workbook_id:int,user_id:int):
     try:
         if(request.user.id != user_id):
@@ -1417,3 +1417,26 @@ def group_join(request,group_id:int,workbook_id:int,user_id:int):
             status = 400,
         )
 
+# #グループ終了時の参加者の解答を返すAPI
+# @api.get("/group_result/{group_id}/{workbook_id}")
+# def group_result(request,group_id:int,workbook_id:int):
+#     try:
+#         group = Group.objects.get(id = group_id)
+#         workbook = Workbook.objects.get(id = workbook_id)
+#         return JsonResponse(
+#             {
+#                 "success":True,
+#                 # "data":data,
+#                 "error":None,
+#             },
+#             status = 200,
+#         )
+#     except Exception as e:
+#         return JsonResponse(
+#             {
+#                 "success":False,
+#                 "data":None,
+#                 "error":str(e),
+#             },
+#             status = 400,
+#         )
