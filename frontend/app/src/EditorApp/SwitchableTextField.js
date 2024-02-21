@@ -62,8 +62,9 @@ function InsertCode(text) {
 }
 */
 
+const createId = () => (Math.random() * Math.random()).toString(16);
 function parse(text) {
-  let returnJSX = <></>;
+  let returnJSX = [];
   let nextStart = 0;
   for (let i = 0; i < text.length; i++) {
     if (text[i] === "`") {
@@ -74,15 +75,17 @@ function parse(text) {
         if (codeEnd !== -1) {
           const languageEnd = text.indexOf("\n", i + 3);
           const language = text.slice(i + 3, languageEnd + 1);
-          console.log(language);
-          returnJSX = (
-            <>
-              {returnJSX}
-              <Paragraph>{text.slice(nextStart, i)}</Paragraph>
-              <SyntaxHighlighter language={language} style={hlStyle}>
-                {text.slice(i + 3 + language.length, codeEnd)}
-              </SyntaxHighlighter>
-            </>
+          returnJSX.push(
+            <Paragraph key={createId()}>{text.slice(nextStart, i)}</Paragraph>
+          );
+          returnJSX.push(
+            <SyntaxHighlighter
+              language={language}
+              style={hlStyle}
+              key={createId()}
+            >
+              {text.slice(i + 3 + language.length, codeEnd)}
+            </SyntaxHighlighter>
           );
           // 閉じタグの後ろまで飛ばす。末尾が改行なら、それも飛ばす。
           nextStart = text[codeEnd + 3] === "\n" ? codeEnd + 4 : codeEnd + 3;
@@ -94,12 +97,11 @@ function parse(text) {
         //インラインコードならば\
         let codeEnd = text.indexOf("`", i + 1);
         if (codeEnd !== -1) {
-          returnJSX = (
-            <>
-              {returnJSX}
-              <Paragraph>{text.slice(nextStart, i)}</Paragraph>
-              <code>{text.slice(i + 1, codeEnd)}</code>
-            </>
+          returnJSX.push(
+            <Paragraph key={createId()}>{text.slice(nextStart, i)}</Paragraph>
+          );
+          returnJSX.push(
+            <code key={createId()}>{text.slice(i + 1, codeEnd)}</code>
           );
           nextStart = codeEnd + 1;
           i = codeEnd;
@@ -108,26 +110,26 @@ function parse(text) {
     } else if (text[i] === "$") {
       if (text.slice(i, i + 2) === "$$") {
         let mathEnd = text.indexOf("$$", i + 2);
+        console.log("math", text.slice(i + 2, mathEnd));
         if (mathEnd !== -1) {
-          returnJSX = (
-            <>
-              {returnJSX}
-              <Paragraph>{text.slice(nextStart, i)}</Paragraph>
-              <MathJax>\({text.slice(i + 2, mathEnd)}\)</MathJax>
-            </>
+          returnJSX.push(
+            <Paragraph key={createId()}>{text.slice(nextStart, i)}</Paragraph>
+          );
+          returnJSX.push(
+            <MathJax key={createId()}>\({text.slice(i + 2, mathEnd)}\)</MathJax>
           );
           nextStart = test[mathEnd + 2] === "\n" ? mathEnd + 3 : mathEnd + 2;
           i = test[mathEnd + 2] === "\n" ? mathEnd + 2 : mathEnd + 1;
         }
       } else {
         let mathEnd = text.indexOf("$", i + 1);
+        console.log("math", text.slice(i + 1, mathEnd));
         if (mathEnd !== -1) {
-          returnJSX = (
-            <>
-              {returnJSX}
-              <Paragraph>{text.slice(nextStart, i)}</Paragraph>
-              <MathJax inline={true}>\({text.slice(i + 1, mathEnd)}\)</MathJax>
-            </>
+          returnJSX.push(
+            <Paragraph key={createId()}>{text.slice(nextStart, i)}</Paragraph>
+          );
+          returnJSX.push(
+            <MathJax key={createId()}>\({text.slice(i + 1, mathEnd)}\)</MathJax>
           );
           nextStart = mathEnd + 1;
           i = mathEnd;
@@ -136,18 +138,14 @@ function parse(text) {
     }
   }
   if (text.slice(nextStart) !== "") {
-    returnJSX = (
-      <>
-        {returnJSX}
-        <Paragraph>{text.slice(nextStart)}</Paragraph>
-      </>
+    returnJSX.push(
+      <Paragraph key={createId()}>{text.slice(nextStart)}</Paragraph>
     );
   }
-  return returnJSX;
+  return <>{returnJSX}</>;
 }
 export function format(text) {
-  let returnJSX = parse(text);
-  return returnJSX;
+  return parse(text);
 }
 
 // クリックでフィールドを有効、無効にできるテキストフィールド
