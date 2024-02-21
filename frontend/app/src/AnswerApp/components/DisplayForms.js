@@ -56,7 +56,9 @@ export function DisplayForms({ info = {}, questionTree, questionId }) {
       "\n\n" +
       question.childIds
         .map((childId, index) => {
-          return `問題${index + 1}\n` + questionTree[childId].question + "";
+          return questionTree[childId].question !== ""
+            ? `問題${index + 1}\n` + questionTree[childId].question + ""
+            : "";
         })
         .join("\n\n");
 
