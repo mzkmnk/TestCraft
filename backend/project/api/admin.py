@@ -72,6 +72,17 @@ class CustomComment(admin.ModelAdmin):
     search_fields = ('id',)
 admin.site.register(Comment,CustomComment)
 
+class CustomGroup(admin.ModelAdmin):
+    list_display = ('id','test_name','host')
+    search_fields = ('id',)
+admin.site.register(Group,CustomGroup)
+
+class CustomGroupMember(admin.ModelAdmin):
+    list_display = ('group_id','group','user')
+    search_fields = ('id',)
+admin.site.register(GroupMember,CustomGroupMember)
+admin.site.register(Comment,CustomComment)
+
 class CustomPostLike(admin.ModelAdmin):
     list_display = ('user','post')
     search_fields = ('id',)

@@ -144,6 +144,14 @@ class PostCommentSchema(Schema):
 class DeleteWorkBookSchema(Schema):
     workbookId:int
 
+class CreateGroupSchema(Schema):
+    testName:str # グループ名
+    workbookId:int # 問題ID
+    isPublic:bool # 公開かどうか
+    groupUsers:List[int] # 非公開の場合アクセスできるユーザーIDのリスト
+    startTime:Optional[str] # グループの開始時間
+    endTime:Optional[str] # グループの終了時間
+    
 # API
     
 #ログイン中のユーザー情報を取得するAPI
@@ -832,6 +840,16 @@ import json
 @api.get("/edit_workbook/{workbookId}")
 def edit_workbook(request,workbookId:int):
     try:
+        access_user = request.user
+        workbook = Workbook.objects.get(id = workbookId)
+        if(access_user != workbook.create_id):
+            return JsonResponse(
+                {
+                    'success':False,
+                    'error':"権限がありません。",
+                },
+                status = 400
+            )
         json_data = Problem.objects.get(workbook_id = workbookId).problem_json
         return JsonResponse(
             {
@@ -1366,6 +1384,132 @@ def ai_score(request,payload:AiScore):
             },
             status = 400,
         )
+
+
+#  class CreateGroupSchema(Schema):
+#     testName:str # グループ名
+#     workbookId:int # 問題ID
+#     hostId:int # グループのホストのID
+#     isPublic:bool # 公開かどうか
+#     groupUsers:List[int] # 非公開の場合アクセスできるユーザーIDのリスト
+#     startTime:Optional[str] # グループの開始時間
+#     endTime:Optional[str] # グループの終了時間  
+ 
+@api.post("/create_group")
+def create_group(request,payload:CreateGroupSchema):
+    try:
+        test_name : str = payload.testName
+        workbook_id : int = payload.workbookId
+        host = request.user
+        is_public : bool = payload.isPublic
+        group_users : list[int] = payload.groupUsers
+        start_time = payload.startTime
+        end_time = payload.endTime
+        group = Group.objects.create(
+            test_name = test_name,
+            workbook = Workbook.objects.get(id = workbook_id),
+            host = host,
+            is_public = is_public,
+            start_time = start_time,
+            end_time = end_time,
+        )
+        if not is_public:
+            for user_id in group_users:
+                group_user = GroupMember.objects.create(
+                    group = group,
+                    user = User.objects.get(id = user_id),
+                )
+        return JsonResponse(
+            {
+                "success":True,
+                "error":None,
+            },
+            status = 200,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "error":str(e),
+            },
+            status = 400,            
+        )
+
+#グループ参加時のAPI
+@api.get("/group_join/{group_id}/{workbook_id}/{user_id}")
+def group_join(request,group_id:int,workbook_id:int,user_id:int):
+    try:
+        if(request.user.id != user_id):
+            return JsonResponse(
+                {
+                    "success":False,
+                    "error":"ユーザーが一致しません。",
+                },
+                status = 400,
+            )
+        group = Group.objects.get(id = group_id)
+        user = User.objects.get(id = user_id)
+        group_member = GroupMember.objects.filter(group = group, user = user).exists()
+        group = Group.objects.get(id = group_id)
+        workbook = Workbook.objects.get(id = workbook_id)
+        problem = Problem.objects.get(workbook_id = workbook_id)
+        data = {
+            "workbook":{
+                "id":workbook.id,
+                "workbook_name":workbook.workbook_name,
+                "description":workbook.description,
+                "create_id__username":workbook.create_id.username,
+                "created_at":workbook.created_at,
+                "updated_at":workbook.updated_at,
+                "like_count":workbook.like_count,
+            },
+            "problem":{
+                "id":problem.id,
+                "problem_json":problem.problem_json,
+            }
+        }
+        if(group.is_public):
+            if not group_member:
+                GroupMember.objects.create(
+                    group = group,
+                    user = user,
+                )
+            return JsonResponse(
+                {
+                    "success":True,
+                    "data":data,
+                    "error":None,
+                },
+                status = 200,
+            )
+        else:
+            if(GroupMember.objects.filter(group = group, user = User.objects.get(id=user_id)).exists()):
+                return JsonResponse(
+                    {
+                        "success":True,
+                        "data":data,
+                        "error":None,
+                    },
+                    status = 200,
+                )
+            else:
+                return JsonResponse(
+                    {
+                        "success":False,
+                        "error":"グループに参加できません。",
+                    },
+                    status = 400,
+                )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success":False,
+                "error":str(e),
+            },
+            status = 400,
+        )
+
+
 
 #投稿内容を10件取得するAPI
 #これ使わないかも、というか多分使わないappsyncのクエリでやると思う

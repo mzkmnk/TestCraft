@@ -41,6 +41,7 @@ const APIs = {
   get_post_detail: (postId) => `${urlBase}/get_post_detail/${postId}`,
   post_comment: `${urlBase}/post_comment`,
   change_icon: `${urlBase}/change_icon`,
+  create_group: `${urlBase}/create_group`,
 };
 
 /**

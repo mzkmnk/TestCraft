@@ -21,14 +21,17 @@ function Paragraph({ children }) {
 }
 
 function InsertMathJax(text, JSX) {
+  console.log("InsertMathJax");
   const re = /\(.+?\)/;
   if (text.match(re)) {
+    console.log("InsertMathJax/match!");
     return (
       <MathJaxContext>
         <MathJax>{JSX}</MathJax>
       </MathJaxContext>
     );
   } else {
+    console.log("InsertMathJax/Not match!");
     return <>{JSX}</>;
   }
 }
@@ -65,6 +68,7 @@ function InsertCode(text) {
 }
 
 export function format(text) {
+  console.log("format");
   let returnJSX = InsertCode(text);
   returnJSX = InsertMathJax(text, returnJSX);
   return returnJSX;

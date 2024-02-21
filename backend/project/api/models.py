@@ -214,3 +214,25 @@ class Message(models.Model):
 
     class Meta:
         ordering = ('timestamp',)
+
+# グループ機能のためのモデル
+class Group(models.Model):
+    test_name = models.CharField(max_length=48)
+    workbook = models.ForeignKey(Workbook, on_delete=models.CASCADE)
+    host = models.ForeignKey(User, on_delete=models.CASCADE, related_name='host')
+    is_public = models.BooleanField(default=False)
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+
+    def __str__(self):
+        return self.test_name
+
+class GroupMember(models.Model):
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='group')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='member')
+
+    class Meta:
+        unique_together = (('group', 'user'),)
+
+    def __str__(self):
+        return f"{self.group.test_name} - {self.user.username}"

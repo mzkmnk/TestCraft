@@ -252,7 +252,7 @@ export default function EditorApp({ workBook }) {
     workBook = editingWorkbook;
   } else if (!workBook) {
     workBook = {
-      info: { title: "新規ドキュメント" },
+      info: { title: "" },
       questions: {
         [createId()]: {
           questionType: "root",
@@ -311,7 +311,7 @@ export default function EditorApp({ workBook }) {
     if (workbookId === undefined && localWorkbookId !== null) {
       workBook = {
         info: {
-          title: title,
+          title: title === "" ? "タイトルなし" : title,
           workbook_id: localWorkbookId,
         },
         questions: questionTree,
@@ -320,7 +320,7 @@ export default function EditorApp({ workBook }) {
     } else if (workbookId === undefined) {
       workBook = {
         info: {
-          title: title,
+          title: title === "" ? "タイトルなし" : title,
         },
         questions: questionTree,
         isEdit: isEdit,
@@ -328,7 +328,7 @@ export default function EditorApp({ workBook }) {
     } else {
       workBook = {
         info: {
-          title: title,
+          title: title === "" ? "タイトルなし" : title,
           workbook_id: workbookId,
         },
         questions: questionTree,
@@ -348,7 +348,7 @@ export default function EditorApp({ workBook }) {
     if (workbookId === undefined && localWorkbookId !== null) {
       workBook = {
         info: {
-          title: title,
+          title: title === "" ? "タイトルなし" : title,
           workbook_id: localWorkbookId,
         },
         questions: questionTree,
@@ -357,7 +357,7 @@ export default function EditorApp({ workBook }) {
     } else if (workbookId === undefined) {
       workBook = {
         info: {
-          title: title,
+          title: title === "" ? "タイトルなし" : title,
         },
         questions: questionTree,
         isEdit: isEdit,
@@ -365,7 +365,7 @@ export default function EditorApp({ workBook }) {
     } else {
       workBook = {
         info: {
-          title: title,
+          title: title === "" ? "タイトルなし" : title,
           workbook_id: workbookId,
         },
         questions: questionTree,
