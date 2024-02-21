@@ -95,14 +95,14 @@ export function PlanTest() {
       return;
     }
 
-    const body = {
+    const body = JSON.stringify({
       testName,
       workbookId,
       isPublic,
       groupUsers: isPublic ? [] : selectedUserIds,
       startTime: toISOStringWithTimezone(startTimeDate),
       endTime: toISOStringWithTimezone(endTimeDate),
-    };
+    });
     console.log(body);
     create_groupAPI.sendAPI({ body });
   };

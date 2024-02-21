@@ -1305,7 +1305,6 @@ def ai_score(request,payload:AiScore):
  
 @api.post("/create_group")
 def create_group(request,payload:CreateGroupSchema):
-    print("create_group")
     try:
         test_name : str = payload.testName
         workbook_id : int = payload.workbookId
@@ -1336,8 +1335,6 @@ def create_group(request,payload:CreateGroupSchema):
             status = 200,
         )
     except Exception as e:
-        print("error:" + e)
-        print("why")
         return JsonResponse(
             {
                 "success":False,
