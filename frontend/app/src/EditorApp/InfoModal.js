@@ -88,12 +88,13 @@ export function InfoModal({ open, setOpen }) {
             <ListItem>
               <ListItemText>
                 <strong>バッククォート三つ（```）</strong>
-                で囲むことによるコードブロック
+                で囲むことによる<strong>コードブロック</strong>
               </ListItemText>
             </ListItem>
             <ListItem>
               <ListItemText>
-                <strong>\(TeX記法\)</strong>を用いた<strong>数式</strong>
+                <strong>$$</strong>または<strong>$</strong>で囲むことによる
+                <strong>数式</strong>
               </ListItemText>
             </ListItem>
           </List>
