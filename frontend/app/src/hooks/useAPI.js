@@ -35,6 +35,8 @@ const APIs = {
   follow: `${urlBase}/follow`,
   delete_workbook: `${urlBase}/delete_workbook`,
   create_group: `${urlBase}/create_group`,
+  group_list: `${urlBase}/group_list`,
+  group_join: (arr) => `${urlBase}/group_join/${arr[0]}/${arr[1]}/${arr[2]}`,
 };
 
 /**
