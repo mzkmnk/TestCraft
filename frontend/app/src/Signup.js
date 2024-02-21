@@ -310,7 +310,7 @@ function Signup() {
                 }
                 label="企業の代表の方"
               />
-              <FormControlLabel
+              {/* <FormControlLabel
                 control={
                   <Checkbox
                     checked={is_company_user}
@@ -324,7 +324,7 @@ function Signup() {
                   />
                 }
                 label="企業のメンバーの方"
-              />
+              /> */}
               <Button
                 type="submit"
                 fullWidth
