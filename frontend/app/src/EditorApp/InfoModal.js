@@ -67,7 +67,8 @@ export function InfoModal({ open, setOpen }) {
         <ListItem>
           <ListItemText>
             <strong>記述式</strong>
-            では、完全一致またはAIによる採点が可能です。
+            では、完全一致またはAIによる採点が可能です。 <strong>AI採点</strong>
+            では、問題文と模範解答を元に採点を行います。
           </ListItemText>
         </ListItem>
       </List>

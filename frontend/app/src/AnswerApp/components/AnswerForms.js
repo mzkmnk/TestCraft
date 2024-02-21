@@ -6,6 +6,7 @@ import { DisplayFormsForSP } from "./DisplayFormsForSP";
 
 import { useQuestions } from "../context/QuestionsContext";
 import { DisplayResult } from "./DisplayResult";
+import Modal from "@mui/material/Modal";
 
 export function AnswerForms({
   exitFunc,
@@ -35,6 +36,7 @@ export function AnswerForms({
   const [displayPageIndex, setDisplayPageIndex] = useState(0);
   const [isFirstQuestion, setIsFirstQuestion] = useState(true);
   const [isLastQuestion, setIsLastQuestion] = useState(false);
+  const [isCheckOpen, setIsCheckOpen] = useState(false);
 
   // 問題遷移
   const handlePrevQuestion = () => {
@@ -67,6 +69,45 @@ export function AnswerForms({
       setIsLastQuestion(true);
     }
   };
+  const checkModal = (
+    <Modal
+      open={isCheckOpen}
+      onClose={() => setIsCheckOpen(false)}
+      aria-labelledby="modal-modal-title"
+      aria-describedby="modal-modal-description"
+    >
+      <Box
+        sx={{
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          backgroundColor: "white",
+          border: "2px solid #4d4d4d",
+          borderRadius: 2,
+          boxShadow: 24,
+          p: 4,
+          width: "20rem",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <p style={{ fontSize: "1.5rem" }}>解答を終了しますか？</p>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginTop: 2,
+            width: "100%",
+          }}
+        >
+          <Button onClick={() => setIsCheckOpen(false)}>キャンセル</Button>
+          <Button onClick={exitFunc}>終了</Button>
+        </Box>
+      </Box>
+    </Modal>
+  );
 
   // スマホの場合
   if (document.documentElement.clientWidth < 700) {
@@ -108,16 +149,17 @@ export function AnswerForms({
           </Box>
           <Box sx={{ padding: 1, margin: 1 }}>
             {isLastQuestion ? (
-              <Button onClick={exitFunc}>終了</Button>
+              <Button onClick={() => setIsCheckOpen(true)}>終了</Button>
             ) : (
               <Button onClick={handleNextQuestion}>次へ</Button>
             )}
           </Box>
         </Box>
+        {checkModal}
       </>
     );
   }
-
+  // それ以外の場合
   return (
     <>
       <Box
@@ -178,13 +220,14 @@ export function AnswerForms({
           </Box>
           <Box sx={{ padding: 1, margin: 1 }}>
             {isLastQuestion ? (
-              <Button onClick={exitFunc}>終了</Button>
+              <Button onClick={() => setIsCheckOpen(true)}>終了</Button>
             ) : (
               <Button onClick={handleNextQuestion}>次へ</Button>
             )}
           </Box>
         </Box>
       </Box>
+      {checkModal}
     </>
   );
 }

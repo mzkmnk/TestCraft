@@ -10,11 +10,6 @@ import { InfoHeader } from "./components/InfoHeader";
 import { AnswerSettingsProvider } from "./context/AnswerSettingsContext";
 import Box from "@mui/material/Box";
 
-const defaultAnswerSettings = {
-  /**単位は秒 */
-  time: 300,
-};
-
 /**
  * 問題を解くアプリ。画面の切り替えとタイマーの管理の役割を持つ。
  * タイマーの描画は、InputAnswersで行う。
@@ -32,20 +27,20 @@ export default function AnswersApp({ workbook }) {
   const [isSettingsOpen, setIsSettingsOpen] = useState(true);
   const [isInputOpen, setIsInputOpen] = useState(false);
   const [isResultOpen, setIsResultOpen] = useState(false);
-  const [isTimerActive, setIsTimerActive] = useState(false);
+  const [isTimerStart, setIsTimerStart] = useState(false);
   const navigate = useNavigate();
 
   const startInputAnswers = () => {
     setIsSettingsOpen(false);
     setIsResultOpen(false);
     setIsInputOpen(true);
-    setIsTimerActive(true);
+    setIsTimerStart(true);
   };
 
   const finishInputAnswers = () => {
     setIsInputOpen(false);
     setIsResultOpen(true);
-    setIsTimerActive(false);
+    setIsTimerStart(false);
   };
 
   return (
@@ -58,7 +53,7 @@ export default function AnswersApp({ workbook }) {
           <QuestionsProvider workbook={workbook}>
             <AnswersProvider>
               <InfoHeader
-                isTimerActive={isTimerActive}
+                isTimerStart={isTimerStart}
                 TimerFinishedFunc={finishInputAnswers}
               />
 
