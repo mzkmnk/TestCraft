@@ -24,6 +24,7 @@ import { format } from "./SwitchableTextField";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import IconButton from "@mui/material/IconButton";
 import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
+import { MathJaxContext } from "better-react-mathjax";
 
 const theme = createTheme({
   palette: {
@@ -812,103 +813,109 @@ export default function EditorApp({ workBook }) {
     <>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <EditorHeader
-          saveFunc={updateDataInDB}
-          saveAPI={saveAPIForUpdate}
-          isLatest={isLatest}
-          setIsLatest={setIsLatest}
-          exitFunc={save}
-          isEdit={isEdit}
-          handleIsEdit={handleIsEdit}
-        />
-        <Snackbar
-          open={isMessageOpen}
-          autoHideDuration={6000}
-          onClose={handleClose}
-          anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        >
-          <Alert
-            severity={isSuccess ? "success" : "error"}
-            variant="filled"
-            sx={{ width: "100%" }}
+        <MathJaxContext>
+          <EditorHeader
+            saveFunc={updateDataInDB}
+            saveAPI={saveAPIForUpdate}
+            isLatest={isLatest}
+            setIsLatest={setIsLatest}
+            exitFunc={save}
+            isEdit={isEdit}
+            handleIsEdit={handleIsEdit}
+          />
+          <Snackbar
+            open={isMessageOpen}
+            autoHideDuration={6000}
+            onClose={handleClose}
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
           >
-            {message}
-          </Alert>
-        </Snackbar>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            flexDirection: "column",
-            margin: "auto",
-            maxWidth: "60rem",
-          }}
-        >
-          <Paper
-            elevation={4}
+            <Alert
+              severity={isSuccess ? "success" : "error"}
+              variant="filled"
+              sx={{ width: "100%" }}
+            >
+              {message}
+            </Alert>
+          </Snackbar>
+          <Box
             sx={{
-              margin: 2,
-              marginTop: 3,
-              padding: 2,
-
-              borderTop: 12,
-              borderColor: "secondary.main",
+              display: "flex",
+              justifyContent: "center",
+              flexDirection: "column",
+              margin: "auto",
+              maxWidth: "60rem",
             }}
           >
-            <>
-              <TextField
-                variant="standard"
-                label="タイトル"
-                value={title}
-                onChange={(e) => {
-                  setIsLatest(false);
-                  setTitle(e.target.value);
-                }}
-                margin="normal"
-                InputProps={{ style: { fontSize: "2rem" } }}
-              />
-              <FormGroup>
-                <FormControlLabel
-                  control={<Switch checked={!isEdit} onChange={handleIsEdit} />}
-                  label="編集を終了"
-                />
-              </FormGroup>
-            </>
-          </Paper>
-
-          {questionIds.map((questionId, index) => (
             <Paper
-              key={questionId + index}
               elevation={4}
               sx={{
                 margin: 2,
+                marginTop: 3,
                 padding: 2,
-                borderLeft: 8,
+
+                borderTop: 12,
                 borderColor: "secondary.main",
               }}
             >
-              <QuestionEditor
-                key={questionId}
-                questionId={questionId}
-                questionNumber={[index + 1]}
-                questionTree={questionTree}
-                handleAddNewOption={handleAddNewOption}
-                handleAddNewAnswer={handleAddNewAnswer}
-                handleReplaceAnswers={handleReplaceAnswers}
-                handleAddNewQuestion={handleAddNewQuestion}
-                handleRemoveOption={handleRemoveOption}
-                handleRemoveAnswer={handleRemoveAnswer}
-                handleRemoveQuestion={handleRemoveQuestion}
-                handleChangeText={handleChangeText}
-                handleSelectQuestionType={handleSelectQuestionType}
-                handleChangeBool={handleChangeBool}
-              />
+              <>
+                <TextField
+                  variant="standard"
+                  label="タイトル"
+                  value={title}
+                  onChange={(e) => {
+                    setIsLatest(false);
+                    setTitle(e.target.value);
+                  }}
+                  margin="normal"
+                  InputProps={{ style: { fontSize: "2rem" } }}
+                />
+                <FormGroup>
+                  <FormControlLabel
+                    control={
+                      <Switch checked={!isEdit} onChange={handleIsEdit} />
+                    }
+                    label="編集を終了"
+                  />
+                </FormGroup>
+              </>
             </Paper>
-          ))}
 
-          <Button onClick={() => handleAddNewQuestion(rootId)}>新規問題</Button>
-          <Button onClick={() => save()}>保存して終了</Button>
-        </Box>
+            {questionIds.map((questionId, index) => (
+              <Paper
+                key={questionId + index}
+                elevation={4}
+                sx={{
+                  margin: 2,
+                  padding: 2,
+                  borderLeft: 8,
+                  borderColor: "secondary.main",
+                }}
+              >
+                <QuestionEditor
+                  key={questionId}
+                  questionId={questionId}
+                  questionNumber={[index + 1]}
+                  questionTree={questionTree}
+                  handleAddNewOption={handleAddNewOption}
+                  handleAddNewAnswer={handleAddNewAnswer}
+                  handleReplaceAnswers={handleReplaceAnswers}
+                  handleAddNewQuestion={handleAddNewQuestion}
+                  handleRemoveOption={handleRemoveOption}
+                  handleRemoveAnswer={handleRemoveAnswer}
+                  handleRemoveQuestion={handleRemoveQuestion}
+                  handleChangeText={handleChangeText}
+                  handleSelectQuestionType={handleSelectQuestionType}
+                  handleChangeBool={handleChangeBool}
+                />
+              </Paper>
+            ))}
+
+            <Button onClick={() => handleAddNewQuestion(rootId)}>
+              新規問題
+            </Button>
+            <Button onClick={() => save()}>保存して終了</Button>
+          </Box>
+        </MathJaxContext>
       </ThemeProvider>
     </>
   );
