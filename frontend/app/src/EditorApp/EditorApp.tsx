@@ -915,7 +915,6 @@ export default function EditorApp({ workBook }) {
             <Button onClick={() => handleAddNewQuestion(rootId)}>
               新規問題
             </Button>
-            <Button onClick={() => save()}>保存して終了</Button>
           </Box>
         </MathJaxContext>
       </ThemeProvider>
