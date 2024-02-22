@@ -841,16 +841,16 @@ import json
 @api.get("/edit_workbook/{workbookId}")
 def edit_workbook(request,workbookId:int):
     try:
-        access_user = request.user
-        workbook = Workbook.objects.get(id = workbookId)
-        if(access_user != workbook.create_id):
-            return JsonResponse(
-                {
-                    'success':False,
-                    'error':"権限がありません。",
-                },
-                status = 400
-            )
+        # access_user = request.user
+        # workbook = Workbook.objects.get(id = workbookId)
+        # if(access_user != workbook.create_id):
+        #     return JsonResponse(
+        #         {
+        #             'success':False,
+        #             'error':"権限がありません。",
+        #         },
+        #         status = 400
+        #     )
         json_data = Problem.objects.get(workbook_id = workbookId).problem_json
         return JsonResponse(
             {
