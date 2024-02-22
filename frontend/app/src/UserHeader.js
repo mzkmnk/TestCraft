@@ -199,7 +199,7 @@ const UserHeader = ({ position = "static" }) => {
                   ログアウト
                 </MenuItem>
               </Menu>
-              {(isOwnCompanyUser || isCompanyUser) && (
+              {/* {(isOwnCompanyUser || isCompanyUser) && (
                 <>
                   <Button
                     color="inherit"
@@ -237,7 +237,7 @@ const UserHeader = ({ position = "static" }) => {
                     </MenuItem>
                   </Menu>
                 </>
-              )}
+              )} */}
               <Button
                 color="inherit"
                 aria-controls="questions-menu-appbar"
